@@ -408,7 +408,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     private val backupManager by lazy { com.example.service.OfflineBackupManager(getApplication()) }
 
     suspend fun exportEncryptedBackup(passphrase: String): String {
-        return backupManager.exportEncryptedBackup(passphrase)
+        val result = backupManager.exportEncryptedBackup(passphrase)
+        repository.preferences.setLastBackupTimestamp(System.currentTimeMillis())
+        return result
     }
 
     suspend fun importEncryptedBackup(backupJson: String, passphrase: String): Boolean {

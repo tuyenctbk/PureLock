@@ -17,7 +17,7 @@ class DatabaseChecksumManager(private val context: Context) {
     fun validateChecksumAndLog() {
         scope.launch {
             try {
-                val dbFile = context.getDatabasePath("purelock_privacy_encrypted_db")
+                val dbFile = context.getDatabasePath("purelock_privacy_db")
                 if (!dbFile.exists()) return@launch
 
                 val bytes = dbFile.readBytes()

@@ -662,9 +662,13 @@ fun launchBiometricPrompt(
     if (activity != null) {
         val manager = com.example.service.BiometricPromptManager(context)
         val status = manager.checkBiometricAvailability()
-        if (status == com.example.service.BiometricStatus.NO_HARDWARE || status == com.example.service.BiometricStatus.UNAVAILABLE) {
-            // Emulated environment or no sensor present -> graceful fallback
-            onSuccess()
+        if (status != com.example.service.BiometricStatus.AVAILABLE) {
+            val msg = when (status) {
+                com.example.service.BiometricStatus.NOT_ENROLLED -> "No biometrics registered on device. Please use PIN or Pattern."
+                com.example.service.BiometricStatus.NO_HARDWARE -> "No biometric hardware detected. Please use PIN or Pattern."
+                else -> "Biometric authentication is currently unavailable. Please use PIN or Pattern."
+            }
+            onError(msg)
             return
         }
         manager.showBiometricPrompt(
@@ -676,6 +680,6 @@ fun launchBiometricPrompt(
             onError = onError
         )
     } else {
-        onSuccess()
+        onError("Activity context unavailable for biometric prompt.")
     }
 }
