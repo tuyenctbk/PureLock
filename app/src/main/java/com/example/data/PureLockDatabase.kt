@@ -14,8 +14,6 @@ import com.example.data.model.IntruderSelfieEntity
 import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
 
 @Database(
     entities = [
@@ -41,16 +39,11 @@ abstract class PureLockDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): PureLockDatabase {
             return INSTANCE ?: synchronized(this) {
-                SQLiteDatabase.loadLibs(context)
-                val passphrase = SQLiteDatabase.getBytes("PureLock_EncryptedAtRest_Passphrase_2026!".toCharArray())
-                val factory = SupportFactory(passphrase)
-
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     PureLockDatabase::class.java,
-                    "purelock_privacy_encrypted_db"
+                    "purelock_privacy_db"
                 )
-                .openHelperFactory(factory)
                 .fallbackToDestructiveMigration()
                 .build()
                 INSTANCE = instance

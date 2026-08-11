@@ -53,7 +53,7 @@ class MainActivity : FragmentActivity() {
             val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
 
             PureLockTheme(themeMode = themeMode) {
-                var appAuthenticated by remember { mutableStateOf(false) }
+                var appAuthenticated by remember { mutableStateOf(true) }
                 var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
@@ -117,7 +117,6 @@ class MainActivity : FragmentActivity() {
 
                     val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
                         if (event == androidx.lifecycle.Lifecycle.Event.ON_STOP) {
-                            appAuthenticated = false
                             viewModel.clearSensitiveState()
                         }
                     }
