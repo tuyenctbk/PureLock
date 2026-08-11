@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktive beskyttelser</string>
+    <string name="all">ALLE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Appbeskyttelse</string>
+    <string name="autofill_btn">Aktiver PureLock autofyll</string>
+    <string name="autofill_desc">Fyll inn pålogginger trygt direkte fra ditt offline hvelv.</string>
+    <string name="autofill_title">Android Autofyll-tjeneste</string>
+    <string name="integrity_btn">Verifiser hvelvintegritet nå</string>
+    <string name="integrity_desc">SHA-256-sjekk i bakgrunnen for å oppdage uautoriserte endringer.</string>
+    <string name="integrity_success">INTEGRITET VERIFISERT INTAKT</string>
+    <string name="integrity_title">Verifisering av hvelvintegritet</string>
+    <string name="integrity_verifying">Verifiserer...</string>
+    <string name="locked">Låst</string>
+    <string name="search_apps">Søk etter apper...</string>
+    <string name="secrets">Hemmeligheter</string>
+    <string name="secure_vault">Sikkert hvelv</string>
+    <string name="settings">Innstillinger</string>
+    <string name="shake_to_lock">Rist for å låse</string>
+    <string name="shake_to_lock_desc">Utløser nødslåsing ved registrering av ristebevegelse.</string>
+    <string name="snapshots">Snapshots</string>
+    <string name="trash_bin">Papirkurv</string>
+    <string name="trash_purge">Tømming av papirkurv</string>
+    <string name="trash_purge_desc">Slettede hemmeligheter slettes permanent etter valgt periode.</string>
+    <string name="unlocked">Låst opp</string>
+</resources>

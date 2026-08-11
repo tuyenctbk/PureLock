@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Virkar varnir</string>
+    <string name="all">ALLT</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Forritavörn</string>
+    <string name="autofill_btn">Virkja sjálfvirka útfyllingu</string>
+    <string name="autofill_desc">Fylltu inn innskráningarupplýsingar örugglega beint úr hvelfingunni þinni.</string>
+    <string name="autofill_title">Sjálfvirk útfylling</string>
+    <string name="integrity_btn">Staðfesta heilleika verkun</string>
+    <string name="integrity_desc">SHA-256 úttekt í bakgrunni til að greina breytingar.</string>
+    <string name="integrity_success">HEILLEIKI HVELFINGAR ER Í LAGI</string>
+    <string name="integrity_title">Heilleikaverkun hvelfingar</string>
+    <string name="integrity_verifying">Staðfestir...</string>
+    <string name="locked">Læst</string>
+    <string name="search_apps">Leita að forritum...</string>
+    <string name="secrets">Leyndarmál</string>
+    <string name="secure_vault">Öruggt hvelfing</string>
+    <string name="settings">Stillingar</string>
+    <string name="shake_to_lock">Hrista til að læsa</string>
+    <string name="shake_to_lock_desc">Virkjar neyðarlæsingu þegar skyndileg hristing greinist.</string>
+    <string name="snapshots">Skyndimyndir</string>
+    <string name="trash_bin">Ruslafata</string>
+    <string name="trash_purge">Sjálfvirk hreinsun</string>
+    <string name="trash_purge_desc">Eytt leyndarmál verða endanlega eytt eftir valinn tíma.</string>
+    <string name="unlocked">Ólæst</string>
+</resources>

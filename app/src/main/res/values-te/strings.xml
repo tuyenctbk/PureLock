@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">క్రియాశీల రక్షణ</string>
+    <string name="all">అన్నీ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">యాప్ షీల్డ్</string>
+    <string name="autofill_btn">ఆటోఫిల్ సక్రియం చేయండి</string>
+    <string name="autofill_desc">వాల్ట్ నుండి సురક્ષితంగా ఆటో-ఫిల్ చేయండి.</string>
+    <string name="autofill_title">ఆండ్రాయిడ్ ఆటోఫిల్</string>
+    <string name="integrity_btn">సమగ్రతను తنيఖీ చేయండి</string>
+    <string name="integrity_desc">మార్పులను గుర్తించడానికి బ్యాక్‌గ్రౌండ్ SHA-256 ఆడిట్ నిర్వహించండి.</string>
+    <string name="integrity_success">సమగ్రత నిర్ధారించబడింది</string>
+    <string name="integrity_title">వాల్ట్ సమగ్రత పరిశీలನೆ</string>
+    <string name="integrity_verifying">తనిఖీ చేస్తోంది...</string>
+    <string name="locked">లాక్ చేయబడింది</string>
+    <string name="search_apps">యాప్‌లను వెతకండి...</string>
+    <string name="secrets">రహస్యాలు</string>
+    <string name="secure_vault">సురక్షిత వాల్ట్</string>
+    <string name="settings">సెట్టింగ్స్</string>
+    <string name="shake_to_lock">లాక్ చేయడానికి ఫోన్ కదపండి</string>
+    <string name="shake_to_lock_desc">ఆకస్మికంగా కదిలితే అత్యవసర లాక్‌డౌన్‌ను సక్రియం చేస్తుంది.</string>
+    <string name="snapshots">స్నాప్‌షాట్లు</string>
+    <string name="trash_bin">చెత్త బుట్ట</string>
+    <string name="trash_purge">ఆటో-క్లీనింగ్</string>
+    <string name="trash_purge_desc">తొలగించబడిన రహస్యాలు ఎంచుకున్న సమయం తర్వాత శాశ్వతంగా తొలగించబడతాయి.</string>
+    <string name="unlocked">అన్‌లాక్ చేయబడింది</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">فعال تحفظات</string>
+    <string name="all">تمام</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">ایپ شیلڈ</string>
+    <string name="autofill_btn">آٹو فل فعال کریں</string>
+    <string name="autofill_desc">والٹ سے محفوظ طریقے سے آٹو فل کریں۔</string>
+    <string name="autofill_title">اینڈرائیڈ آٹو فل</string>
+    <string name="integrity_btn">سالمیت کی تصدیق کریں</string>
+    <string name="integrity_desc">تبدیلیوں کا پتہ لگانے کے لیے SHA-256 آڈٹ چلائیں۔</string>
+    <string name="integrity_success">سالمیت کی تصدیق ہو گئی</string>
+    <string name="integrity_title">والٹ کی سالمیت کی تصدیق</string>
+    <string name="integrity_verifying">تصدیق کی جا رہی ہے...</string>
+    <string name="locked">مقفل</string>
+    <string name="search_apps">ایپس تلاش کریں...</string>
+    <string name="secrets">راز</string>
+    <string name="secure_vault">محفوظ والٹ</string>
+    <string name="settings">سیٹنگز</string>
+    <string name="shake_to_lock">لاک کرنے کے لیے ہلائیں</string>
+    <string name="shake_to_lock_desc">اچانک ہلنے کا پتہ چلنے پر ہنگامی لاک ڈاؤن شروع کریں۔</string>
+    <string name="snapshots">سنیپ شاٹس</string>
+    <string name="trash_bin">ری سائیکل بن</string>
+    <string name="trash_purge">خودکار صفائی</string>
+    <string name="trash_purge_desc">حذف شدہ راز مقررہ وقت کے بعد مستقل طور پر مٹ جائیں گے۔</string>
+    <string name="unlocked">غیر مقفل</string>
+</resources>

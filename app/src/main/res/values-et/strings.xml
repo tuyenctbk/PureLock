@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktiivsed kaitsed</string>
+    <string name="all">KÕIK</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Rakenduse kaitse</string>
+    <string name="autofill_btn">Lülita automaattäide sisse</string>
+    <string name="autofill_desc">Täida sisselogimisandmed turvaliselt otse võrguvälisest hoidlast.</string>
+    <string name="autofill_title">Automaattäite teenus</string>
+    <string name="integrity_btn">Kontrolli terviklikkust nüüd</string>
+    <string name="integrity_desc">Taustal SHA-256 audit muudatuste tuvastamiseks.</string>
+    <string name="integrity_success">TERVIKLIKKUS ON KINNITATUD RIKKUMATA</string>
+    <string name="integrity_title">Hoidla terviklikkuse kontroll</string>
+    <string name="integrity_verifying">Kontrollitakse...</string>
+    <string name="locked">Lukustatud</string>
+    <string name="search_apps">Otsi rakendusi...</string>
+    <string name="secrets">Saladused</string>
+    <string name="secure_vault">Turvaline hoidla</string>
+    <string name="settings">Seaded</string>
+    <string name="shake_to_lock">Raputa lukustamiseks</string>
+    <string name="shake_to_lock_desc">Käivitab hädalukustuse, kui tuvastatakse äkiline raputamine.</string>
+    <string name="snapshots">Tõmmised</string>
+    <string name="trash_bin">Prügikast</string>
+    <string name="trash_purge">Prügikasti automaatne tühjendamine</string>
+    <string name="trash_purge_desc">Kustutatud saladused pühitakse jäädavalt pärast valitud aega.</string>
+    <string name="unlocked">Lukustamata</string>
+</resources>

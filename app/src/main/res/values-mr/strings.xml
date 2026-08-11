@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">सक्रिय संरक्षण</string>
+    <string name="all">सर्व</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">अ‍ॅप शील्ड</string>
+    <string name="autofill_btn">ऑटोफिल सक्षम करा</string>
+    <string name="autofill_desc">व्हॉल्टमधून सुरक्षितपणे ऑटो-फिल करा.</string>
+    <string name="autofill_title">अँड्रॉइड ऑटोफिल</string>
+    <string name="integrity_btn">अखंडता तपासा</string>
+    <string name="integrity_desc">डेटाबेसशी छेडछाड शोधण्यासाठी बॅकग्राउंड SHA-256 ऑडिट चालवा.</string>
+    <string name="integrity_success">अखंडता सिद्ध झाली</string>
+    <string name="integrity_title">व्हॉल्ट अखंडता तपासणी</string>
+    <string name="integrity_verifying">तपासत आहे...</string>
+    <string name="locked">लॉक केलेले</string>
+    <string name="search_apps">अ‍ॅप्स शोधा...</string>
+    <string name="secrets">गुप्त पासवर्ड</string>
+    <string name="secure_vault">सुरक्षित व्हॉल्ट</string>
+    <string name="settings">सेटिंग्ज</string>
+    <string name="shake_to_lock">लॉक करण्यासाठी फोन हलवा</string>
+    <string name="shake_to_lock_desc">अचानक फोन हलवल्यास तात्काळ लॉकडाऊन सक्रिय होते.</string>
+    <string name="snapshots">स्नॅपशॉट्स</string>
+    <string name="trash_bin">कचरा पेटी</string>
+    <string name="trash_purge">स्वयंचलित स्वच्छता</string>
+    <string name="trash_purge_desc">डिलिट केलेले पासवर्ड निवडलेल्या कालावधीनंतर कायमचे नष्ट होतील.</string>
+    <string name="unlocked">अनलॉक केलेले</string>
+</resources>

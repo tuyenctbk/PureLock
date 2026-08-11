@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Proteções Ativas</string>
+    <string name="all">TODOS</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Bloqueio de Apps</string>
+    <string name="autofill_btn">Ativar Preenchimento Automático</string>
+    <string name="autofill_desc">Preencha credenciais com segurança diretamente do seu cofre offline.</string>
+    <string name="autofill_title">Preenchimento Automático</string>
+    <string name="financial">FINANCEIRO</string>
+    <string name="games">JOGOS</string>
+    <string name="integrity_btn">Verificar Integridade</string>
+    <string name="integrity_desc">Executa auditoria criptográfica SHA-256 em segundo plano.</string>
+    <string name="integrity_success">INTEGRIDADE VERIFICADA INTACTA</string>
+    <string name="integrity_title">Integridade do Cofre</string>
+    <string name="integrity_verifying">Verificando...</string>
+    <string name="locked">Bloqueado</string>
+    <string name="media">MÍDIA</string>
+    <string name="search_apps">Buscar aplicativos...</string>
+    <string name="secrets">Segredos</string>
+    <string name="secure_vault">Cofre Seguro</string>
+    <string name="settings">Configurações</string>
+    <string name="shake_to_lock">Agitar para Bloquear</string>
+    <string name="shake_to_lock_desc">Ativa o bloqueio de emergência imediato ao detectar um movimento brusco.</string>
+    <string name="snapshots">Capturas</string>
+    <string name="social">SOCIAL</string>
+    <string name="system">SISTEMA</string>
+    <string name="trash_bin">Lixeira</string>
+    <string name="trash_purge">Autolimpeza da Lixeira</string>
+    <string name="trash_purge_desc">Segredos na lixeira serão excluídos após o período selecionado.</string>
+    <string name="unlocked">Desbloqueado</string>
+</resources>

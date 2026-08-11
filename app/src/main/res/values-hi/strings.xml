@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Активний захист</string>
+    <string name="all">ВСЕ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Захист програм</string>
+    <string name="autofill_btn">Увімкнути автозаповнення</string>
+    <string name="autofill_desc">Безпечне автозаповнення облікових даних прямо з сейфу.</string>
+    <string name="autofill_title">Автозаповнення Android</string>
+    <string name="financial">वित्तीय</string>
+    <string name="games">गेम्स</string>
+    <string name="integrity_btn">Перевірити цілісність</string>
+    <string name="integrity_desc">Фонова перевірка хэшу SHA-256 на предмет зламів.</string>
+    <string name="integrity_success">ЦІЛІСНІСТЬ ПІДТВЕРДЖЕНА ІНТАКТНОЮ</string>
+    <string name="integrity_title">Перевірка цілісності</string>
+    <string name="integrity_verifying">Перевірка хэшу...</string>
+    <string name="locked">Заблоковано</string>
+    <string name="media">मीडिया</string>
+    <string name="search_apps">Пошук...</string>
+    <string name="secrets">Секрети</string>
+    <string name="secure_vault">Сейф</string>
+    <string name="settings">Налаштування</string>
+    <string name="shake_to_lock">Блокування струшуванням</string>
+    <string name="shake_to_lock_desc">Екстрене блокування при різкому струшуванні.</string>
+    <string name="snapshots">Знімки</string>
+    <string name="social">सामाजिक</string>
+    <string name="system">सिस्टम</string>
+    <string name="trash_bin">Кошик</string>
+    <string name="trash_purge">Очищення кошика</string>
+    <string name="trash_purge_desc">Видалені секрети стираються назавжди після вибраного терміну.</string>
+    <string name="unlocked">Розблоковано</string>
+</resources>

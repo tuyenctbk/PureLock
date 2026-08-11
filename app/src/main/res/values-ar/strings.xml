@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">الحمايات النشطة</string>
+    <string name="all">الكل</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">درع التطبيقات</string>
+    <string name="autofill_btn">تفعيل الإكمال التلقائي لـ PureLock</string>
+    <string name="autofill_desc">تعبئة آمنة للبيانات بدون إنترنت في التطبيقات الأخرى مباشرة من خزنتك المحلية.</string>
+    <string name="autofill_title">خدمة الإكمال التلقائي لأندرويد</string>
+    <string name="financial">مالي</string>
+    <string name="games">الألعاب</string>
+    <string name="integrity_btn">افحص سلامة الخزنة الآن</string>
+    <string name="integrity_desc">إجراء تدقيق تشفيري للخلفية SHA-256 للتأكد من عدم تعرض الملفات للتلف أو التلاعب.</string>
+    <string name="integrity_success">تم التحقق: البيانات سليمة تمامًا ولم تعدل</string>
+    <string name="integrity_title">التحقق من سلامة الخزنة</string>
+    <string name="integrity_verifying">جاري فحص الهاش التشفيري...</string>
+    <string name="locked">مغلق</string>
+    <string name="media">الوسائط</string>
+    <string name="search_apps">بحث عن التطبيقات...</string>
+    <string name="secrets">الأسرار المشفرة</string>
+    <string name="secure_vault">الخزنة الآمنة</string>
+    <string name="settings">الإعدادات</string>
+    <string name="shake_to_lock">إيماءة الهز للقفل</string>
+    <string name="shake_to_lock_desc">إغلاق طوارئ فوري عند كشف حركة هز مفاجئة عبر مستشعر التسارع للوعاء.</string>
+    <string name="snapshots">لقطات الدخيل</string>
+    <string name="social">اجتماعي</string>
+    <string name="system">النظام</string>
+    <string name="trash_bin">سلة المهملات</string>
+    <string name="trash_purge">تلقائي إفراغ المهملات</string>
+    <string name="trash_purge_desc">سيتم محو الأسرار المحذوفة نهائيًا وبشكل آمن بعد المدة المحددة تلقائيًا.</string>
+    <string name="unlocked">مفتوح</string>
+</resources>

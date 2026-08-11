@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktívna ochrana</string>
+    <string name="all">VŠETKO</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Ochrana aplikácií</string>
+    <string name="autofill_btn">Aktivovať automatické vypĺňanie</string>
+    <string name="autofill_desc">Bezpečné automatické vypĺňanie hesiel priamo z offline trezoru.</string>
+    <string name="autofill_title">Služba automatického vypĺňania</string>
+    <string name="integrity_btn">Overiť integritu teraz</string>
+    <string name="integrity_desc">SHA-256 kontrola na pozadí pre detekciu manipulácie.</string>
+    <string name="integrity_success">INTEGRITA ÚSPĚŠNE OVERENÁ</string>
+    <string name="integrity_title">Overenie integrity trezoru</string>
+    <string name="integrity_verifying">Overuje sa...</string>
+    <string name="locked">Zamknuté</string>
+    <string name="search_apps">Hľadať aplikácie...</string>
+    <string name="secrets">Tajomstvá</string>
+    <string name="secure_vault">Zabezpečený trezor</string>
+    <string name="settings">Nastavenia</string>
+    <string name="shake_to_lock">Zatrasenie pre uzamknutie</string>
+    <string name="shake_to_lock_desc">Spustí nouzové uzamknutie pri náhlom zatrasení.</string>
+    <string name="snapshots">Snímky</string>
+    <string name="trash_bin">Kôš</string>
+    <string name="trash_purge">Automatické vysypanie koša</string>
+    <string name="trash_purge_desc">Smazané tajomstvá budú natrvalo odstránené po zvolenej dobe.</string>
+    <string name="unlocked">Odomknuté</string>
+</resources>

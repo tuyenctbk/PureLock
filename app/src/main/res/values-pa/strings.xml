@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">ਸਰਗਰਮ ਸੁਰੱਖਿਆ</string>
+    <string name="all">ਸਾਰੇ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">ਐਪ ਸ਼ੀਲਡ</string>
+    <string name="autofill_btn">ਆਟੋਫਿਲ ਸਮਰੱਥ ਕਰੋ</string>
+    <string name="autofill_desc">ਆਪਣੇ ਵਾਲਟ ਤੋਂ سੁਰੱਖਿਅਤ ਰੂਪ ਨਾਲ ਆਟੋ-ਫਿਲ ਕਰੋ।</string>
+    <string name="autofill_title">ਐਂਡਰਾਇਡ ਆਟੋਫਿਲ</string>
+    <string name="integrity_btn">ਅਖੰਡਤਾ ਦੀ ਜਾਂਚ ਕਰੋ</string>
+    <string name="integrity_desc">ਕਿਸੇ ਵੀ ਛੇੜਛाੜ ਦਾ ਪਤਾ ਲਗਾਉਣ ਲਈ SHA-256 ਆਡਿਟ ਚਲਾਓ।</string>
+    <string name="integrity_success">ਅਖੰਡਤਾ ਦੀ ਪੁਸ਼ਟੀ ਹੋਈ</string>
+    <string name="integrity_title">ਵਾਲਟ ਅਖੰਡਤਾ ਦੀ ਜਾਂਚ</string>
+    <string name="integrity_verifying">ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...</string>
+    <string name="locked">ਲਾਕ ਕੀਤਾ</string>
+    <string name="search_apps">ਐਪਸ ਖੋਜੋ...</string>
+    <string name="secrets">ਭੇਦ</string>
+    <string name="secure_vault">ਸੁਰੱਖਿਅਤ ਵਾਲਟ</string>
+    <string name="settings">ਸੈਟਿੰਗਾਂ</string>
+    <string name="shake_to_lock">ਲਾਕ ਕਰਨ ਲਈ ਹਿਲਾਓ</string>
+    <string name="shake_to_lock_desc">ਅਚਾਨਕ ਹਿਲਣ ਦਾ ਪਤਾ ਲੱਗਣ \'ਤੇ ਤਾਲਾਬੰਦੀ ਨੂੰ ਸਰਗਰਮ ਕਰੋ।</string>
+    <string name="snapshots">ਸਨੈპਸ਼ਾਟ</string>
+    <string name="trash_bin">ਰੱਦੀ ਡੱਬਾ</string>
+    <string name="trash_purge">ਆਟੋ-ਸਫਾਈ</string>
+    <string name="trash_purge_desc">ਹਟਾਏ ਗਏ ਭੇਦ ਚੁਣੇ ਹੋਏ ਸਮੇਂ ਦੇ ਬਾਅਦ ਸਥਾਈ ਤੌਰ \'ਤੇ ਮਿٹਾ ਦਿੱਤੇ ਜਾਣਗੇ।</string>
+    <string name="unlocked">ਅਨਲਾਕ ਕੀਤਾ</string>
+</resources>

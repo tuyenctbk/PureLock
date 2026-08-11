@@ -1,0 +1,6 @@
+{
+  "name": "PureLock",
+  "description": "The Ad-Free, No-Cloud Privacy Shield. Minimalist security for Mobile, Tablet, and Android TV.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

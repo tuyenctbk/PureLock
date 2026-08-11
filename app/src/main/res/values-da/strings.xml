@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktive beskyttelser</string>
+    <string name="all">ALLE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Appbeskyttelse</string>
+    <string name="autofill_btn">Aktiver PureLock autofyld</string>
+    <string name="autofill_desc">Udfyld loginoplysninger sikkert direkte fra din offline boks.</string>
+    <string name="autofill_title">Android Autofyld-tjeneste</string>
+    <string name="integrity_btn">Verificer boksintegritet nu</string>
+    <string name="integrity_desc">Kryptografisk SHA-256-kontrol i baggrunden for at opdage ændringer.</string>
+    <string name="integrity_success">INTEGRITET VERIFICERET INTAKT</string>
+    <string name="integrity_title">Verifikation af boksintegritet</string>
+    <string name="integrity_verifying">Verificerer hashes...</string>
+    <string name="locked">Låst</string>
+    <string name="search_apps">Søg efter apps...</string>
+    <string name="secrets">Hemmeligheder</string>
+    <string name="secure_vault">Sikker boks</string>
+    <string name="settings">Indstillinger</string>
+    <string name="shake_to_lock">Ryst for at låse</string>
+    <string name="shake_to_lock_desc">Udløser nødspærring ved registrering af en rystebevægelse.</string>
+    <string name="snapshots">Snapshots</string>
+    <string name="trash_bin">Papirkurv</string>
+    <string name="trash_purge">Rensning af papirkurv</string>
+    <string name="trash_purge_desc">Slettede hemmeligheder slettes permanent efter det valgte tidsrum.</string>
+    <string name="unlocked">Låst op</string>
+</resources>

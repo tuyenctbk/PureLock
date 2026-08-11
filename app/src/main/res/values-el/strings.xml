@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Ενεργές προστασίες</string>
+    <string name="all">ΟΛΑ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Προστασία εφαρμογών</string>
+    <string name="autofill_btn">Ενεργοποίηση αυτόματης συμπλήρωσης</string>
+    <string name="autofill_desc">Συμπληρώστε με ασφάλεια τα στοιχεία σύνδεσης απευθείας από το offline χρηματοκιβώτιο.</string>
+    <string name="autofill_title">Υπηρεσία αυτόματης συμπλήρωσης</string>
+    <string name="integrity_btn">Έλεγχος ακεραιότητας τώρα</string>
+    <string name="integrity_desc">Έλεγχος SHA-256 στο παρασκήνιο για τον εντοπισμό τροποποιήσεων.</string>
+    <string name="integrity_success">Η ΑΚΕΡΑΙΟΤΗΤΑ ΕΠΙΒΕΒΑΙΩΘΗΚΕ</string>
+    <string name="integrity_title">Έλεγχος ακεραιότητας</string>
+    <string name="integrity_verifying">Έλεγχος...</string>
+    <string name="locked">Κλειδωμένο</string>
+    <string name="search_apps">Αναζήτηση...</string>
+    <string name="secrets">Μυστικά</string>
+    <string name="secure_vault">Ασφαλές χρηματοκιβώτιο</string>
+    <string name="settings">Ρυθμίσεις</string>
+    <string name="shake_to_lock">Κούνημα για κλείδωμα</string>
+    <string name="shake_to_lock_desc">Ενεργοποιεί κλείδωμα έκτακτης ανάγκης όταν ανιχνευθεί κούνημα.</string>
+    <string name="snapshots">Στιγμιότυπα</string>
+    <string name="trash_bin">Κάδος</string>
+    <string name="trash_purge">Αυτόματη εκκαθάριση κάδου</string>
+    <string name="trash_purge_desc">Τα διαγραμμένα μυστικά θα διαγραφούν οριστικά μετά την επιλεγμένη διάρκεια.</string>
+    <string name="unlocked">Ξεκλείδωτο</string>
+</resources>

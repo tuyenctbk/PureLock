@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Protecciones Activas</string>
+    <string name="all">TODO</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Protección</string>
+    <string name="autofill_btn">Habilitar Autocompletado</string>
+    <string name="autofill_desc">Autocompleta credenciales de forma segura directamente desde la bóveda.</string>
+    <string name="autofill_title">API de Autocompletado</string>
+    <string name="financial">FINANCIERO</string>
+    <string name="games">JUEGOS</string>
+    <string name="integrity_btn">Verificar Integridad</string>
+    <string name="integrity_desc">Realiza una auditoría criptográfica SHA-256 en segundo plano.</string>
+    <string name="integrity_success">INTEGRIDAD VERIFICADA INTACTA</string>
+    <string name="integrity_title">Integridad de la Bóveda</string>
+    <string name="integrity_verifying">Verificando...</string>
+    <string name="locked">Bloqueado</string>
+    <string name="media">MEDIOS</string>
+    <string name="search_apps">Buscar aplicaciones...</string>
+    <string name="secrets">Secretos</string>
+    <string name="secure_vault">Bóveda Segura</string>
+    <string name="settings">Ajustes</string>
+    <string name="shake_to_lock">Gesto de Agitar para Bloquear</string>
+    <string name="shake_to_lock_desc">Activa el bloqueo de de emergencia cuando se detecta un movimiento brusco.</string>
+    <string name="snapshots">Capturas</string>
+    <string name="social">SOCIAL</string>
+    <string name="system">SISTEMA</string>
+    <string name="trash_bin">Papelera</string>
+    <string name="trash_purge">Período de Auto-Purga</string>
+    <string name="trash_purge_desc">Los secretos se borrarán permanentemente después de la duración elegida.</string>
+    <string name="unlocked">Desbloqueado</string>
+</resources>

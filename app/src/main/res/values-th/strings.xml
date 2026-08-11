@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">การป้องกันที่เปิดใช้งาน</string>
+    <string name="all">ทั้งหมด</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">ป้องกันแอป</string>
+    <string name="autofill_btn">เปิดใช้ระบบป้อนข้อมูลอัตโนมัติ</string>
+    <string name="autofill_desc">ป้อนรหัสผ่านอัตโนมัติอย่างปลอดภัยโดยตรงจากตู้นิรภัยแบบออฟไลน์</string>
+    <string name="autofill_title">ระบบป้อนข้อมูลอัตโนมัติ</string>
+    <string name="integrity_btn">ตรวจสอบตู้นิรภัยเดี๋ยวนี้</string>
+    <string name="integrity_desc">ตรวจสอบความถูกต้องด้วยรหัส SHA-256 เพื่อตรวจจับการแก้ไขไฟล์เสียหาย</string>
+    <string name="integrity_success">ตู้นิรภัยปลอดภัย ข้อมูลไม่ถูกแก้ไข</string>
+    <string name="integrity_title">ตรวจสอบความถูกต้องของตู้นิรภัย</string>
+    <string name="integrity_verifying">กำลังตรวจสอบ...</string>
+    <string name="locked">ล็อกอยู่</string>
+    <string name="search_apps">ค้นหาแอป...</string>
+    <string name="secrets">ข้อมูลลับ</string>
+    <string name="secure_vault">ตู้นิรภัย</string>
+    <string name="settings">ตั้งค่า</string>
+    <string name="shake_to_lock">เขย่าเครื่องเพื่อล็อก</string>
+    <string name="shake_to_lock_desc">ล็อกแอปฉุกเฉินทันทีเมื่อเซ็นเซอร์ตรวจพบการเขย่าอย่างรุนแรง</string>
+    <string name="snapshots">ภาพถ่ายผู้บุกรุก</string>
+    <string name="trash_bin">ถังขยะ</string>
+    <string name="trash_purge">ล้างถังขยะอัตโนมัติ</string>
+    <string name="trash_purge_desc">ข้อมูลที่ถูกลบจะถูกลบออกอย่างถาวรตามระยะเวลาที่เลือก</string>
+    <string name="unlocked">ปลดล็อกแล้ว</string>
+</resources>

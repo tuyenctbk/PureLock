@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">সক্রিয় সুরক্ষা</string>
+    <string name="all">সব</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">অ্যাপ শিল্ড</string>
+    <string name="autofill_btn">অটোফিল সক্ষম করুন</string>
+    <string name="autofill_desc">আপনার অফলাইন ভল্ট থেকে নিরাপদে অটোফিল করুন।</string>
+    <string name="autofill_title">অ্যান্ড্রয়েড অটোফিল</string>
+    <string name="integrity_btn">ভল্ট অখণ্ডতা পরীক্ষা করুন</string>
+    <string name="integrity_desc">ডাটাবেসের কোনো পরিবর্তন সনাক্ত করতে SHA-256 অডিট করে।</string>
+    <string name="integrity_success">অখণ্ডতা সফলভাবে যাচাই করা হয়েছে</string>
+    <string name="integrity_title">ভল্ট অখণ্ডতা যাচাই</string>
+    <string name="integrity_verifying">যাচাই করা হচ্ছে...</string>
+    <string name="locked">লকড</string>
+    <string name="search_apps">অ্যাপস খুঁজুন...</string>
+    <string name="secrets">গোপন তথ্য</string>
+    <string name="secure_vault">নিরাপদ ভল্ট</string>
+    <string name="settings">সেটিংস</string>
+    <string name="shake_to_lock">লক করতে ঝাঁকান</string>
+    <string name="shake_to_lock_desc">আকস্মিক ঝাঁকুনি সনাক্ত হলে লকডাউন ট্রিগার করে।</string>
+    <string name="snapshots">স্ন্যাপশট</string>
+    <string name="trash_bin">আবর্জনা বিন</string>
+    <string name="trash_purge">অটো-মুছে ফেলা</string>
+    <string name="trash_purge_desc">নির্দিষ্ট সময় পর মুছে ফেলা পাসওয়ার্ড স্থায়ীভাবে মুছে যাবে।</string>
+    <string name="unlocked">আনলকড</string>
+</resources>

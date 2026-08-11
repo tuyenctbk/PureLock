@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Белсенді қорғаныс</string>
+    <string name="all">БАРЛЫҒЫ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Қолданбаны қорғау</string>
+    <string name="autofill_btn">Автотолтыруды белсендіру</string>
+    <string name="autofill_desc">Кіру деректерін офлайн қоймадан қауіпсіз автоматты түрде толтыру.</string>
+    <string name="autofill_title">Автоматты толтыру қызметі</string>
+    <string name="integrity_btn">Тұтастықты қазір тексеру</string>
+    <string name="integrity_desc">Өзгерістерді анықтау үшін фондағы SHA-256 тексеруі.</string>
+    <string name="integrity_success">ТҰТАСТЫҒЫ СӘТТІ ТЕКСЕРІЛДІ</string>
+    <string name="integrity_title">Қойма тұтастығын тексеру</string>
+    <string name="integrity_verifying">Тексерілуде...</string>
+    <string name="locked">Блокталған</string>
+    <string name="search_apps">Қолданбаны іздеу...</string>
+    <string name="secrets">Құпиялар</string>
+    <string name="secure_vault">Қауіпсіз қойма</string>
+    <string name="settings">Параметрлер</string>
+    <string name="shake_to_lock">Блоктау үшін сілку</string>
+    <string name="shake_to_lock_desc">Кенеттен сілкуді анықтаған кезде шұғыл блоктауды іске қосады.</string>
+    <string name="snapshots">Суреттер</string>
+    <string name="trash_bin">Қоқыс жәшігі</string>
+    <string name="trash_purge">Қоқысты автоматты тазарту</string>
+    <string name="trash_purge_desc">Жойылған құпиялар таңдалған мерзімнен кейін біржола жойылады.</string>
+    <string name="unlocked">Блоктан босатылған</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktiver Schutz</string>
+    <string name="all">ALLE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">App-Schutz</string>
+    <string name="autofill_btn">Autofill aktivieren</string>
+    <string name="autofill_desc">Sicheres automatisches Ausfüllen direkt aus Ihrem Offline-Tresor.</string>
+    <string name="autofill_title">Autofill-Dienst</string>
+    <string name="financial">FINANZEN</string>
+    <string name="games">SPIELE</string>
+    <string name="integrity_btn">Tresor-Integrität prüfen</string>
+    <string name="integrity_desc">Führt eine SHA-256-Prüfung aus, um Manipulationen zu erkennen.</string>
+    <string name="integrity_success">INTEGRITÄT BESTÄTIGT</string>
+    <string name="integrity_title">Tresor-Integritätsprüfung</string>
+    <string name="integrity_verifying">Prüfe Hashes...</string>
+    <string name="locked">Gesperrt</string>
+    <string name="media">MEDIEN</string>
+    <string name="search_apps">Apps suchen...</string>
+    <string name="secrets">Geheimnisse</string>
+    <string name="secure_vault">Tresor</string>
+    <string name="settings">Einstellungen</string>
+    <string name="shake_to_lock">Schütteln zum Sperren</string>
+    <string name="shake_to_lock_desc">Löst eine Notfallsperre aus, wenn plötzliche Erschütterung erkannt wird.</string>
+    <string name="snapshots">Schnappschüsse</string>
+    <string name="social">SOZIALES</string>
+    <string name="system">SYSTEM</string>
+    <string name="trash_bin">Papierkorb</string>
+    <string name="trash_purge">Papierkorb-Löschung</string>
+    <string name="trash_purge_desc">Gelöschte Geheimnisse werden nach Ablauf automatisch gelöscht.</string>
+    <string name="unlocked">Entsperrt</string>
+</resources>

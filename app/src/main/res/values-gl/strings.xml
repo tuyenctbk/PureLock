@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Proteccións activas</string>
+    <string name="all">TODO</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Protección de apps</string>
+    <string name="autofill_btn">Activar autocompletado</string>
+    <string name="autofill_desc">Autocompleta credenciais de xeito seguro desde a bóveda offline.</string>
+    <string name="autofill_title">Servizo de autocompletado</string>
+    <string name="integrity_btn">Verificar integritate agora</string>
+    <string name="integrity_desc">Auditoría SHA-256 en segundo plano para detectar manipulacións.</string>
+    <string name="integrity_success">INTEGRIDADE VERIFICADA INTACTA</string>
+    <string name="integrity_title">Verificación de integridade</string>
+    <string name="integrity_verifying">Verificando...</string>
+    <string name="locked">Bloqueado</string>
+    <string name="search_apps">Buscar aplicacións...</string>
+    <string name="secrets">Segredos</string>
+    <string name="secure_vault">Bóveda segura</string>
+    <string name="settings">Axustes</string>
+    <string name="shake_to_lock">Axitar para bloquear</string>
+    <string name="shake_to_lock_desc">Activa o bloqueo de emerxencia ao detectar un movemento brusco.</string>
+    <string name="snapshots">Captures</string>
+    <string name="trash_bin">Papelera</string>
+    <string name="trash_purge">Autolimpeza de papelera</string>
+    <string name="trash_purge_desc">Os segredos eliminaranse definitivamente despois do tempo escollido.</string>
+    <string name="unlocked">Desbloqueado</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">સક્રિય સુરક્ષા</string>
+    <string name="all">બધા</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">એપ શીલ્ડ</string>
+    <string name="autofill_btn">ઓટોફિલ સક્ષમ કરો</string>
+    <string name="autofill_desc">તિજોરીમાંથી સુરક્ષિત રીતે ઓટો-ફિલ કરો.</string>
+    <string name="autofill_title">એન્ડ્રોઇડ ઓટોફિલ</string>
+    <string name="integrity_btn">અખંડિતતા તપાસો</string>
+    <string name="integrity_desc">ડેટાબેઝ સાથે છેડછાડ શોધવા બેકગ્રાઉન્ડ SHA-256 ઓડિટ કરો.</string>
+    <string name="integrity_success">અખંડិតતા સફળતાપૂર્વક ચકાસવામાં આવી છે</string>
+    <string name="integrity_title">તિજોરીની અખંડિતતા તપાસ</string>
+    <string name="integrity_verifying">તપાસ ચાલુ છે...</string>
+    <string name="locked">લૉક કરેલ</string>
+    <string name="search_apps">એપ્લિકેશન શોધો...</string>
+    <string name="secrets">ગુપ્ત વિગતો</string>
+    <string name="secure_vault">સુરક્ષિત તિજોરી</string>
+    <string name="settings">સેટિંગ્સ</string>
+    <string name="shake_to_lock">ફોન હલાવીને લૉક કરો</string>
+    <string name="shake_to_lock_desc">અચાનક ફોન હલવાથી આપાતકાલીન લૉકડાઉન સક્રિય કરો.</string>
+    <string name="snapshots">સ્નેપશોટ</string>
+    <string name="trash_bin">કચરાપેટી</string>
+    <string name="trash_purge">સ્વતઃ સફાઈ</string>
+    <string name="trash_purge_desc">દૂર કરેલા પાસવર્ડ્સ નિર્ધારિત સમય પછી કાયમ માટે ભૂંસાઈ જશે.</string>
+    <string name="unlocked">અનલૉક કરેલ</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Ulinzi Amilifu</string>
+    <string name="all">ZOTE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Ulinzi wa Programu</string>
+    <string name="autofill_btn">Wezesha Kujaza Kiotomatiki</string>
+    <string name="autofill_desc">Jaza maelezo ya kuingia kwa usalama kutoka kwenye kasha yako ya nje ya mtandao.</string>
+    <string name="autofill_title">Huduma ya Kujaza Kiotomatiki</string>
+    <string name="integrity_btn">Thibitisha Uadilifu Sasa</string>
+    <string name="integrity_desc">Ukaguzi wa hash wa SHA-256 ili kugundua mabadiliko yoyote.</string>
+    <string name="integrity_success">UADILIFU UMEKUBALIWA KUWA SAHIHI</string>
+    <string name="integrity_title">Uthibitishaji wa Uadilifu wa Kasha</string>
+    <string name="integrity_verifying">Inathibitisha...</string>
+    <string name="locked">Imefungwa</string>
+    <string name="search_apps">Tafuta programu...</string>
+    <string name="secrets">Siri</string>
+    <string name="secure_vault">Kasha Salama</string>
+    <string name="settings">Mipangilio</string>
+    <string name="shake_to_lock">Tikisa ili Kufunga</string>
+    <string name="shake_to_lock_desc">Huchochea kufungwa kwa dharura wakati mtikisiko mkali unapogunduliwa.</string>
+    <string name="snapshots">Picha</string>
+    <string name="trash_bin">Jalada</string>
+    <string name="trash_purge">Kusafisha Jalada</string>
+    <string name="trash_purge_desc">Siri zilizofutwa zitaharibiwa kabisa baada ya muda uliochaguliwa.</string>
+    <string name="unlocked">Imefunguliwa</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktibong Proteksyon</string>
+    <string name="all">LAHAT</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Proteksyon ng App</string>
+    <string name="autofill_btn">Paganahin ang Autofill</string>
+    <string name="autofill_desc">Ligtas na i-autofill ang mga login nang direkta mula sa offline vault.</string>
+    <string name="autofill_title">Autofill Service</string>
+    <string name="integrity_btn">I-verify ang Integrity Ngayon</string>
+    <string name="integrity_desc">Background SHA-256 audit para makita ang anumang pakikialam.</string>
+    <string name="integrity_success">INTEGRITY AY VERIFIED INTACT</string>
+    <string name="integrity_title">Pag-verify ng Vault Integrity</string>
+    <string name="integrity_verifying">Verifying...</string>
+    <string name="locked">Naka-lock</string>
+    <string name="search_apps">Maghanap ng mga app...</string>
+    <string name="secrets">Mga Lihim</string>
+    <string name="secure_vault">Ligtas na Vault</string>
+    <string name="settings">Mga Setting</string>
+    <string name="shake_to_lock">Yugyugin para I-lock</string>
+    <string name="shake_to_lock_desc">Nagsisimula ng emergency lockdown kapag nakakita ng biglaang pagyugyog.</string>
+    <string name="snapshots">Mga Larawan</string>
+    <string name="trash_bin">Recycle Bin</string>
+    <string name="trash_purge">Auto-Purge ng Trash</string>
+    <string name="trash_purge_desc">Ang mga lihim sa trash ay permanenteng mabubura pagkatapos ng napiling tagal.</string>
+    <string name="unlocked">Naka-unlock</string>
+</resources>

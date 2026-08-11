@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PureLock</string>
+    <string name="accessibility_service_description">PureLock uses this lightweight service strictly to detect when protected applications are launched and show the secure lock screen. PureLock contains zero internet permissions and never sends or shares your data.</string>
+    <string name="shortcut_vault_short">View Vault</string>
+    <string name="shortcut_vault_long">Open Encrypted Secret Vault</string>
+    <string name="shortcut_generator_short">Password Gen</string>
+    <string name="shortcut_generator_long">Generate Secure Password</string>
+</resources>

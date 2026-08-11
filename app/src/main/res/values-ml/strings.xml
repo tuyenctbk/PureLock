@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">സജീവ സംരക്ഷണം</string>
+    <string name="all">എല്ലാം</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">ആപ്പ് ഷീൽഡ്</string>
+    <string name="autofill_btn">ഓട്ടოഫിൽ പ്രവർത്തനക്ഷമമാക്കുക</string>
+    <string name="autofill_desc">വോൾട്ടിൽ നിന്ന് സുരക്ഷിതമായി ഓട്ടോ-ഫിൽ ചെയ്യുക.</string>
+    <string name="autofill_title">ആൻഡ്രോയിഡ് ഓട്ടോഫിൽ</string>
+    <string name="integrity_btn">സമഗ്രത പരിശോധിക്കുക</string>
+    <string name="integrity_desc">മാറ്റങ്ങൾ കണ്ടെത്താൻ പശ്ചാത്തല SHA-256 ഓഡിറ്റ് നടത്തുക.</string>
+    <string name="integrity_success">സമഗ്രത സ്ഥിരീകരിച്ചു</string>
+    <string name="integrity_title">വോൾട്ട് സമഗ്രതാ പരിശോധന</string>
+    <string name="integrity_verifying">പരിശോധിക്കുന്നു...</string>
+    <string name="locked">ലോക്ക് ചെയ്തു</string>
+    <string name="search_apps">ആപ്പുകൾ തിരയുക...</string>
+    <string name="secrets">രഹസ്യങ്ങൾ</string>
+    <string name="secure_vault">സുരക്ഷിത വോൾട്ട്</string>
+    <string name="settings">ക്രമീകരണങ്ങൾ</string>
+    <string name="shake_to_lock">ലോക്ക് ചെയ്യാൻ കുലുക്കുക</string>
+    <string name="shake_to_lock_desc">പെട്ടെന്ന് കുലുക്കുമ്പോൾ അടിയന്തിര ലോക്ക്ഡൗൺ സജീവമാക്കുന്നു.</string>
+    <string name="snapshots">സ്നാപ്ഷോട്ടുകൾ</string>
+    <string name="trash_bin">ട്രാഷ് ബിൻ</string>
+    <string name="trash_purge">ഓട്ടോ-ക്ലീനിംഗ്</string>
+    <string name="trash_purge_desc">തിരഞ്ഞെടുത്ത കാലയളവിനുശേഷം ഡാറ്റ ശാശ്വതമായി ഇല്ലാതാക്കപ്പെടും.</string>
+    <string name="unlocked">അൺലോക്ക് ചെയ്തു</string>
+</resources>

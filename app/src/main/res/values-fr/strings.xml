@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Protections Actives</string>
+    <string name="all">TOUT</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Protection App</string>
+    <string name="autofill_btn">Activer la Saisie Automatique</string>
+    <string name="autofill_desc">Saisie automatique sécurisée directement depuis votre coffre hors ligne.</string>
+    <string name="autofill_title">Saisie Automatique</string>
+    <string name="financial">FINANCES</string>
+    <string name="games">JEUX</string>
+    <string name="integrity_btn">Vérifier l\'Intégrité</string>
+    <string name="integrity_desc">Effectue un audit SHA-256 en arrière-plan pour détecter toute altération.</string>
+    <string name="integrity_success">INTÉGRITÉ VÉRIFIÉE INTACTE</string>
+    <string name="integrity_title">Vérification d\'Intégrité</string>
+    <string name="integrity_verifying">Vérification...</string>
+    <string name="locked">Verrouillé</string>
+    <string name="media">MÉDIAS</string>
+    <string name="search_apps">Rechercher des applications...</string>
+    <string name="secrets">Secrets</string>
+    <string name="secure_vault">Coffre Sécurisé</string>
+    <string name="settings">Paramètres</string>
+    <string name="shake_to_lock">Secouer pour Verrouiller</string>
+    <string name="shake_to_lock_desc">Déclenche un verrouillage d\'urgence en cas de secousse brusque.</string>
+    <string name="snapshots">Captures</string>
+    <string name="social">RÉSEAUX</string>
+    <string name="system">SYSTÈME</string>
+    <string name="trash_bin">Corbeille</string>
+    <string name="trash_purge">Période d\'Auto-Purge</string>
+    <string name="trash_purge_desc">Les secrets seront effacés définitivement après la durée choisie.</string>
+    <string name="unlocked">Déverrouillé</string>
+</resources>

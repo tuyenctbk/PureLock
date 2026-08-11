@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">محافظت فعال</string>
+    <string name="all">همه</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">محافظ برنامه</string>
+    <string name="autofill_btn">فعال‌سازی تکمیل خودکار</string>
+    <string name="autofill_desc">تکمیل خودکار امن رمزها بدون نیاز به اینترنت مستقیماً از گاوصندوق.</string>
+    <string name="autofill_title">سرویس تکمیل خودکار اندروید</string>
+    <string name="integrity_btn">سلامت گاوصندوق را بررسی کن</string>
+    <string name="integrity_desc">بررسی هش SHA-256 در پس‌زمینه جهت کشف دستکاری یا خرابی فایل‌ها.</string>
+    <string name="integrity_success">اطلاعات تایید شده و کاملاً سالم هستند</string>
+    <string name="integrity_title">تأیید سلامت گاوصندوق</string>
+    <string name="integrity_verifying">در حال بررسی سلامت...</string>
+    <string name="locked">قفل شده</string>
+    <string name="search_apps">جستجوی برنامه‌ها...</string>
+    <string name="secrets">اطلاعات رمزنگاری</string>
+    <string name="secure_vault">گاوصندوق امن</string>
+    <string name="settings">تنظیمات</string>
+    <string name="shake_to_lock">قفل با تکان دادن تلفن</string>
+    <string name="shake_to_lock_desc">اجرای قفل اضطراری سریع در صورت تکان دادن ناگهانی تلفن همراه.</string>
+    <string name="snapshots">تصاویر نفوذ</string>
+    <string name="trash_bin">سطل زباله</string>
+    <string name="trash_purge">پاکسازی خودکار سطل</string>
+    <string name="trash_purge_desc">اطلاعات حذف شده پس از دوره مشخص شده برای همیشه نابود خواهند شد.</string>
+    <string name="unlocked">باز شده</string>
+</resources>

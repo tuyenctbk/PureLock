@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">აქტიური დაცვა</string>
+    <string name="all">ყველა</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">აპლიკაციის დაცვა</string>
+    <string name="autofill_btn">ჩართეთ ავტომატური შევსება</string>
+    <string name="autofill_desc">უსაფრთხოდ შეავსეთ მონაცემები საცავიდან ინტერნეტის გარეშე.</string>
+    <string name="autofill_title">ავტომატური შევსება</string>
+    <string name="integrity_btn">შეამოწმეთ მთლიანობა ახლავე</string>
+    <string name="integrity_desc">ფონური SHA-256 აუდიტი ცვლილებების აღმოსაჩენად.</string>
+    <string name="integrity_success">მთლიანობა დადასტურებულია</string>
+    <string name="integrity_title">საცავის მთლიანობის შემოწმება</string>
+    <string name="integrity_verifying">მოწმდება...</string>
+    <string name="locked">დაბლოკილი</string>
+    <string name="search_apps">ძებნა...</string>
+    <string name="secrets">საიდუმლოებები</string>
+    <string name="secure_vault">დაცული საცავი</string>
+    <string name="settings">პარამეტრები</string>
+    <string name="shake_to_lock">შენჯღრევა დასაბლოკად</string>
+    <string name="shake_to_lock_desc">აშორებს გადაუდებელ ბლოკირებას მოულოდნელი შენჯღრევისას.</string>
+    <string name="snapshots">სურათები</string>
+    <string name="trash_bin">ნაგვის ყუთი</string>
+    <string name="trash_purge">ავტომატური გასუფთავება</string>
+    <string name="trash_purge_desc">წაშლილი საიდუმლოებები სამუდამოდ წაიშლება არჩეული დროის შემდეგ.</string>
+    <string name="unlocked">განბლოკილი</string>
+</resources>

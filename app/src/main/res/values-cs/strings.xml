@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktivní ochrana</string>
+    <string name="all">VŠE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Ochrana aplikací</string>
+    <string name="autofill_btn">Aktivovat automatické vyplňování</string>
+    <string name="autofill_desc">Bezpečné automatické vyplňování hesel přímo z offline trezoru.</string>
+    <string name="autofill_title">Automatické vyplňování Android</string>
+    <string name="integrity_btn">Ověřit integritu trezoru</string>
+    <string name="integrity_desc">Podkladový SHA-256 audit pro detekci poškození dat.</string>
+    <string name="integrity_success">INTEGRITA ÚSPĚŠNĚ OVĚŘENA</string>
+    <string name="integrity_title">Ověření integrity trezoru</string>
+    <string name="integrity_verifying">Ověřování...</string>
+    <string name="locked">Uzamčeno</string>
+    <string name="search_apps">Hledat...</string>
+    <string name="secrets">Tajemství</string>
+    <string name="secure_vault">Trezor</string>
+    <string name="settings">Nastavení</string>
+    <string name="shake_to_lock">Gesto zatřesení pro uzamčení</string>
+    <string name="shake_to_lock_desc">Spustí nouzové uzamčení při detekování náhlého zatřesení.</string>
+    <string name="snapshots">Snímky</string>
+    <string name="trash_bin">Koš</string>
+    <string name="trash_purge">Automatické vysypávání</string>
+    <string name="trash_purge_desc">Smazané položky budou trvale odstraněny po zvolené době.</string>
+    <string name="unlocked">Odemčeno</string>
+</resources>

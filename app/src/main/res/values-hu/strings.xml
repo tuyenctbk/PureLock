@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktív védelem</string>
+    <string name="all">MIND</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Alkalmazásvédelem</string>
+    <string name="autofill_btn">Automatikus kitöltés bekapcsolása</string>
+    <string name="autofill_desc">Biztonságos automatikus kitöltés közvetlenül az offline trezorból.</string>
+    <string name="autofill_title">Android Automatikus kitöltés</string>
+    <string name="integrity_btn">Trezor integritás ellenőrzése most</string>
+    <string name="integrity_desc">Háttérben futó SHA-256 ellenőrzés a módosítások felderítésére.</string>
+    <string name="integrity_success">AZ INTEGRITÁS SIKERESEN MEGERŐSÍTVE</string>
+    <string name="integrity_title">Trezor integritás ellenőrzése</string>
+    <string name="integrity_verifying">Ellenőrzés fut...</string>
+    <string name="locked">Zárolt</string>
+    <string name="search_apps">Alkalmazás keresése...</string>
+    <string name="secrets">Titkok</string>
+    <string name="secure_vault">Biztonságos trezor</string>
+    <string name="settings">Beállítások</string>
+    <string name="shake_to_lock">Rázás a zároláshoz</string>
+    <string name="shake_to_lock_desc">Azonnali vészhelyzeti zárolást hajt végre hirtelen rázási mozdulatra.</string>
+    <string name="snapshots">Pillanatképek</string>
+    <string name="trash_bin">Kuka</string>
+    <string name="trash_purge">Kuka automatikus ürítése</string>
+    <string name="trash_purge_desc">A törölt titkok a választott idő után automatikusan és véglegesen törlődnek.</string>
+    <string name="unlocked">Feloldott</string>
+</resources>

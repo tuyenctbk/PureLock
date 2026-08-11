@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Активна заштита</string>
+    <string name="all">СВЕ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Заштита апликација</string>
+    <string name="autofill_btn">Омогући аутоматско попуњавање</string>
+    <string name="autofill_desc">Сигурно аутоматски попуните лозинке директно из трезора.</string>
+    <string name="autofill_title">Услуга аутоматског попуњавања</string>
+    <string name="integrity_btn">Провери интегритет сада</string>
+    <string name="integrity_desc">Позадинска SHA-256 провера за откривање нелегалних измена.</string>
+    <string name="integrity_success">ИНТЕГРИТЕТ ЈЕ ПОТВРЂЕН И НЕТАКНУТ</string>
+    <string name="integrity_title">Провера интегритета трезора</string>
+    <string name="integrity_verifying">Проверавање...</string>
+    <string name="locked">Закључано</string>
+    <string name="search_apps">Претрага апликација...</string>
+    <string name="secrets">Тајне</string>
+    <string name="secure_vault">Сигуран трезор</string>
+    <string name="settings">Подешавања</string>
+    <string name="shake_to_lock">Протресите за закључавање</string>
+    <string name="shake_to_lock_desc">Активира хитно закључавање при наглом протресању телефона.</string>
+    <string name="snapshots">Снимци</string>
+    <string name="trash_bin">Корпа за отпатке</string>
+    <string name="trash_purge">Аутоматско чишћење</string>
+    <string name="trash_purge_desc">Обрисане тајне биће трајно избрисане након изабраног периода.</string>
+    <string name="unlocked">Откључано</string>
+</resources>

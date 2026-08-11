@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktiv Qorumalar</string>
+    <string name="all">HAMISI</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Tətbiq Qoruyucu</string>
+    <string name="autofill_btn">Avtomatik doldurmanı aktiv et</string>
+    <string name="autofill_desc">Giriş məlumatlarını offline seyfdən təhlükəsiz doldurun.</string>
+    <string name="autofill_title">Avtomatik doldurma</string>
+    <string name="integrity_btn">Bütünlüyü yoxla</string>
+    <string name="integrity_desc">Dəyişiklikləri aşkar etmək üçün fona SHA-256 yoxlaması.</string>
+    <string name="integrity_success">BÜTÜNLÜK TƏSDİQLƏNDİ</string>
+    <string name="integrity_title">Seyf bütünlüyü yoxlaması</string>
+    <string name="integrity_verifying">Yoxlanılır...</string>
+    <string name="locked">Kilidli</string>
+    <string name="search_apps">Tətbiq axtar...</string>
+    <string name="secrets">Sirlər</string>
+    <string name="secure_vault">Təhlükəsiz Seyf</string>
+    <string name="settings">Ayarlar</string>
+    <string name="shake_to_lock">Kilidləmək üçün salla</string>
+    <string name="shake_to_lock_desc">Sallanma hərəkəti aşkar edildikdə təcili kilidləməni işə salır.</string>
+    <string name="snapshots">Görüntülər</string>
+    <string name="trash_bin">Zibil Qutusu</string>
+    <string name="trash_purge">Zibil qutusunun təmizlənməsi</string>
+    <string name="trash_purge_desc">Silinmiş sirlər seçilmiş müddətdən sonra birdəfəlik silinəcək.</string>
+    <string name="unlocked">Kilidsiz</string>
+</resources>

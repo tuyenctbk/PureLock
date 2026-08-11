@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktif Korumalar</string>
+    <string name="all">HEPSİ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Uygulama Koruması</string>
+    <string name="autofill_btn">Otomatik Doldurmayı Etkinleştir</string>
+    <string name="autofill_desc">Çevrimdışı kasanızdan şifreleri güvenli ve otomatik doldurun.</string>
+    <string name="autofill_title">Android Otomatik Doldurma</string>
+    <string name="integrity_btn">Bütünlüğü Şimdi Doğrula</string>
+    <string name="integrity_desc">Yetkisiz değişiklikleri tespit etmek için SHA-256 denetimi gerçekleştirir.</string>
+    <string name="integrity_success">BÜTÜNLÜK DOĞRULANDI HASARSIZ</string>
+    <string name="integrity_title">Kasa Bütünlüğü Doğrulama</string>
+    <string name="integrity_verifying">Doğrulanıyor...</string>
+    <string name="locked">Kilitli</string>
+    <string name="search_apps">Uygulama ara...</string>
+    <string name="secrets">Sırlar</string>
+    <string name="secure_vault">Güvenli Kasa</string>
+    <string name="settings">Ayarlar</string>
+    <string name="shake_to_lock">Kilitlemek için Salla</string>
+    <string name="shake_to_lock_desc">Sallama hareketi algılandığında acil durum kilidini tetikler.</string>
+    <string name="snapshots">Görüntüler</string>
+    <string name="trash_bin">Çöp Kutusu</string>
+    <string name="trash_purge">Otomatik Çöp Temizliği</string>
+    <string name="trash_purge_desc">Silinen sırlar seçilen süre sonunda kalıcı olarak temizlenir.</string>
+    <string name="unlocked">Kilit Açık</string>
+</resources>

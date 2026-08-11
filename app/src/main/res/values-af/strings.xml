@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktiewe beskerming</string>
+    <string name="all">ALLES</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Toepassingbeskerming</string>
+    <string name="autofill_btn">Aktiver outo-vul</string>
+    <string name="autofill_desc">Vul aanmeldings veilig direk vanaf jou vanlyn kluis in.</string>
+    <string name="autofill_title">Outovul-diens</string>
+    <string name="integrity_btn">Verifieer integriteit nou</string>
+    <string name="integrity_desc">Agtergrond SHA-256-kontrole om knoeiery op te spoor.</string>
+    <string name="integrity_success">INTEGRITEIT AS INTAK BEVESTIG</string>
+    <string name="integrity_title">Kluisintegriteitverifikasie</string>
+    <string name="integrity_verifying">Verifieer momenteel...</string>
+    <string name="locked">Gesluit</string>
+    <string name="search_apps">Soek toepassings...</string>
+    <string name="secrets">Geheime</string>
+    <string name="secure_vault">Veilige kluis</string>
+    <string name="settings">Instellings</string>
+    <string name="shake_to_lock">Skud om te sluit</string>
+    <string name="shake_to_lock_desc">Aktiveer noodsluiting wanneer \'n skielike skudding waargeneem word.</string>
+    <string name="snapshots">Skermkiekies</string>
+    <string name="trash_bin">Asblik</string>
+    <string name="trash_purge">Asblik outo-skoonmaak</string>
+    <string name="trash_purge_desc">Geskrapte geheime word permanent na die gekose tydperk uitgevee.</string>
+    <string name="unlocked">Oopgesluit</string>
+</resources>

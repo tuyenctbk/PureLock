@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Ակտիվ պաշտպանություն</string>
+    <string name="all">ԲՈԼՈՐԸ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Հավելվածների պաշտպանություն</string>
+    <string name="autofill_btn">Միացնել ավտոլրացումը</string>
+    <string name="autofill_desc">Ապահով ավտոլրացրեք տվյալները անցանց պահոցից:</string>
+    <string name="autofill_title">Ավտոլրացում</string>
+    <string name="integrity_btn">Ստուգել ամբողջականությունը</string>
+    <string name="integrity_desc">Հետին պլանի SHA-256 ստուգում փոփոությունները հայտնաբերելու համար:</string>
+    <string name="integrity_success">ԱՄԲՈՂՋԱԿԱՆՈՒԹՅՈՒՆԸ ՍՏՈՒԳՎԱԾ Է</string>
+    <string name="integrity_title">Պահոցի ամբողջականություն</string>
+    <string name="integrity_verifying">Ստուգվում է...</string>
+    <string name="locked">Կողպված է</string>
+    <string name="search_apps">Որոնել...</string>
+    <string name="secrets">Գաղտնիքներ</string>
+    <string name="secure_vault">Ապահով պահոց</string>
+    <string name="settings">Կարգավորումներ</string>
+    <string name="shake_to_lock">Թափահարել կողպելու համար</string>
+    <string name="shake_to_lock_desc">Ակտիվացնում է անհապաղ կողպում հանկարծակի թափահարումից:</string>
+    <string name="snapshots">Պատկերներ</string>
+    <string name="trash_bin">Աղբաման</string>
+    <string name="trash_purge">Աղբամանի մաքրում</string>
+    <string name="trash_purge_desc">Ջնջված գաղտնիքները ընտրված ժամանակից հետո ընդմիշտ կջնջվեն:</string>
+    <string name="unlocked">Ապակողպված է</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktiiviset suojat</string>
+    <string name="all">KAIKKI</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Sovellussuoja</string>
+    <string name="autofill_btn">Ota automaattinen täyttö käyttöön</string>
+    <string name="autofill_desc">Täytä kirjautumistiedot turvallisesti suoraan offline-tallennuksesta.</string>
+    <string name="autofill_title">Androidin automaattinen täyttö</string>
+    <string name="integrity_btn">Varmista eheys nyt</string>
+    <string name="integrity_desc">Suorittaa taustalla SHA-256-tarkistuksen muutosten havaitsemiseksi.</string>
+    <string name="integrity_success">EHEYS VARMISTETTU VIRHEETTÖMÄKSI</string>
+    <string name="integrity_title">Eheyden varmistus</string>
+    <string name="integrity_verifying">Varmistetaan...</string>
+    <string name="locked">Lukittu</string>
+    <string name="search_apps">Etsi sovelluksia...</string>
+    <string name="secrets">Salaisuudet</string>
+    <string name="secure_vault">Turvatalletus</string>
+    <string name="settings">Asetukset</string>
+    <string name="shake_to_lock">Lukitus ravistamalla</string>
+    <string name="shake_to_lock_desc">Käynnistää hätälukituksen, kun havaitaan äkillinen ravistusliike.</string>
+    <string name="snapshots">Kuvat</string>
+    <string name="trash_bin">Roskakori</string>
+    <string name="trash_purge">Roskakorin tyhjennys</string>
+    <string name="trash_purge_desc">Poistetut salaisuudet poistetaan pysyvästi valitun ajan jälkeen.</string>
+    <string name="unlocked">Lukitsematon</string>
+</resources>

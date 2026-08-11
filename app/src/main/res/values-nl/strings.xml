@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Actieve bescherming</string>
+    <string name="all">ALLE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">App-beveiliging</string>
+    <string name="autofill_btn">Autofill inschakelen</string>
+    <string name="autofill_desc">Veilig wachtwoorden invullen rechtstreeks vanuit uw offline kluis.</string>
+    <string name="autofill_title">Android Autofill-service</string>
+    <string name="integrity_btn">Controleer integriteit nu</string>
+    <string name="integrity_desc">Achtergrond SHA-256-controle om manipulatie op te sporen.</string>
+    <string name="integrity_success">INTEGRITEIT GOEDGEKEURD INTACT</string>
+    <string name="integrity_title">Kluisintegriteitscontrole</string>
+    <string name="integrity_verifying">Controleren...</string>
+    <string name="locked">Gegrendeld</string>
+    <string name="search_apps">Zoeken...</string>
+    <string name="secrets">Geheimen</string>
+    <string name="secure_vault">Kluis</string>
+    <string name="settings">Instellingen</string>
+    <string name="shake_to_lock">Schudden om te vergrendelen</string>
+    <string name="shake_to_lock_desc">Start noodvergrendeling bij een plotselinge schudbeweging.</string>
+    <string name="snapshots">Snapshots</string>
+    <string name="trash_bin">Prullenbak</string>
+    <string name="trash_purge">Automatisch legen</string>
+    <string name="trash_purge_desc">Geheimen in de prullenbak worden definitief gewist na de gekozen tijd.</string>
+    <string name="unlocked">Ontgrendeld</string>
+</resources>

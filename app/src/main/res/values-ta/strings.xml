@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">செயலில் உள்ள பாதுகாப்பு</string>
+    <string name="all">அனைத்தும்</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">ஆப் ஷீல்ட்</string>
+    <string name="autofill_btn">ஆட்டோஃபில்லை இயக்குக</string>
+    <string name="autofill_desc">பெட்டகத்திலிருந்து பாதுகாப்பாக ஆட்டோஃபில் செய்யவும்.</string>
+    <string name="autofill_title">ஆண்ட்ராய்டு ஆட்டோஃபில்</string>
+    <string name="integrity_btn">சரிபார்ப்பை இயக்குக</string>
+    <string name="integrity_desc">மாற்றங்களைக் கண்டறிய பின்னணி SHA-256 தணிக்கையை இயக்கவும்.</string>
+    <string name="integrity_success">நேர்மை வெற்றிகரமாக சரிபார்க்கப்பட்டது</string>
+    <string name="integrity_title">பெட்டகத்தின் நேர்மை சரிபார்ப்பு</string>
+    <string name="integrity_verifying">சரிபார்க்கிறது...</string>
+    <string name="locked">பூட்டப்பட்டது</string>
+    <string name="search_apps">ஆப்ஸ்களை தேடுக...</string>
+    <string name="secrets">ரகசியங்கள்</string>
+    <string name="secure_vault">பாதுகாப்பான பெட்டகம்</string>
+    <string name="settings">அமைப்புகள்</string>
+    <string name="shake_to_lock">பூட்ட குலுக்கவும்</string>
+    <string name="shake_to_lock_desc">திடீர் குலுக்கலைக் கண்டறிந்தால் அவசர பூட்டுதலைச் செயல்படுத்தும்.</string>
+    <string name="snapshots">ஸ்னாப்ஷாட்கள்</string>
+    <string name="trash_bin">குப்பைத் தொட்டி</string>
+    <string name="trash_purge">தானியங்கி குப்பை நீக்கம்</string>
+    <string name="trash_purge_desc">அழிக்கப்பட்ட தரவுகள் தேர்ந்தெடுக்கப்பட்ட காலத்திற்குப் பிறகு நிரந்தரமாக நீக்கப்படும்.</string>
+    <string name="unlocked">திறக்கப்பட்டது</string>
+</resources>

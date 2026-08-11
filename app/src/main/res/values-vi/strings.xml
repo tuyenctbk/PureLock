@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Đang Bảo Vệ</string>
+    <string name="all">TẤT CẢ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Khóa Ứng Dụng</string>
+    <string name="autofill_btn">Bật Tự Động Điền PureLock trong Cài Đặt</string>
+    <string name="autofill_desc">Tự động điền mật khẩu vào ứng dụng khác một cách an toàn trực tiếp từ két ngoại tuyến.</string>
+    <string name="autofill_title">Dịch vụ Tự Động Điền</string>
+    <string name="financial">TÀI CHÍNH</string>
+    <string name="games">TRÒ CHƠI</string>
+    <string name="integrity_btn">Kiểm tra Tính Toàn Vẹn Ngay</string>
+    <string name="integrity_desc">Quét mã SHA-256 chạy ẩn để kiểm tra xem dữ liệu có bị chỉnh sửa hoặc bị hỏng hay không.</string>
+    <string name="integrity_success">TÍNH TOÀN VẸN ĐƯỢC ĐẢM BẢO AN TOÀN</string>
+    <string name="integrity_title">Xác minh Tính Toàn Vẹn Két</string>
+    <string name="integrity_verifying">Đang kiểm tra...</string>
+    <string name="locked">Đã khóa</string>
+    <string name="media">TRUYỀN THÔNG</string>
+    <string name="search_apps">Tìm ứng dụng...</string>
+    <string name="secrets">Mật Khẩu</string>
+    <string name="secure_vault">Két Bảo Mật</string>
+    <string name="settings">Cài Đặt</string>
+    <string name="shake_to_lock">Cử chỉ Lắc để khóa</string>
+    <string name="shake_to_lock_desc">Kích hoạt khóa khẩn cấp ngay lập tức khi cảm biến phát hiện chuyển động lắc mạnh.</string>
+    <string name="snapshots">Ảnh Kẻ Xâm Nhập</string>
+    <string name="social">MẠNG XÃ HỘI</string>
+    <string name="system">HỆ THỐNG</string>
+    <string name="trash_bin">Thùng Rác</string>
+    <string name="trash_purge">Tự động dọn thùng rác</string>
+    <string name="trash_purge_desc">Các dữ liệu đã xóa sẽ tự động bị hủy vĩnh viễn sau khoảng thời gian đã chọn.</string>
+    <string name="unlocked">Đã mở khóa</string>
+</resources>

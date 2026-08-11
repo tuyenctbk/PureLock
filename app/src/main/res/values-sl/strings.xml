@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktivne zaščite</string>
+    <string name="all">VSE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Zaščita aplikacij</string>
+    <string name="autofill_btn">Omoguči samodejno izpolnjevanje</string>
+    <string name="autofill_desc">Varno samodejno izpolnite podatke neposredno iz trezorja.</string>
+    <string name="autofill_title">Storitev samodejnega izpolnjevanja</string>
+    <string name="integrity_btn">Preveri integriteto zdaj</string>
+    <string name="integrity_desc">Preverjanje SHA-256 v ozadju za zaznavanje sprememb.</string>
+    <string name="integrity_success">INTEGRITETA JE POTRJENA NEPOŠKODOVANA</string>
+    <string name="integrity_title">Preverjanje integritete trezorja</string>
+    <string name="integrity_verifying">Preverjanje...</string>
+    <string name="locked">Zaklenjeno</string>
+    <string name="search_apps">Iskanje aplikacij...</string>
+    <string name="secrets">Skrivnosti</string>
+    <string name="secure_vault">Varni trezor</string>
+    <string name="settings">Nastavitve</string>
+    <string name="shake_to_lock">Stresanje za zaklepanje</string>
+    <string name="shake_to_lock_desc">Sproži zasilno zaklepanje ob zaznavi nenadnega tresenja.</string>
+    <string name="snapshots">Posnetki</string>
+    <string name="trash_bin">Smetnjak</string>
+    <string name="trash_purge">Samodejno čiščenje</string>
+    <string name="trash_purge_desc">Izbrisane skrivnosti bodo trajno izbrisane po izbranem času.</string>
+    <string name="unlocked">Odklenjeno</string>
+</resources>

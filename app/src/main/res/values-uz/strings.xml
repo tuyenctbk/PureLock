@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Faol Himoya</string>
+    <string name="all">BARCHASI</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Ilova Himoyasi</string>
+    <string name="autofill_btn">Avto-to\'ldirishni yoqing</string>
+    <string name="autofill_desc">Parollarni xavfsiz ravishda oflayn seyfdan to\'ldiring.</string>
+    <string name="autofill_title">Avtomatik to\'ldirish</string>
+    <string name="integrity_btn">Butunlikni hozir tekshirish</string>
+    <string name="integrity_desc">O\'zgarishlarni aniqlash uchun fonda SHA-256 tekshiruvi.</string>
+    <string name="integrity_success">BUTUNLIK TASDIQLANDI</string>
+    <string name="integrity_title">Seyf butunligini tekshirish</string>
+    <string name="integrity_verifying">Tekshirilmoqda...</string>
+    <string name="locked">Bloklangan</string>
+    <string name="search_apps">Ilovani qidirish...</string>
+    <string name="secrets">Sirlar</string>
+    <string name="secure_vault">Xavfsiz Seyf</string>
+    <string name="settings">Sozlamalar</string>
+    <string name="shake_to_lock">Bloklash uchun silkiting</string>
+    <string name="shake_to_lock_desc">To\'satdan silkitish aniqlanganda favqulodda qulflashni ishga tushiradi.</string>
+    <string name="snapshots">Suratlar</string>
+    <string name="trash_bin">Chiqindi Qutisi</string>
+    <string name="trash_purge">Chiqindini tozalash</string>
+    <string name="trash_purge_desc">O\'chirilgan sirlar tanlangan vaqtdan keyin butunlay yo\'q qilinadi.</string>
+    <string name="unlocked">Blokdan ochilgan</string>
+</resources>

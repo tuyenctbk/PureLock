@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktyvi apsauga</string>
+    <string name="all">VISOS</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Programėlių apsauga</string>
+    <string name="autofill_btn">Įjungti automatinį užpildymą</string>
+    <string name="autofill_desc">Saugiai užpildykite slaptažodžius tiesiai iš neprisijungus seifo.</string>
+    <string name="autofill_title">Automatinio užpildymo paslauga</string>
+    <string name="integrity_btn">Patikrinti vientisumą dabar</string>
+    <string name="integrity_desc">Fono SHA-256 auditas, skirtas aptikti klastojimą.</string>
+    <string name="integrity_success">VIENTISUMAS PATVIRTINTAS NEPAŽEISTAS</string>
+    <string name="integrity_title">Seifo vientisumo patikra</string>
+    <string name="integrity_verifying">Tikrinama...</string>
+    <string name="locked">Užrakinta</string>
+    <string name="search_apps">Ieškoti programėlių...</string>
+    <string name="secrets">Paslaptys</string>
+    <string name="secure_vault">Saugus seifas</string>
+    <string name="settings">Nustatymai</string>
+    <string name="shake_to_lock">Suvėrimas užrakinti</string>
+    <string name="shake_to_lock_desc">Suaktyvina avarinį užrakinimą, kai aptinkamas staigus purtymas.</string>
+    <string name="snapshots">Nuotraukos</string>
+    <string name="trash_bin">Šiukšlinė</string>
+    <string name="trash_purge">Automatinis šiukšlinės valymas</string>
+    <string name="trash_purge_desc">Ištrintos paslaptys bus visam laikui pašalintos po pasirinkto laiko.</string>
+    <string name="unlocked">Atrakinta</string>
+</resources>

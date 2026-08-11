@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Perlindungan Aktif</string>
+    <string name="all">SEMUA</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Pelindung Aplikasi</string>
+    <string name="autofill_btn">Aktifkan Isi Automatik</string>
+    <string name="autofill_desc">Mengisi kata laluan dengan selamat daripada brankas luar talian anda.</string>
+    <string name="autofill_title">Perkhidmatan Isi Automatik Android</string>
+    <string name="integrity_btn">Sahkan Integriti Sekarang</string>
+    <string name="integrity_desc">Audit hash SHA-256 latar belakang untuk mengesan sebarang gangguan.</string>
+    <string name="integrity_success">INTEGRITI DISAHKAN SELESA</string>
+    <string name="integrity_title">Sahkan Integriti Brankas</string>
+    <string name="integrity_verifying">Mengesahkan...</string>
+    <string name="locked">Terkunci</string>
+    <string name="search_apps">Cari aplikasi...</string>
+    <string name="secrets">Rahsia</string>
+    <string name="secure_vault">Brankas Selamat</string>
+    <string name="settings">Tetapan</string>
+    <string name="shake_to_lock">Goncang untuk Mengunci</string>
+    <string name="shake_to_lock_desc">Mencetuskan kunci kecemasan apabila peranti digoncang secara mengejut.</string>
+    <string name="snapshots">Tangkapan</string>
+    <string name="trash_bin">Tong Sampah</string>
+    <string name="trash_purge">Pembersihan Tong Sampah</string>
+    <string name="trash_purge_desc">Rahsia yang dipadamkan akan dibuang secara kekal mengikut tempoh terpilih.</string>
+    <string name="unlocked">Terbuka</string>
+</resources>

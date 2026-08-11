@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktywna ochrona</string>
+    <string name="all">WSZYSTKO</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Ochrona aplikacji</string>
+    <string name="autofill_btn">Włącz autouzupełnianie</string>
+    <string name="autofill_desc">Bezpieczne autouzupełnianie haseł z lokalnego sejfu.</string>
+    <string name="autofill_title">Autouzupełnianie Android</string>
+    <string name="integrity_btn">Sprawdź integralność</string>
+    <string name="integrity_desc">Audyt SHA-256 bazy danych pod kątem zmian.</string>
+    <string name="integrity_success">INTEGRALNOŚĆ ZWERYFIKOWANA POMYŚLNIE</string>
+    <string name="integrity_title">Weryfikacja integralności</string>
+    <string name="integrity_verifying">Weryfikacja...</string>
+    <string name="locked">Zablokowany</string>
+    <string name="search_apps">Szukaj...</string>
+    <string name="secrets">Tajemnice</string>
+    <string name="secure_vault">Sejf</string>
+    <string name="settings">Ustawienia</string>
+    <string name="shake_to_lock">Potrząśnij, aby zablokować</string>
+    <string name="shake_to_lock_desc">Włącza blokadę awaryjną przy potrząśnięciu.</string>
+    <string name="snapshots">Migawki</string>
+    <string name="trash_bin">Kosz</string>
+    <string name="trash_purge">Automatyczne czyszczenie kosza</string>
+    <string name="trash_purge_desc">Usunięte hasła zostaną trwale wymazane po wybranym czasie.</string>
+    <string name="unlocked">Odblokowany</string>
+</resources>

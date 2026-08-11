@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">활성 보호</string>
+    <string name="all">전체</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">앱 보호</string>
+    <string name="autofill_btn">설정에서 PureLock 자동 채우기 활성화</string>
+    <string name="autofill_desc">오프라인 금고에서 다른 앱의 로그인 입력란에 직접 안전하게 자동 완성해 줍니다.</string>
+    <string name="autofill_title">Android 자동 채우기 API</string>
+    <string name="financial">금융</string>
+    <string name="games">게임</string>
+    <string name="integrity_btn">금고 무결성 즉시 확인</string>
+    <string name="integrity_desc">백그라운드에서 SHA-256 해시 검사를 통해 로컬 데이터베이스 변조나 손상을 감지합니다.</string>
+    <string name="integrity_success">무결성 검증 완료: 정상 상태</string>
+    <string name="integrity_title">금고 무결성 실시간 확인</string>
+    <string name="integrity_verifying">무결성 검사 중...</string>
+    <string name="locked">잠금됨</string>
+    <string name="media">미디어</string>
+    <string name="search_apps">앱 검색...</string>
+    <string name="secrets">보안 비밀</string>
+    <string name="secure_vault">보안 금고</string>
+    <string name="settings">설정</string>
+    <string name="shake_to_lock">흔들어서 즉시 잠금</string>
+    <string name="shake_to_lock_desc">기기 가속도 센서가 갑작스러운 흔들림을 감지하면 즉시 비상 잠금을 실행합니다.</string>
+    <string name="snapshots">침입자 사진</string>
+    <string name="social">소셜</string>
+    <string name="system">시스템</string>
+    <string name="trash_bin">휴지통</string>
+    <string name="trash_purge">휴지통 자동 비우기</string>
+    <string name="trash_purge_desc">삭제된 비밀번호는 지정된 기간 후에 자동으로 영구 소멸 및 삭제됩니다.</string>
+    <string name="unlocked">해제됨</string>
+</resources>

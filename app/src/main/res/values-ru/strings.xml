@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Активная защита</string>
+    <string name="all">ВСЕ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Защита приложений</string>
+    <string name="autofill_btn">Включить автозаполнение</string>
+    <string name="autofill_desc">Безопасное автозаполнение учетных данных напрямую из офлайн-сейфа.</string>
+    <string name="autofill_title">Автозаполнение Android</string>
+    <string name="financial">ФИНАНСЫ</string>
+    <string name="games">ИГРЫ</string>
+    <string name="integrity_btn">Проверить целостность</string>
+    <string name="integrity_desc">Фоновая проверка хэша SHA-256 на предмет взлома или повреждения.</string>
+    <string name="integrity_success">ЦЕЛОСТНОСТЬ ПОДТВЕРЖДЕНА ИНТАКТНОЙ</string>
+    <string name="integrity_title">Проверка целостности</string>
+    <string name="integrity_verifying">Проверка хэшей...</string>
+    <string name="locked">Заблокировано</string>
+    <string name="media">МЕДИА</string>
+    <string name="search_apps">Поиск приложений...</string>
+    <string name="secrets">Секреты</string>
+    <string name="secure_vault">Сейф</string>
+    <string name="settings">Настройки</string>
+    <string name="shake_to_lock">Блокировка встряхиванием</string>
+    <string name="shake_to_lock_desc">Экстренная блокировка при обнаружении резкого встряхивания.</string>
+    <string name="snapshots">Снимки</string>
+    <string name="social">СОЦСЕТИ</string>
+    <string name="system">СИСТЕМА</string>
+    <string name="trash_bin">Корзина</string>
+    <string name="trash_purge">Очистка корзины</string>
+    <string name="trash_purge_desc">Удаленные секреты стираются навсегда по истечении периода.</string>
+    <string name="unlocked">Разблокировано</string>
+</resources>

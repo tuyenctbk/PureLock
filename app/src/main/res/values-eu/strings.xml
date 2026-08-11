@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Babes aktiboak</string>
+    <string name="all">DENAK</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Aplikazio-babesa</string>
+    <string name="autofill_btn">Gaitu autobetetzea</string>
+    <string name="autofill_desc">Autobete pasahitzak gotorleku lineaz kanpotik modu seguruan.</string>
+    <string name="autofill_title">Autobetetze zerbitzua</string>
+    <string name="integrity_btn">Egiaztatu osotasuna orain</string>
+    <string name="integrity_desc">SHA-256 auditoria atzealdean aldaketak detektatzeko.</string>
+    <string name="integrity_success">OSOTASUNA ZUZEN EGIAZTATU DA</string>
+    <string name="integrity_title">Gotorlekuaren osotasuna</string>
+    <string name="integrity_verifying">Egiaztatzen...</string>
+    <string name="locked">Blokeatuta</string>
+    <string name="search_apps">Bilatu aplikazioak...</string>
+    <string name="secrets">Sekretuak</string>
+    <string name="secure_vault">Gotorleku segurua</string>
+    <string name="settings">Ezarpenak</string>
+    <string name="shake_to_lock">Mugitu blokeatzeko</string>
+    <string name="shake_to_lock_desc">Larrialdi-blokeoa aktibatzen du mugimendu zakar bat detektatzean.</string>
+    <string name="snapshots">Argazkiak</string>
+    <string name="trash_bin">Zakarrontzia</string>
+    <string name="trash_purge">Zakarrontzia garbitzea</string>
+    <string name="trash_purge_desc">Ezabatutako sekretuak betiko ezabatuko dira hautatutako epea igarotakoan.</string>
+    <string name="unlocked">Desblokeatuta</string>
+</resources>

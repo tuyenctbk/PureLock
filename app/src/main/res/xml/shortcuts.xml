@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="view_vault"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_vault_short"
+        android:shortcutLongLabel="@string/shortcut_vault_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example"
+            android:targetClass="com.example.MainActivity">
+            <extra android:name="shortcut_action" android:value="VIEW_VAULT" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="generate_password"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_generator_short"
+        android:shortcutLongLabel="@string/shortcut_generator_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example"
+            android:targetClass="com.example.MainActivity">
+            <extra android:name="shortcut_action" android:value="GENERATE_PASSWORD" />
+        </intent>
+    </shortcut>
+</shortcuts>

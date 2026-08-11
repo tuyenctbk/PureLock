@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Protezioni Attive</string>
+    <string name="all">TUTTE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Protezione</string>
+    <string name="autofill_btn">Abilita Compilazione Automatica</string>
+    <string name="autofill_desc">Compila in sicurezza le credenziali direttamente dalla cassaforte.</string>
+    <string name="autofill_title">Compilazione Automatica</string>
+    <string name="financial">FINANZA</string>
+    <string name="games">GIOCHI</string>
+    <string name="integrity_btn">Verifica Integrità</string>
+    <string name="integrity_desc">Esegue un controllo SHA-256 in background per rilevare modifiche.</string>
+    <string name="integrity_success">INTEGRITÀ VERIFICATA INTACTA</string>
+    <string name="integrity_title">Verifica Integrità</string>
+    <string name="integrity_verifying">Verifica in corso...</string>
+    <string name="locked">Bloccato</string>
+    <string name="media">MEDIA</string>
+    <string name="search_apps">Cerca app...</string>
+    <string name="secrets">Segreti</string>
+    <string name="secure_vault">Cassaforte</string>
+    <string name="settings">Impostazioni</string>
+    <string name="shake_to_lock">Scuoti per Bloccare</string>
+    <string name="shake_to_lock_desc">Avvia il blocco di emergenza quando rileva un movimento brusco.</string>
+    <string name="snapshots">Istantanee</string>
+    <string name="social">SOCIAL</string>
+    <string name="system">SISTEMA</string>
+    <string name="trash_bin">Cestino</string>
+    <string name="trash_purge">Auto-Eliminazione Cestino</string>
+    <string name="trash_purge_desc">I segreti verranno cancellati in modo definitivo dopo il periodo scelto.</string>
+    <string name="unlocked">Sbloccato</string>
+</resources>

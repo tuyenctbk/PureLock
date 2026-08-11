@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktīvā aizsardzība</string>
+    <string name="all">VISAS</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Lietotņu aizsardzība</string>
+    <string name="autofill_btn">Iespējot automātisko aizpildi</string>
+    <string name="autofill_desc">Droši aizpildiet pieteikšanās datus tieši no bezsaistes krātuves.</string>
+    <string name="autofill_title">Automātiskās aizpildes pakalpojums</string>
+    <string name="integrity_btn">Pārbaudit integritāti tagad</string>
+    <string name="integrity_desc">Fona SHA-256 pārbaude, lai atklātu izmaiņas.</string>
+    <string name="integrity_success">INTEGRITĀTE IR APSTIPRINĀTA NEAIZSKARTA</string>
+    <string name="integrity_title">Krātuves integritātes pārbaude</string>
+    <string name="integrity_verifying">Pārbauda...</string>
+    <string name="locked">Bloķēts</string>
+    <string name="search_apps">Meklēt lietotnes...</string>
+    <string name="secrets">Noslēpumi</string>
+    <string name="secure_vault">Droša krātuve</string>
+    <string name="settings">Iestatījumi</string>
+    <string name="shake_to_lock">Kratīšana bloķēšanai</string>
+    <string name="shake_to_lock_desc">Izraisa avārijas bloķēšanu, kad tiek konstatēta pēkšņa kratīšana.</string>
+    <string name="snapshots">Uzņēmumi</string>
+    <string name="trash_bin">Miskaste</string>
+    <string name="trash_purge">Automātiska attīrīšana</string>
+    <string name="trash_purge_desc">Izdzēstie noslēpumi tiks neatgriezeniski izdzēsti pēc izvēlētā laika.</string>
+    <string name="unlocked">Atbloķēts</string>
+</resources>

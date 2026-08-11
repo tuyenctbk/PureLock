@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">活躍防護</string>
+    <string name="all">全部</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">應用防護</string>
+    <string name="autofill_btn">前往設定啟用 PureLock 自動填入</string>
+    <string name="autofill_desc">安全無聯網地將您的密碼和憑證自動填寫至其他應用程式中。</string>
+    <string name="autofill_title">Android 自動填入 API</string>
+    <string name="financial">金融</string>
+    <string name="games">遊戲</string>
+    <string name="integrity_btn">立即校驗保險箱完整性</string>
+    <string name="integrity_desc">在背景執行 SHA-256 密碼學雜湊稽核，防止本地檔案損壞或被惡意竄改。</string>
+    <string name="integrity_success">完整性驗證通過：數據未遭篡改</string>
+    <string name="integrity_title">資料庫完整性校驗</string>
+    <string name="integrity_verifying">正在校驗雜湊值...</string>
+    <string name="locked">已鎖定</string>
+    <string name="media">媒體</string>
+    <string name="search_apps">搜尋應用...</string>
+    <string name="secrets">密碼庫</string>
+    <string name="secure_vault">加密保險箱</string>
+    <string name="settings">設定</string>
+    <string name="shake_to_lock">搖一搖應急鎖定</string>
+    <string name="shake_to_lock_desc">當裝置加速度感應器檢測到劇烈晃動時，立即觸發緊急一鍵鎖定。</string>
+    <string name="snapshots">入侵抓拍</string>
+    <string name="social">社交</string>
+    <string name="system">系統</string>
+    <string name="trash_bin">回收站</string>
+    <string name="trash_purge">回收站自動清空</string>
+    <string name="trash_purge_desc">已刪除的秘密將在指定期限後被自動永久粉碎抹除。</string>
+    <string name="unlocked">已解鎖</string>
+</resources>

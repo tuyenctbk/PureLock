@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Активна защита</string>
+    <string name="all">ВСИЧКИ</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Защита на приложения</string>
+    <string name="autofill_btn">Активиране на автопопълване</string>
+    <string name="autofill_desc">Сигурно автоматично попълване директно от офлайн сейфа.</string>
+    <string name="autofill_title">Автоматично попълване</string>
+    <string name="integrity_btn">Провери целостта сега</string>
+    <string name="integrity_desc">Фонова SHA-256 проверка за откриване на подмяна.</string>
+    <string name="integrity_success">ЦЕЛОСТТА Е ПОТВЪРДЕНА</string>
+    <string name="integrity_title">Проверка на целостта</string>
+    <string name="integrity_verifying">Проверява се...</string>
+    <string name="locked">Заключено</string>
+    <string name="search_apps">Търсене на приложения...</string>
+    <string name="secrets">Тайни</string>
+    <string name="secure_vault">Защитен сейф</string>
+    <string name="settings">Настройки</string>
+    <string name="shake_to_lock">Разклащане за заключване</string>
+    <string name="shake_to_lock_desc">Задейства аварийно заключване при внезапно разклащане.</string>
+    <string name="snapshots">Снимки</string>
+    <string name="trash_bin">Кошче</string>
+    <string name="trash_purge">Автоматично почистване</string>
+    <string name="trash_purge_desc">Изтритите тайни ще бъдат окончателно премахнати след избрания период.</string>
+    <string name="unlocked">Отключено</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Protecții active</string>
+    <string name="all">TOATE</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Protecție aplicații</string>
+    <string name="autofill_btn">Activează completarea automată</string>
+    <string name="autofill_desc">Completează datele de conectare în siguranță direct din seiful offline.</string>
+    <string name="autofill_title">Serviciu de completare automată</string>
+    <string name="integrity_btn">Verifică integritatea acum</string>
+    <string name="integrity_desc">Audit hash SHA-256 în fundal pentru a detecta alterarea fișierelor.</string>
+    <string name="integrity_success">INTEGRITATE VERIFICATĂ INTACTĂ</string>
+    <string name="integrity_title">Verificare integritate seif</string>
+    <string name="integrity_verifying">Se verifică...</string>
+    <string name="locked">Blocat</string>
+    <string name="search_apps">Căutare aplicații...</string>
+    <string name="secrets">Secrete</string>
+    <string name="secure_vault">Seif securizat</string>
+    <string name="settings">Setări</string>
+    <string name="shake_to_lock">Scutură pentru a bloca</string>
+    <string name="shake_to_lock_desc">Declanșează blocarea de urgență la detectarea unei mișcări bruște.</string>
+    <string name="snapshots">Instantanee</string>
+    <string name="trash_bin">Coș de gunoi</string>
+    <string name="trash_purge">Auto-curățare coș</string>
+    <string name="trash_purge_desc">Secretele șterse vor fi eliminate definitiv după perioada aleasă.</string>
+    <string name="unlocked">Deblocat</string>
+</resources>

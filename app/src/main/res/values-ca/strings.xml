@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Proteccions actives</string>
+    <string name="all">TOT</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Protecció d\'aplicacions</string>
+    <string name="autofill_btn">Activar l\'emplenament automàtic</string>
+    <string name="autofill_desc">Emplena credencials de forma segura directament des de la caixa forta.</string>
+    <string name="autofill_title">Servei d\'emplenament automàtic</string>
+    <string name="integrity_btn">Verificar integritat ara</string>
+    <string name="integrity_desc">Auditoria SHA-256 en segon pla per detectar qualsevol alteració.</string>
+    <string name="integrity_success">INTEGRITAT VERIFICADA INTACTA</string>
+    <string name="integrity_title">Verificació d\'integritat</string>
+    <string name="integrity_verifying">Verificant hashes...</string>
+    <string name="locked">Bloquejat</string>
+    <string name="search_apps">Cercar aplicacions...</string>
+    <string name="secrets">Secrets</string>
+    <string name="secure_vault">Caixa forta</string>
+    <string name="settings">Configuració</string>
+    <string name="shake_to_lock">Sacsejar per bloquejar</string>
+    <string name="shake_to_lock_desc">Activa el bloqueig d\'emergència en detectar una sacsejada brusca.</string>
+    <string name="snapshots">Captures</string>
+    <string name="trash_bin">Paperera</string>
+    <string name="trash_purge">Període d\'auto-purga</string>
+    <string name="trash_purge_desc">Els secrets de la paperera s\'eliminaran permanentment després de la durada triada.</string>
+    <string name="unlocked">Desbloquejat</string>
+</resources>

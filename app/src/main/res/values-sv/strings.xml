@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="active_protections">Aktivt skydd</string>
+    <string name="all">ALLA</string>
+    <string name="app_name">PureLock</string>
+    <string name="app_shield">Appskydd</string>
+    <string name="autofill_btn">Aktivera autofyll</string>
+    <string name="autofill_desc">Fyll i lösenord säkert direkt från ditt offline-valv.</string>
+    <string name="autofill_title">Android Autofyll</string>
+    <string name="integrity_btn">Verifiera integritet nu</string>
+    <string name="integrity_desc">SHA-256-kontroll i bakgrunden för att upptäcka manipulation.</string>
+    <string name="integrity_success">INTEGRITET VERIFIERAD INTAKT</string>
+    <string name="integrity_title">Integritetsverifiering</string>
+    <string name="integrity_verifying">Verifierar...</string>
+    <string name="locked">Låst</string>
+    <string name="search_apps">Sök...</string>
+    <string name="secrets">Hemligheter</string>
+    <string name="secure_vault">Säkert valv</string>
+    <string name="settings">Inställningar</string>
+    <string name="shake_to_lock">Skaka för att låsa</string>
+    <string name="shake_to_lock_desc">Aktiverar nödlåsning när en plötslig skakning upptäcks.</string>
+    <string name="snapshots">Ögonblicksbilder</string>
+    <string name="trash_bin">Papperskorg</string>
+    <string name="trash_purge">Automatisk rensning</string>
+    <string name="trash_purge_desc">Borttagna hemligheter raderas permanent efter vald tid.</string>
+    <string name="unlocked">Upplåst</string>
+</resources>
