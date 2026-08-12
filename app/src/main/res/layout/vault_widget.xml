@@ -16,7 +16,7 @@
             android:layout_width="24.dp"
             android:layout_height="24.dp"
             android:contentDescription="Shield"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/splash_logo" />
 
         <TextView
             android:layout_width="0dp"

@@ -61,7 +61,7 @@ class BackupHealthService(private val context: Context) {
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_warning)
+            .setSmallIcon(com.example.R.drawable.splash_logo)
             .setContentTitle("Backup Health Warning")
             .setContentText("No encrypted backup performed in over 30 days! Tap to backup now.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)

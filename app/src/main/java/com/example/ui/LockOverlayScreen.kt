@@ -150,10 +150,10 @@ fun LockOverlayScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Shield,
+                    painter = androidx.compose.ui.res.painterResource(id = com.example.R.drawable.splash_logo),
                     contentDescription = "PureLock Shield",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(36.dp)
+                    tint = androidx.compose.ui.graphics.Color.Unspecified,
+                    modifier = Modifier.size(44.dp)
                 )
             }
 

@@ -100,7 +100,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_lock_lock)
+            .setSmallIcon(com.example.R.drawable.splash_logo)
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)

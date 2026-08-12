@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="view_vault"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/splash_logo"
         android:shortcutShortLabel="@string/shortcut_vault_short"
         android:shortcutLongLabel="@string/shortcut_vault_long">
         <intent
@@ -16,7 +16,7 @@
     <shortcut
         android:shortcutId="generate_password"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/splash_logo"
         android:shortcutShortLabel="@string/shortcut_generator_short"
         android:shortcutLongLabel="@string/shortcut_generator_long">
         <intent

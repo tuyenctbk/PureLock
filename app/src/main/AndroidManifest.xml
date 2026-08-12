@@ -79,7 +79,7 @@
         <!-- Quick Lockdown Tile Service -->
         <service
             android:name=".service.QuickLockdownTileService"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/splash_logo"
             android:label="Quick Lockdown"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
@@ -91,7 +91,7 @@
         <!-- Quick Biometric Re-Auth Quick Settings Tile Service -->
         <service
             android:name=".service.QuickBiometricAuthTileService"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/splash_logo"
             android:label="Vault Re-Auth"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
