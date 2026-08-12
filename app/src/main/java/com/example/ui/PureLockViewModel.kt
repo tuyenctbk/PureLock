@@ -163,8 +163,8 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     fun completeOnboarding(pin: String, securityType: String) {
         viewModelScope.launch {
-            repository.setMasterPin(pin)
-            repository.setSecurityType(securityType)
+            repository.preferences.setMasterPin(pin)
+            repository.preferences.setSecurityType(securityType)
             repository.preferences.setOnboardingCompleted(true)
             com.example.util.FirebaseManager.logEvent("onboarding_complete", mapOf("security_type" to securityType))
         }
