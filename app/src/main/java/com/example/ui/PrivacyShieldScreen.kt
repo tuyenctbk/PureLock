@@ -189,6 +189,7 @@ fun PrivacyShieldScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
+                        modifier = Modifier.weight(1f, fill = false),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -206,7 +207,7 @@ fun PrivacyShieldScreen(
                     }
 
                     Surface(
-                        color = MaterialTheme.colorScheme.primary,
+                        color = if (protectionScore >= 70) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
@@ -215,7 +216,7 @@ fun PrivacyShieldScreen(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.CheckCircle,
+                                imageVector = if (protectionScore >= 70) Icons.Default.CheckCircle else Icons.Default.Warning,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(14.dp)

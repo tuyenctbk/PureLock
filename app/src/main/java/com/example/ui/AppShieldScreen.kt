@@ -571,7 +571,7 @@ private fun AppShieldItemCard(
                         Icon(
                             imageVector = categoryIcon,
                             contentDescription = app.category,
-                            tint = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                            tint = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -600,7 +600,7 @@ private fun AppShieldItemCard(
                             Text(
                                 text = app.packageName,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.outline,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1
                             )
                         }

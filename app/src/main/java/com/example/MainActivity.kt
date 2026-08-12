@@ -188,12 +188,23 @@ class MainActivity : FragmentActivity() {
                             modifier = Modifier.fillMaxSize(),
                             bottomBar = {
                                 NavigationBar(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    contentColor = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier
                                         .windowInsetsPadding(WindowInsets.navigationBars)
                                         .testTag("main_navigation_bar")
                                 ) {
+                                    val navColors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = androidx.compose.ui.graphics.Color.White,
+                                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                                        indicatorColor = MaterialTheme.colorScheme.primary,
+                                        unselectedIconColor = androidx.compose.ui.graphics.Color(0xFF64748B),
+                                        unselectedTextColor = androidx.compose.ui.graphics.Color(0xFF64748B)
+                                    )
+
                                     NavigationBarItem(
                                         selected = currentRoute == "shield",
+                                        colors = navColors,
                                         onClick = {
                                             lastInteractionTime = System.currentTimeMillis()
                                             navController.navigate("shield") {
@@ -211,6 +222,7 @@ class MainActivity : FragmentActivity() {
 
                                     NavigationBarItem(
                                         selected = currentRoute == "suite",
+                                        colors = navColors,
                                         onClick = {
                                             lastInteractionTime = System.currentTimeMillis()
                                             navController.navigate("suite") {
@@ -228,6 +240,7 @@ class MainActivity : FragmentActivity() {
 
                                     NavigationBarItem(
                                         selected = currentRoute == "vault",
+                                        colors = navColors,
                                         onClick = {
                                             lastInteractionTime = System.currentTimeMillis()
                                             navController.navigate("vault") {
@@ -245,6 +258,7 @@ class MainActivity : FragmentActivity() {
 
                                     NavigationBarItem(
                                         selected = currentRoute == "audit",
+                                        colors = navColors,
                                         onClick = {
                                             lastInteractionTime = System.currentTimeMillis()
                                             navController.navigate("audit") {
