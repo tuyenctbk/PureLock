@@ -10,6 +10,7 @@ import com.example.data.PureLockRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.N)
 class QuickLockdownTileService : TileService() {
@@ -36,12 +37,14 @@ class QuickLockdownTileService : TileService() {
             repository.setAllAppsLockState(true)
             repository.logSecurityEvent("QUICK_LOCKDOWN_TILE", "Emergency Quick Lockdown executed from Quick Settings Tile.")
 
-            tile.state = Tile.STATE_ACTIVE
-            tile.label = "Lockdown ACTIVE"
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                tile.subtitle = "All Apps Secured"
+            withContext(Dispatchers.Main) {
+                tile.state = Tile.STATE_ACTIVE
+                tile.label = "Lockdown ACTIVE"
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    tile.subtitle = "All Apps Secured"
+                }
+                tile.updateTile()
             }
-            tile.updateTile()
         }
     }
 

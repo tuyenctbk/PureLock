@@ -10,6 +10,9 @@ import androidx.core.app.NotificationCompat
 import com.example.MainActivity
 import com.example.R
 import com.example.data.PureLockPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BackupHealthService(private val context: Context) {
 
@@ -19,13 +22,19 @@ class BackupHealthService(private val context: Context) {
     }
 
     fun checkBackupHealth() {
-        val prefs = PureLockPreferences(context)
-        val lastBackupTime = prefs.getLastBackupTimestamp()
-        val thirtyDaysMillis = 30L * 24L * 60L * 60L * 1000L
-        val currentTime = System.currentTimeMillis()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val prefs = PureLockPreferences(context)
+                val lastBackupTime = prefs.getLastBackupTimestamp()
+                val thirtyDaysMillis = 30L * 24L * 60L * 60L * 1000L
+                val currentTime = System.currentTimeMillis()
 
-        if (lastBackupTime == 0L || (currentTime - lastBackupTime) > thirtyDaysMillis) {
-            triggerBackupWarningNotification()
+                if (lastBackupTime == 0L || (currentTime - lastBackupTime) > thirtyDaysMillis) {
+                    triggerBackupWarningNotification()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

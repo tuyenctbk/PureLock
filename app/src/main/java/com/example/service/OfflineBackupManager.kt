@@ -160,7 +160,7 @@ class OfflineBackupManager(private val context: Context) {
                 for (i in 0 until rulesArray.length()) {
                     val ruleObj = rulesArray.getJSONObject(i)
                     val entity = ScheduleRuleEntity(
-                        id = ruleObj.optLong("id", 0L),
+                        id = 0L,
                         packageName = ruleObj.getString("packageName"),
                         appName = ruleObj.optString("appName", "App"),
                         startHour = ruleObj.optInt("startHour", 18),
@@ -180,7 +180,7 @@ class OfflineBackupManager(private val context: Context) {
                 for (i in 0 until vaultArray.length()) {
                     val itemObj = vaultArray.getJSONObject(i)
                     val entity = EncryptedVaultEntity(
-                        id = itemObj.optLong("id", 0L),
+                        id = 0L,
                         title = itemObj.getString("title"),
                         secretContent = itemObj.getString("secretContent"),
                         category = itemObj.optString("category", "NOTE"),

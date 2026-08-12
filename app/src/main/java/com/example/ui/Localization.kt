@@ -74,7 +74,9 @@ object L10n {
         return if (resId != 0) {
             context.getString(resId)
         } else {
-            key
+            key.replace('_', ' ').split(" ").joinToString(" ") { word ->
+                word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.ROOT) else it.toString() }
+            }
         }
     }
 }

@@ -44,7 +44,7 @@ abstract class PureLockDatabase : RoomDatabase() {
                     PureLockDatabase::class.java,
                     "purelock_privacy_db"
                 )
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()
                 INSTANCE = instance
                 instance

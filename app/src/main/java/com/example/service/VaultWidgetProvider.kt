@@ -32,22 +32,28 @@ class VaultWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_LOCK_VAULT) {
-            // Immediately lock vault / reset auth
+            val pendingResult = goAsync()
             val db = PureLockDatabase.getDatabase(context)
             scope.launch {
-                val lockedApps = db.appLockDao().getAllLockedApps().first()
-                val lockedCount = lockedApps.count { it.isLocked }
-                val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
-                val totalProtected = lockedCount + vaultCount
+                try {
+                    val lockedApps = db.appLockDao().getAllLockedApps().first()
+                    val lockedCount = lockedApps.count { it.isLocked }
+                    val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
+                    val totalProtected = lockedCount + vaultCount
 
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                    android.content.ComponentName(context, VaultWidgetProvider::class.java)
-                )
-                for (appWidgetId in appWidgetIds) {
-                    val views = RemoteViews(context.packageName, R.layout.vault_widget)
-                    views.setTextViewText(R.id.tv_protected_count, "Vault Locked! Protected Items: $totalProtected")
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                    val appWidgetManager = AppWidgetManager.getInstance(context)
+                    val appWidgetIds = appWidgetManager.getAppWidgetIds(
+                        android.content.ComponentName(context, VaultWidgetProvider::class.java)
+                    )
+                    for (appWidgetId in appWidgetIds) {
+                        val views = RemoteViews(context.packageName, R.layout.vault_widget)
+                        views.setTextViewText(R.id.tv_protected_count, "Vault Locked! Protected Items: $totalProtected")
+                        appWidgetManager.updateAppWidget(appWidgetId, views)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }

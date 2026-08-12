@@ -37,13 +37,23 @@ class PureLockAutofillService : AutofillService() {
             return
         }
 
-        val lastContext = contexts.last()
-        val structure = lastContext.structure
+        val lastContext = contexts.lastOrNull()
+        val structure = lastContext?.structure
+        if (structure == null || structure.windowNodeCount == 0) {
+            callback.onSuccess(null)
+            return
+        }
+
+        val rootViewNode = structure.getWindowNodeAt(0)?.rootViewNode
+        if (rootViewNode == null) {
+            callback.onSuccess(null)
+            return
+        }
 
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
 
-        findAutofillNodes(structure.getWindowNodeAt(0).rootViewNode, usernameIds, passwordIds)
+        findAutofillNodes(rootViewNode, usernameIds, passwordIds)
 
         if (usernameIds.isEmpty() && passwordIds.isEmpty()) {
             callback.onSuccess(null)
@@ -78,16 +88,19 @@ class PureLockAutofillService : AutofillService() {
                         setTextViewText(android.R.id.text2, "Category: ${item.category} (Encrypted)")
                     }
 
+                    @Suppress("DEPRECATION")
                     val datasetBuilder = Dataset.Builder(presentation)
 
                     if (usernameIds.isNotEmpty()) {
                         usernameIds.forEach { id ->
+                            @Suppress("DEPRECATION")
                             datasetBuilder.setValue(id, AutofillValue.forText(item.title))
                         }
                     }
 
                     if (passwordIds.isNotEmpty()) {
                         passwordIds.forEach { id ->
+                            @Suppress("DEPRECATION")
                             datasetBuilder.setValue(id, AutofillValue.forText(item.secretContent))
                         }
                     }

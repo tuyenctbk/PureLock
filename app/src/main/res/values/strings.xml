@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PureLock</string>
     <string name="accessibility_service_description">PureLock uses this lightweight service strictly to detect when protected applications are launched and show the secure lock screen. PureLock contains zero internet permissions and never sends or shares your data.</string>
@@ -5,4 +6,33 @@
     <string name="shortcut_vault_long">Open Encrypted Secret Vault</string>
     <string name="shortcut_generator_short">Password Gen</string>
     <string name="shortcut_generator_long">Generate Secure Password</string>
+
+    <string name="active_protections">Active Protections</string>
+    <string name="all">ALL</string>
+    <string name="app_shield">App Shield</string>
+    <string name="autofill_btn">Enable Autofill Service</string>
+    <string name="autofill_desc">Securely autofill credentials directly from your vault.</string>
+    <string name="autofill_title">Android Autofill Service</string>
+    <string name="financial">FINANCIAL</string>
+    <string name="games">GAMES</string>
+    <string name="integrity_btn">Verify Integrity Now</string>
+    <string name="integrity_desc">Run background SHA-256 cryptographic audit to detect unauthorized changes.</string>
+    <string name="integrity_success">VAULT INTEGRITY VERIFIED INTACT</string>
+    <string name="integrity_title">Vault Integrity Check</string>
+    <string name="integrity_verifying">Verifying...</string>
+    <string name="locked">Locked</string>
+    <string name="media">MEDIA</string>
+    <string name="search_apps">Search apps...</string>
+    <string name="secrets">Secrets</string>
+    <string name="secure_vault">Secure Vault</string>
+    <string name="settings">Settings</string>
+    <string name="shake_to_lock">Shake to Lock Gesture</string>
+    <string name="shake_to_lock_desc">Triggers emergency lockdown when a sudden shake motion is detected.</string>
+    <string name="snapshots">Snapshots</string>
+    <string name="social">SOCIAL</string>
+    <string name="system">SYSTEM</string>
+    <string name="trash_bin">Trash Bin</string>
+    <string name="trash_purge">Auto-Purge Period</string>
+    <string name="trash_purge_desc">Deleted secrets will be permanently purged after the chosen duration.</string>
+    <string name="unlocked">Unlocked</string>
 </resources>

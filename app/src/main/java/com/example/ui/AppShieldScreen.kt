@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +37,7 @@ fun AppShieldScreen(
 ) {
     val allApps by viewModel.allApps.collectAsState()
     val activeCount by viewModel.activeLockedAppsCount.collectAsState()
+    val haptic = LocalHapticFeedback.current
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("ALL") }
@@ -106,7 +110,7 @@ fun AppShieldScreen(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
                                 Text(
-                                    text = L10n.getString(LocalContext.current, "app_shield"),
+                                    text = "PureLock",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -205,7 +209,10 @@ fun AppShieldScreen(
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         IconButton(
-                            onClick = { viewModel.setAllAppsLockState(true) },
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.setAllAppsLockState(true)
+                            },
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
@@ -218,7 +225,10 @@ fun AppShieldScreen(
                             )
                         }
                         IconButton(
-                            onClick = { viewModel.setAllAppsLockState(false) },
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.setAllAppsLockState(false)
+                            },
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
@@ -280,7 +290,7 @@ fun AppShieldScreen(
                         leadingIcon = {
                             val icon = when (category) {
                                 "FINANCIAL" -> Icons.Default.AccountBalance
-                                "SOCIAL" -> Icons.Default.Chat
+                                "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
                                 "SYSTEM" -> Icons.Default.Build
                                 "MEDIA" -> Icons.Default.PlayCircle
                                 "GAMES" -> Icons.Default.SportsEsports
@@ -373,7 +383,7 @@ fun AppShieldScreen(
                                         Icon(
                                             imageVector = when (recApp.category) {
                                                 "FINANCIAL" -> Icons.Default.AccountBalance
-                                                "SOCIAL" -> Icons.Default.Chat
+                                                "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
                                                 else -> Icons.Default.Photo
                                             },
                                             contentDescription = null,
@@ -486,6 +496,7 @@ private fun AppShieldItemCard(
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
+    val haptic = LocalHapticFeedback.current
 
     Card(
         colors = CardDefaults.cardColors(
@@ -499,7 +510,10 @@ private fun AppShieldItemCard(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onToggle() }
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onToggle()
+            }
             .testTag("card_app_${app.packageName}")
     ) {
         Row(
@@ -548,7 +562,7 @@ private fun AppShieldItemCard(
                     ) {
                         val categoryIcon = when (app.category) {
                             "FINANCIAL" -> Icons.Default.AccountBalance
-                            "SOCIAL" -> Icons.Default.Chat
+                            "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
                             "SYSTEM" -> Icons.Default.Build
                             "MEDIA" -> Icons.Default.PlayCircle
                             "GAMES" -> Icons.Default.SportsEsports

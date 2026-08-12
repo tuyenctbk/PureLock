@@ -23,6 +23,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
             val packageName = intent.data?.schemeSpecificPart ?: return
             if (packageName == context.packageName) return
 
+            val pendingResult = goAsync()
             val scope = CoroutineScope(Dispatchers.IO)
             scope.launch {
                 try {
@@ -59,6 +60,8 @@ class PackageInstallReceiver : BroadcastReceiver() {
                     sendNewAppNotification(context, packageName, appName, autoLock)
                 } catch (e: Exception) {
                     e.printStackTrace()
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }

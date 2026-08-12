@@ -12,37 +12,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = MinimalDarkOnSurface,
-    onPrimary = MinimalDarkSurface,
-    primaryContainer = MinimalDarkSurface,
-    onPrimaryContainer = MinimalDarkOnSurface,
-    secondary = MinimalDarkOnSurface,
+    primary = SecurityBlueLight,
+    onPrimary = Color(0xFF0F172A),
+    primaryContainer = Color(0xFF1E293B),
+    onPrimaryContainer = Color(0xFFE2E8F0),
+    secondary = SecurityCyan,
+    tertiary = SecurityEmerald,
     background = MinimalDarkSurface,
     surface = MinimalDarkSurface,
-    surfaceVariant = Color(0xFF1E2638),
+    surfaceVariant = MinimalDarkSurfaceVariant,
     onSurface = MinimalDarkOnSurface,
-    onSurfaceVariant = MinimalDarkOnSurface.copy(alpha = 0.8f)
+    onSurfaceVariant = Color(0xFF94A3B8),
+    outline = Color(0xFF334155)
 )
 
 private val AmoledDarkColorScheme = darkColorScheme(
-    primary = Color(0xFF63A0FF),
+    primary = SecurityBlueLight,
     onPrimary = Color(0xFF000000),
-    primaryContainer = Color(0xFF10141D),
+    primaryContainer = Color(0xFF090D16),
     onPrimaryContainer = Color(0xFFE2E8F0),
-    secondary = Color(0xFF38BDF8),
+    secondary = SecurityCyan,
+    tertiary = SecurityEmerald,
     background = Color(0xFF000000),
     surface = Color(0xFF000000),
-    surfaceVariant = Color(0xFF121212),
+    surfaceVariant = Color(0xFF111827),
     onSurface = Color(0xFFFFFFFF),
-    onSurfaceVariant = Color(0xFFA0AEC0)
+    onSurfaceVariant = Color(0xFF9CA3AF),
+    outline = Color(0xFF1F2937)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = MinimalPrimary,
-    onPrimary = MinimalOnPrimary,
-    primaryContainer = MinimalPrimaryContainer,
-    onPrimaryContainer = MinimalOnPrimaryContainer,
-    secondary = MinimalPrimary,
+    primary = SecurityBluePrimary,
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFDBEAFE),
+    onPrimaryContainer = Color(0xFF1E3A8A),
+    secondary = SecurityCyan,
+    tertiary = SecurityEmerald,
     background = MinimalLightBackground,
     surface = MinimalLightSurface,
     surfaceVariant = MinimalLightSurfaceVariant,
@@ -87,4 +92,3 @@ fun MyApplicationTheme(
 ) {
     PureLockTheme(darkTheme = darkTheme, dynamicColor = dynamicColor, content = content)
 }
-

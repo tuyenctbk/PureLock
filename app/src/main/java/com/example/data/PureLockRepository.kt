@@ -192,16 +192,19 @@ class PureLockRepository(
         }
     }
 
-    suspend fun toggleLockState(packageName: String, currentIsLocked: Boolean) {
-        val newState = !currentIsLocked
-        appLockDao.updateLockState(packageName, newState)
+    suspend fun setAppLockState(packageName: String, isLocked: Boolean) {
+        appLockDao.updateLockState(packageName, isLocked)
         val app = appLockDao.getLockedAppByPackage(packageName)
         logDao.insertLog(
             SecurityLogEntity(
-                action = if (newState) "APP_LOCKED" else "APP_UNLOCKED",
-                details = "${app?.appName ?: packageName} lock state set to $newState"
+                action = if (isLocked) "APP_LOCKED" else "APP_UNLOCKED",
+                details = "${app?.appName ?: packageName} lock state set to $isLocked"
             )
         )
+    }
+
+    suspend fun toggleLockState(packageName: String, currentIsLocked: Boolean) {
+        setAppLockState(packageName, !currentIsLocked)
     }
 
     suspend fun setAllAppsLockState(isLocked: Boolean) {

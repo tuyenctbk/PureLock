@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import kotlinx.coroutines.delay
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -474,9 +476,13 @@ private fun KeypadButton(
     onClick: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     Surface(
-        onClick = onClick,
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        },
         shape = CircleShape,
         color = if (isFocused) MaterialTheme.colorScheme.primary
         else if (isAction) MaterialTheme.colorScheme.surfaceContainerHigh
@@ -510,6 +516,7 @@ private fun PatternGridDrawer(
     val primaryColor = MaterialTheme.colorScheme.primary
     val tertiaryColor = MaterialTheme.colorScheme.tertiary
     val lineColor = if (hidePath) androidx.compose.ui.graphics.Color.Transparent else primaryColor
+    val haptic = LocalHapticFeedback.current
 
     Box(
         modifier = Modifier
@@ -519,11 +526,17 @@ private fun PatternGridDrawer(
                 detectDragGestures(
                     onDragStart = { offset ->
                         val node = getNodeAtOffset(offset, size.width, size.height)
-                        if (node != null) onNodeSelected(node)
+                        if (node != null) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onNodeSelected(node)
+                        }
                     },
                     onDrag = { change, _ ->
                         val node = getNodeAtOffset(change.position, size.width, size.height)
-                        if (node != null) onNodeSelected(node)
+                        if (node != null && !selectedNodes.contains(node)) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onNodeSelected(node)
+                        }
                     },
                     onDragEnd = { onPatternCompleted() }
                 )
@@ -661,21 +674,25 @@ fun launchBiometricPrompt(
     val activity = context as? androidx.fragment.app.FragmentActivity
     if (activity != null) {
         val manager = com.example.service.BiometricPromptManager(context)
-        val status = manager.checkBiometricAvailability()
-        if (status == com.example.service.BiometricStatus.NO_HARDWARE || status == com.example.service.BiometricStatus.UNAVAILABLE) {
-            // Emulated environment or no sensor present -> graceful fallback
-            onSuccess()
-            return
+        when (manager.checkBiometricAvailability()) {
+            com.example.service.BiometricStatus.AVAILABLE -> {
+                manager.showBiometricPrompt(
+                    activity = activity,
+                    title = "PureLock Biometric Security",
+                    subtitle = "Scan Fingerprint or Face ID to Unlock",
+                    negativeButtonText = "Use PIN / Pattern",
+                    onSuccess = onSuccess,
+                    onError = onError
+                )
+            }
+            com.example.service.BiometricStatus.NOT_ENROLLED -> {
+                onError("No biometrics enrolled. Please use PIN or Pattern.")
+            }
+            com.example.service.BiometricStatus.NO_HARDWARE, com.example.service.BiometricStatus.UNAVAILABLE -> {
+                onError("Biometric sensor unavailable. Please use PIN or Pattern.")
+            }
         }
-        manager.showBiometricPrompt(
-            activity = activity,
-            title = "PureLock Biometric Security",
-            subtitle = "Scan Fingerprint or Face ID to Unlock",
-            negativeButtonText = "Use PIN / Pattern",
-            onSuccess = onSuccess,
-            onError = onError
-        )
     } else {
-        onSuccess()
+        onError("Unable to launch biometric prompt. Please use PIN or Pattern.")
     }
 }

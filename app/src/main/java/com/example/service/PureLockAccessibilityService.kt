@@ -34,6 +34,8 @@ class PureLockAccessibilityService : AccessibilityService() {
         )
     }
 
+    private var lastCheckTimestamp = 0L
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
 
@@ -41,8 +43,12 @@ class PureLockAccessibilityService : AccessibilityService() {
         if (packageName == applicationContext.packageName) return
         if (packageName == "com.android.systemui") return
 
-        if (packageName == lastCheckedPackage) return
+        val currentTime = System.currentTimeMillis()
+        if (packageName == lastCheckedPackage && (currentTime - lastCheckTimestamp) < 1000L) {
+            return
+        }
         lastCheckedPackage = packageName
+        lastCheckTimestamp = currentTime
 
         serviceScope.launch {
             try {

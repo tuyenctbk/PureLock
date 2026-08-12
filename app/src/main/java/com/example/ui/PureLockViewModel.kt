@@ -209,7 +209,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     fun setAppLanguage(langCode: String) {
         viewModelScope.launch {
             repository.preferences.setAppLanguage(langCode)
-            repository.logSecurityEvent("SETTINGS_CHANGED", "App Language updated to $langCode.")
+            repository.logSecurityEvent("SETTINGS_CHANGED", "Application display language updated to $langCode.")
         }
     }
 
@@ -374,7 +374,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                     if (parts.size >= 4) {
                         val pkg = parts[0].trim()
                         val isLocked = parts[3].trim().toBooleanStrictOrNull() ?: false
-                        repository.toggleLockState(pkg, !isLocked)
+                        repository.setAppLockState(pkg, isLocked)
                     }
                 }
             }
