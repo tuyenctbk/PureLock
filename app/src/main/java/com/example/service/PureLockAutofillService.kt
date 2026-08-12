@@ -32,7 +32,7 @@ class PureLockAutofillService : AutofillService() {
         callback: FillCallback
     ) {
         val contexts = request.fillContexts
-        if (contexts.isNullOrEmpty()) {
+        if (contexts.isEmpty()) {
             callback.onSuccess(null)
             return
         }
@@ -40,21 +40,10 @@ class PureLockAutofillService : AutofillService() {
         val lastContext = contexts.last()
         val structure = lastContext.structure
 
-        if (structure == null || structure.windowNodeCount <= 0) {
-            callback.onSuccess(null)
-            return
-        }
-
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
 
-        val windowNode = structure.getWindowNodeAt(0)
-        val rootNode = windowNode?.rootViewNode ?: run {
-            callback.onSuccess(null)
-            return
-        }
-
-        findAutofillNodes(rootNode, usernameIds, passwordIds)
+        findAutofillNodes(structure.getWindowNodeAt(0).rootViewNode, usernameIds, passwordIds)
 
         if (usernameIds.isEmpty() && passwordIds.isEmpty()) {
             callback.onSuccess(null)

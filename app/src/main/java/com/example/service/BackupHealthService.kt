@@ -11,14 +11,7 @@ import com.example.MainActivity
 import com.example.R
 import com.example.data.PureLockPreferences
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-
 class BackupHealthService(private val context: Context) {
-
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     companion object {
         private const val CHANNEL_ID = "backup_health_channel"
@@ -26,15 +19,13 @@ class BackupHealthService(private val context: Context) {
     }
 
     fun checkBackupHealth() {
-        scope.launch {
-            val prefs = PureLockPreferences(context)
-            val lastBackupTime = prefs.getLastBackupTimestamp()
-            val thirtyDaysMillis = 30L * 24L * 60L * 60L * 1000L
-            val currentTime = System.currentTimeMillis()
+        val prefs = PureLockPreferences(context)
+        val lastBackupTime = prefs.getLastBackupTimestamp()
+        val thirtyDaysMillis = 30L * 24L * 60L * 60L * 1000L
+        val currentTime = System.currentTimeMillis()
 
-            if (lastBackupTime == 0L || (currentTime - lastBackupTime) > thirtyDaysMillis) {
-                triggerBackupWarningNotification()
-            }
+        if (lastBackupTime == 0L || (currentTime - lastBackupTime) > thirtyDaysMillis) {
+            triggerBackupWarningNotification()
         }
     }
 

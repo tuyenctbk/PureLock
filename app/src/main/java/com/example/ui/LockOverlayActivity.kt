@@ -15,9 +15,7 @@ import com.example.data.PureLockRepository
 import com.example.ui.theme.PureLockTheme
 import kotlinx.coroutines.launch
 
-import androidx.fragment.app.FragmentActivity
-
-class LockOverlayActivity : FragmentActivity() {
+class LockOverlayActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_LOCKED_PACKAGE = "extra_locked_package"

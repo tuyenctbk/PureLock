@@ -218,12 +218,15 @@ class PureLockPreferences(private val context: Context) {
         }
     }
 
-    val lastBackupTimestamp: Flow<Long> = context.dataStore.data.map { prefs ->
-        prefs[KEY_LAST_BACKUP_TIMESTAMP] ?: 0L
-    }
-
-    suspend fun getLastBackupTimestamp(): Long {
-        return lastBackupTimestamp.first()
+    fun getLastBackupTimestamp(): Long {
+        var ts = 0L
+        kotlinx.coroutines.runBlocking {
+            context.dataStore.data.collect { prefs ->
+                ts = prefs[KEY_LAST_BACKUP_TIMESTAMP] ?: 0L
+                return@collect
+            }
+        }
+        return ts
     }
 
     suspend fun setDuressPin(pin: String) {

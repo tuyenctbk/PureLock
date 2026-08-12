@@ -13,10 +13,8 @@ import com.example.data.model.IntruderSelfieEntity
 import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 data class VaultIntegrityResult(
@@ -84,9 +82,9 @@ class PureLockRepository(
         logSecurityEvent("VAULT_ITEM_DELETED", "Encrypted item #$id permanently removed from local SQLCipher DB.")
     }
 
-    suspend fun initializeDefaultAppsIfNeeded() = withContext(Dispatchers.IO) {
+    suspend fun initializeDefaultAppsIfNeeded() {
         val existing = appLockDao.getAllLockedApps().first()
-        if (existing.isNotEmpty()) return@withContext
+        if (existing.isNotEmpty()) return
 
         val installedApps = getInstalledUserApps()
         if (installedApps.isNotEmpty()) {
@@ -115,7 +113,7 @@ class PureLockRepository(
         )
     }
 
-    suspend fun clearOldLogsAndCache() = withContext(Dispatchers.IO) {
+    suspend fun clearOldLogsAndCache() {
         val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
         val logsCleared = logDao.deleteLogsOlderThan(thirtyDaysAgo)
         var cacheFilesCleared = 0

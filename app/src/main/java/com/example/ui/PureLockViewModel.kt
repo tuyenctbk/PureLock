@@ -184,6 +184,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     val trashPurgeDays: StateFlow<Int> = repository.preferences.trashPurgeDays
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
 
+    val appLanguage: StateFlow<String> = repository.preferences.appLanguage
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM")
+
     fun setShakeToLock(enabled: Boolean) {
         viewModelScope.launch {
             repository.preferences.setShakeToLock(enabled)
@@ -202,6 +205,13 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateTrashPurgeDays(days: Int) = setTrashPurgeDays(days)
+
+    fun setAppLanguage(langCode: String) {
+        viewModelScope.launch {
+            repository.preferences.setAppLanguage(langCode)
+            repository.logSecurityEvent("SETTINGS_CHANGED", "App Language updated to $langCode.")
+        }
+    }
 
     fun setDashboardCardOrder(order: List<String>) {
         viewModelScope.launch {
@@ -408,9 +418,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     private val backupManager by lazy { com.example.service.OfflineBackupManager(getApplication()) }
 
     suspend fun exportEncryptedBackup(passphrase: String): String {
-        val result = backupManager.exportEncryptedBackup(passphrase)
-        repository.preferences.setLastBackupTimestamp(System.currentTimeMillis())
-        return result
+        return backupManager.exportEncryptedBackup(passphrase)
     }
 
     suspend fun importEncryptedBackup(backupJson: String, passphrase: String): Boolean {

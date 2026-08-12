@@ -37,13 +37,11 @@ class QuickBiometricAuthTileService : TileService() {
                 "Quick Biometric Re-Auth triggered from Quick Settings / Always-on-Display tile."
             )
 
-            kotlinx.coroutines.withContext(Dispatchers.Main) {
-                val intent = Intent(applicationContext, MainActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    putExtra("shortcut_action", "VIEW_VAULT")
-                }
-                startActivityAndCollapse(intent)
+            val intent = Intent(applicationContext, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                putExtra("shortcut_action", "VIEW_VAULT")
             }
+            startActivityAndCollapse(intent)
         }
     }
 
