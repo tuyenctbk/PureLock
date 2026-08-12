@@ -1,18 +1,51 @@
-*.iml
-.gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Built application files & packages
+*.apk
+*.ap_
+*.aab
+*.dex
+
+# Directory locks & build outputs
+build/
+*/build/
+.gradle/
+.kotlin/
+captures/
+
+# Local configuration & environment files
 local.properties
 .env
-debug.keystore
+.env.*
+
+# Signing keystores & secrets
+*.jks
+*.keystore
+*.p12
+*.key
+*.pem
+*.pk8
+
+# IDE & Editor specific files
+.idea/
+*.iml
+.vscode/
+.project
+.settings/
+.classpath
+
+# NDK & Native Build artifacts
+.externalNativeBuild/
+.cxx/
+obj/
+libs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+*_System*
+
+# Python helper script caches
+__pycache__/
+*.pyc
+*.pyo

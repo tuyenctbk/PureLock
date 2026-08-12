@@ -89,21 +89,6 @@ class PureLockRepository(
         val installedApps = getInstalledUserApps()
         if (installedApps.isNotEmpty()) {
             appLockDao.upsertApps(installedApps)
-        } else {
-            // Seed sample system & popular apps if package manager query yields empty list in emulator/test environment
-            val sampleApps = listOf(
-                LockedAppEntity("com.android.settings", "System Settings", "SYSTEM", isLocked = true),
-                LockedAppEntity("com.android.vending", "Google Play Store", "SYSTEM", isLocked = true),
-                LockedAppEntity("com.whatsapp", "WhatsApp Messenger", "SOCIAL", isLocked = true),
-                LockedAppEntity("com.instagram.android", "Instagram", "SOCIAL", isLocked = true),
-                LockedAppEntity("com.google.android.youtube", "YouTube", "MEDIA", isLocked = false),
-                LockedAppEntity("com.google.android.apps.photos", "Google Photos", "MEDIA", isLocked = true),
-                LockedAppEntity("com.finance.bank", "Mobile Banking App", "FINANCIAL", isLocked = true),
-                LockedAppEntity("com.paypal.android.p2pmobile", "PayPal", "FINANCIAL", isLocked = true),
-                LockedAppEntity("com.google.android.dialer", "Phone & Contacts", "SYSTEM", isLocked = false),
-                LockedAppEntity("com.google.android.apps.messaging", "Messages", "SOCIAL", isLocked = false)
-            )
-            appLockDao.upsertApps(sampleApps)
         }
         logDao.insertLog(
             SecurityLogEntity(

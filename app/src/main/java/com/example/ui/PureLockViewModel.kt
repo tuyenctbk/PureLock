@@ -133,6 +133,62 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             initialValue = emptyList()
         )
 
+    val isOnboardingCompleted: StateFlow<Boolean> = repository.preferences.isOnboardingCompleted
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true // Default true until DataStore emits to prevent initial flash
+        )
+
+    val hasSharedApp: StateFlow<Boolean> = repository.preferences.hasSharedApp
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = false)
+
+    val sharePromptCount: StateFlow<Int> = repository.preferences.sharePromptCount
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0)
+
+    val lastSharePromptTimestamp: StateFlow<Long> = repository.preferences.lastSharePromptTimestamp
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0L)
+
+    val hasRatedApp: StateFlow<Boolean> = repository.preferences.hasRatedApp
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = false)
+
+    val ratePromptCount: StateFlow<Int> = repository.preferences.ratePromptCount
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0)
+
+    val lastRatePromptTimestamp: StateFlow<Long> = repository.preferences.lastRatePromptTimestamp
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0L)
+
+    val totalVaultUnlocks: StateFlow<Int> = repository.preferences.totalVaultUnlocks
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0)
+
+    fun completeOnboarding(pin: String, securityType: String) {
+        viewModelScope.launch {
+            repository.setMasterPin(pin)
+            repository.setSecurityType(securityType)
+            repository.preferences.setOnboardingCompleted(true)
+            com.example.util.FirebaseManager.logEvent("onboarding_complete", mapOf("security_type" to securityType))
+        }
+    }
+
+    fun recordSharePromptShown(hasShared: Boolean = false) {
+        viewModelScope.launch {
+            repository.preferences.recordSharePromptShown(hasShared)
+        }
+    }
+
+    fun recordRatePromptShown(hasRated: Boolean = false) {
+        viewModelScope.launch {
+            repository.preferences.recordRatePromptShown(hasRated)
+        }
+    }
+
+    fun recordVaultUnlock() {
+        viewModelScope.launch {
+            val count = repository.preferences.incrementVaultUnlocks()
+            com.example.util.FirebaseManager.logEvent("vault_unlocked", mapOf("total_unlocks" to count.toString()))
+        }
+    }
+
     // Preference States
     val masterPin: StateFlow<String> = repository.preferences.masterPin
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1234")

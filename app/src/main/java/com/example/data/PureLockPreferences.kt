@@ -36,6 +36,14 @@ class PureLockPreferences(private val context: Context) {
         val KEY_APP_LANGUAGE = stringPreferencesKey("app_language") // "SYSTEM", "en", "es"...
         val KEY_LAST_BACKUP_TIMESTAMP = longPreferencesKey("last_backup_timestamp")
         val KEY_DURESS_PIN = stringPreferencesKey("duress_pin")
+        val KEY_IS_ONBOARDING_COMPLETED = booleanPreferencesKey("is_onboarding_completed")
+        val KEY_HAS_SHARED_APP = booleanPreferencesKey("has_shared_app")
+        val KEY_SHARE_PROMPT_COUNT = intPreferencesKey("share_prompt_count")
+        val KEY_LAST_SHARE_PROMPT_TIMESTAMP = longPreferencesKey("last_share_prompt_timestamp")
+        val KEY_HAS_RATED_APP = booleanPreferencesKey("has_rated_app")
+        val KEY_RATE_PROMPT_COUNT = intPreferencesKey("rate_prompt_count")
+        val KEY_LAST_RATE_PROMPT_TIMESTAMP = longPreferencesKey("last_rate_prompt_timestamp")
+        val KEY_TOTAL_VAULT_UNLOCKS = intPreferencesKey("total_vault_unlocks")
     }
 
     val duressPin: Flow<String> = context.dataStore.data.map { prefs ->
@@ -231,5 +239,74 @@ class PureLockPreferences(private val context: Context) {
         context.dataStore.edit { prefs ->
             prefs[KEY_DURESS_PIN] = pin
         }
+    }
+
+    val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_IS_ONBOARDING_COMPLETED] ?: false
+    }
+
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_IS_ONBOARDING_COMPLETED] = completed
+        }
+    }
+
+    val hasSharedApp: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_HAS_SHARED_APP] ?: false
+    }
+
+    val sharePromptCount: Flow<Int> = context.dataStore.data.map { prefs ->
+        prefs[KEY_SHARE_PROMPT_COUNT] ?: 0
+    }
+
+    val lastSharePromptTimestamp: Flow<Long> = context.dataStore.data.map { prefs ->
+        prefs[KEY_LAST_SHARE_PROMPT_TIMESTAMP] ?: 0L
+    }
+
+    suspend fun recordSharePromptShown(hasShared: Boolean = false) {
+        context.dataStore.edit { prefs ->
+            val count = prefs[KEY_SHARE_PROMPT_COUNT] ?: 0
+            prefs[KEY_SHARE_PROMPT_COUNT] = count + 1
+            prefs[KEY_LAST_SHARE_PROMPT_TIMESTAMP] = System.currentTimeMillis()
+            if (hasShared) {
+                prefs[KEY_HAS_SHARED_APP] = true
+            }
+        }
+    }
+
+    val hasRatedApp: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_HAS_RATED_APP] ?: false
+    }
+
+    val ratePromptCount: Flow<Int> = context.dataStore.data.map { prefs ->
+        prefs[KEY_RATE_PROMPT_COUNT] ?: 0
+    }
+
+    val lastRatePromptTimestamp: Flow<Long> = context.dataStore.data.map { prefs ->
+        prefs[KEY_LAST_RATE_PROMPT_TIMESTAMP] ?: 0L
+    }
+
+    suspend fun recordRatePromptShown(hasRated: Boolean = false) {
+        context.dataStore.edit { prefs ->
+            val count = prefs[KEY_RATE_PROMPT_COUNT] ?: 0
+            prefs[KEY_RATE_PROMPT_COUNT] = count + 1
+            prefs[KEY_LAST_RATE_PROMPT_TIMESTAMP] = System.currentTimeMillis()
+            if (hasRated) {
+                prefs[KEY_HAS_RATED_APP] = true
+            }
+        }
+    }
+
+    val totalVaultUnlocks: Flow<Int> = context.dataStore.data.map { prefs ->
+        prefs[KEY_TOTAL_VAULT_UNLOCKS] ?: 0
+    }
+
+    suspend fun incrementVaultUnlocks(): Int {
+        var current = 0
+        context.dataStore.edit { prefs ->
+            current = (prefs[KEY_TOTAL_VAULT_UNLOCKS] ?: 0) + 1
+            prefs[KEY_TOTAL_VAULT_UNLOCKS] = current
+        }
+        return current
     }
 }

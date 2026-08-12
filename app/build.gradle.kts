@@ -8,6 +8,7 @@ plugins {
   alias(libs.plugins.roborazzi)
   alias(libs.plugins.secrets)
   alias(libs.plugins.google.services)
+  alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -113,7 +114,10 @@ dependencies {
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
   implementation(libs.androidx.biometric)
-  // implementation(libs.coil.compose)
+  implementation(platform(libs.firebase.bom))
+  implementation(libs.firebase.analytics)
+  implementation(libs.firebase.crashlytics)
+  implementation(libs.firebase.config)
   implementation(libs.converter.moshi)
   // Uncomment to use Firestore:
   // implementation(libs.firebase.firestore)

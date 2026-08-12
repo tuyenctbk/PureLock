@@ -51,12 +51,57 @@ class MainActivity : FragmentActivity() {
             val themeMode by viewModel.themeMode.collectAsState()
             val inactivityTimeoutSec by viewModel.inactivityTimeoutSec.collectAsState()
             val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
+            val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState()
+
+            val activeLockedAppsCount by viewModel.activeLockedAppsCount.collectAsState()
+            val totalVaultUnlocks by viewModel.totalVaultUnlocks.collectAsState()
+            val hasSharedApp by viewModel.hasSharedApp.collectAsState()
+            val sharePromptCount by viewModel.sharePromptCount.collectAsState()
+            val lastSharePromptTimestamp by viewModel.lastSharePromptTimestamp.collectAsState()
+
+            val hasRatedApp by viewModel.hasRatedApp.collectAsState()
+            val ratePromptCount by viewModel.ratePromptCount.collectAsState()
+            val lastRatePromptTimestamp by viewModel.lastRatePromptTimestamp.collectAsState()
+            val allApps by viewModel.allApps.collectAsState()
+
+            var showShareDialog by remember { mutableStateOf(false) }
+            var showRateDialog by remember { mutableStateOf(false) }
 
             PureLockTheme(themeMode = themeMode) {
                 var appAuthenticated by remember { mutableStateOf(true) }
                 var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+
+                val protectionScore = remember(allApps, activeLockedAppsCount) {
+                    if (allApps.isNotEmpty()) (activeLockedAppsCount * 100) / allApps.size else 100
+                }
+
+                LaunchedEffect(appAuthenticated, activeLockedAppsCount, totalVaultUnlocks, protectionScore) {
+                    if (appAuthenticated && isOnboardingCompleted) {
+                        if (com.example.util.SmartPromptsManager.shouldShowSharePrompt(
+                                lockedAppsCount = activeLockedAppsCount,
+                                totalVaultUnlocks = totalVaultUnlocks,
+                                hasShared = hasSharedApp,
+                                promptCount = sharePromptCount,
+                                lastTimestamp = lastSharePromptTimestamp
+                            )
+                        ) {
+                            delay(1200)
+                            showShareDialog = true
+                        } else if (com.example.util.SmartPromptsManager.shouldShowRatePrompt(
+                                protectionScore = protectionScore,
+                                lockedAppsCount = activeLockedAppsCount,
+                                hasRated = hasRatedApp,
+                                promptCount = ratePromptCount,
+                                lastTimestamp = lastRatePromptTimestamp
+                            )
+                        ) {
+                            delay(1200)
+                            showRateDialog = true
+                        }
+                    }
+                }
 
                 val shortcutAction = remember { intent?.getStringExtra("shortcut_action") }
                 val startRoute = remember(shortcutAction) {
@@ -152,13 +197,19 @@ class MainActivity : FragmentActivity() {
                 }
 
                 AnimatedContent(
-                    targetState = appAuthenticated,
+                    targetState = Pair(isOnboardingCompleted, appAuthenticated),
                     transitionSpec = {
                         fadeIn(tween(400)) togetherWith fadeOut(tween(400))
                     },
                     label = "AppLockTransition"
-                ) { isAuthenticated ->
-                    if (!isAuthenticated) {
+                ) { (onboarded, isAuthenticated) ->
+                    if (!onboarded) {
+                        com.example.ui.OnboardingScreen(
+                            onOnboardingComplete = { pin, securityType ->
+                                viewModel.completeOnboarding(pin, securityType)
+                            }
+                        )
+                    } else if (!isAuthenticated) {
                         LockOverlayScreen(
                             packageName = "com.example",
                             repository = viewModel.repository,
@@ -322,6 +373,34 @@ class MainActivity : FragmentActivity() {
                                 composable("audit") {
                                     PrivacyShieldScreen(viewModel = viewModel)
                                 }
+                            }
+
+                            if (showShareDialog) {
+                                com.example.ui.SmartShareDialog(
+                                    onShareClicked = {
+                                        com.example.util.SmartPromptsManager.shareApp(context)
+                                        viewModel.recordSharePromptShown(hasShared = true)
+                                        showShareDialog = false
+                                    },
+                                    onDismiss = {
+                                        viewModel.recordSharePromptShown(hasShared = false)
+                                        showShareDialog = false
+                                    }
+                                )
+                            }
+
+                            if (showRateDialog) {
+                                com.example.ui.SmartRateDialog(
+                                    onRateClicked = {
+                                        com.example.util.SmartPromptsManager.openPlayStoreForRating(context)
+                                        viewModel.recordRatePromptShown(hasRated = true)
+                                        showRateDialog = false
+                                    },
+                                    onDismiss = {
+                                        viewModel.recordRatePromptShown(hasRated = false)
+                                        showRateDialog = false
+                                    }
+                                )
                             }
                         }
                     }
