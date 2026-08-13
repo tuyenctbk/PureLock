@@ -49,6 +49,7 @@ fun PrivacyShieldScreen(
     val themeMode by viewModel.themeMode.collectAsState()
 
     var showExportDialog by remember { mutableStateOf(false) }
+    var showAccessibilityDisclosure by remember { mutableStateOf(false) }
 
     val powerManager = remember { context.getSystemService(Context.POWER_SERVICE) as? PowerManager }
     val isBatterySaverActive = powerManager?.isPowerSaveMode == true
@@ -658,18 +659,66 @@ fun PrivacyShieldScreen(
                                     )
                                 }
                                 Button(
-                                    onClick = {
-                                        try {
-                                            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                            context.startActivity(intent)
-                                        } catch (e: Exception) {
-                                            // Fallback
-                                        }
-                                    },
+                                    onClick = { showAccessibilityDisclosure = true },
                                     modifier = Modifier.testTag("btn_grant_accessibility")
                                 ) {
                                     Text("Configure")
                                 }
+                            }
+
+                            if (showAccessibilityDisclosure) {
+                                AlertDialog(
+                                    onDismissRequest = { showAccessibilityDisclosure = false },
+                                    icon = { Icon(Icons.Default.AccessibilityNew, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                                    title = { Text("Accessibility Service Disclosure", fontWeight = FontWeight.Bold) },
+                                    text = {
+                                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Text(
+                                                text = "Why PureLock Needs Accessibility Permission:",
+                                                fontWeight = FontWeight.Bold,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = "PureLock uses the AccessibilityService API strictly to detect when your protected apps are opened in the foreground and display the lock screen overlay immediately.",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "Data Collection & Privacy Guarantee:",
+                                                fontWeight = FontWeight.Bold,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = "PureLock does NOT track, store, or transmit any sensitive user data, typed text, passwords, or personal content. PureLock is 100% offline with zero internet permissions.",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    },
+                                    confirmButton = {
+                                        Button(
+                                            onClick = {
+                                                showAccessibilityDisclosure = false
+                                                try {
+                                                    val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                                    context.startActivity(intent)
+                                                } catch (e: Exception) {
+                                                    // Fallback
+                                                }
+                                            }
+                                        ) {
+                                            Text("Agree & Turn On")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        OutlinedButton(
+                                            onClick = { showAccessibilityDisclosure = false }
+                                        ) {
+                                            Text("Decline")
+                                        }
+                                    }
+                                )
                             }
 
                             HorizontalDivider()

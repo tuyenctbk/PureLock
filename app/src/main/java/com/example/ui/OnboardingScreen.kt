@@ -320,6 +320,67 @@ private fun OnboardingStepSecuritySetup(
 
 @Composable
 private fun OnboardingStepPermissions(context: android.content.Context) {
+    var showAccessibilityDisclosure by remember { mutableStateOf(false) }
+
+    if (showAccessibilityDisclosure) {
+        AlertDialog(
+            onDismissRequest = { showAccessibilityDisclosure = false },
+            icon = { Icon(Icons.Default.AccessibilityNew, contentDescription = null, tint = Color(0xFF38BDF8)) },
+            title = { Text("Accessibility Service Disclosure", fontWeight = FontWeight.Bold, color = Color.White) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Why PureLock Needs Accessibility Permission:",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "PureLock uses the AccessibilityService API strictly to detect when your protected apps are opened in the foreground and display the lock screen overlay immediately.",
+                        color = Color(0xFF94A3B8),
+                        fontSize = 13.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Data Collection & Privacy Guarantee:",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "PureLock does NOT track, store, or transmit any sensitive user data, typed text, passwords, or personal content. PureLock is 100% offline with zero internet permissions.",
+                        color = Color(0xFF94A3B8),
+                        fontSize = 13.sp
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showAccessibilityDisclosure = false
+                        try {
+                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+                ) {
+                    Text("Agree & Turn On")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showAccessibilityDisclosure = false },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                ) {
+                    Text("Decline")
+                }
+            },
+            containerColor = Color(0xFF1E293B)
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -362,13 +423,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = {
-                        try {
-                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    },
+                    onClick = { showAccessibilityDisclosure = true },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF334155))
                 ) {
