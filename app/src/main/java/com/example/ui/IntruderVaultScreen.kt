@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -242,7 +243,7 @@ fun IntruderVaultScreen(
                             .testTag("btn_vault_sort_overflow")
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Sort,
+                            imageVector = Icons.AutoMirrored.Filled.Sort,
                             contentDescription = stringResource(R.string.sort_notes_title),
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -1042,7 +1043,7 @@ fun IntruderVaultScreen(
                         if (exportPassphrase.isNotBlank()) {
                             coroutineScope.launch {
                                 val file = viewModel.exportEncryptedNotesToFile(exportPassphrase)
-                                if (file != null && file.exists()) {
+                                if (file.exists()) {
                                     exportResultStatus = context.getString(R.string.export_file_success, file.name)
                                     Toast.makeText(context, "Export complete: ${file.name}", Toast.LENGTH_LONG).show()
                                 } else {

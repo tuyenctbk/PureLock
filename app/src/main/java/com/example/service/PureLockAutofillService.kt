@@ -94,9 +94,10 @@ class PureLockAutofillService : AutofillService() {
                     val datasetBuilder = Dataset.Builder(presentation)
 
                     if (usernameIds.isNotEmpty()) {
+                        val userValue = if (item.username.isNotBlank()) item.username else item.title
                         usernameIds.forEach { id ->
                             @Suppress("DEPRECATION")
-                            datasetBuilder.setValue(id, AutofillValue.forText(item.title))
+                            datasetBuilder.setValue(id, AutofillValue.forText(userValue))
                         }
                     }
 

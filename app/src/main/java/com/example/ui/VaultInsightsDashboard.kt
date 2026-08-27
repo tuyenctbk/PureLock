@@ -78,7 +78,11 @@ fun VaultInsightsDialog(
                 "PERSONAL" -> "Personal"
                 "FINANCE" -> "Finance"
                 "PASSWORD" -> "Passwords"
-                "PIN" -> "PINs"
+                "CREDENTIAL" -> "Credentials"
+                "PIN", "BANK_PIN" -> "PINs"
+                "API_KEY" -> "API Keys"
+                "RECOVERY_KEY" -> "Recovery Keys"
+                "CARD" -> "Cards"
                 else -> "Notes"
             }
         }.eachCount()

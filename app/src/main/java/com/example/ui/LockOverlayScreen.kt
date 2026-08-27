@@ -96,7 +96,7 @@ fun LockOverlayScreen(
 
     fun triggerHapticSuccess() {
         try {
-            val vibrator = context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+            val vibrator = context.getSystemService(android.os.Vibrator::class.java)
             if (vibrator?.hasVibrator() == true) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                     vibrator.vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_DOUBLE_CLICK))
@@ -116,7 +116,7 @@ fun LockOverlayScreen(
 
     fun triggerHapticFailure() {
         try {
-            val vibrator = context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+            val vibrator = context.getSystemService(android.os.Vibrator::class.java)
             if (vibrator?.hasVibrator() == true) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                     vibrator.vibrate(android.os.VibrationEffect.createWaveform(longArrayOf(0, 90, 50, 90), -1))

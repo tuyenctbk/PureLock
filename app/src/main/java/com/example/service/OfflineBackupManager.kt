@@ -85,7 +85,13 @@ class OfflineBackupManager(private val context: Context) {
                     put("title", item.title)
                     put("secretContent", item.secretContent)
                     put("category", item.category)
+                    put("username", item.username)
+                    put("websiteOrApp", item.websiteOrApp)
+                    put("notes", item.notes)
+                    put("isPinned", item.isPinned)
                     put("timestamp", item.timestamp)
+                    put("isDeleted", item.isDeleted)
+                    put("deletedTimestamp", item.deletedTimestamp)
                 })
             }
             put("vaultItems", vaultArray)
@@ -136,7 +142,13 @@ class OfflineBackupManager(private val context: Context) {
                     put("title", item.title)
                     put("secretContent", item.secretContent)
                     put("category", item.category)
+                    put("username", item.username)
+                    put("websiteOrApp", item.websiteOrApp)
+                    put("notes", item.notes)
+                    put("isPinned", item.isPinned)
                     put("timestamp", item.timestamp)
+                    put("isDeleted", item.isDeleted)
+                    put("deletedTimestamp", item.deletedTimestamp)
                 })
             }
             put("vaultItems", vaultArray)
@@ -216,7 +228,13 @@ class OfflineBackupManager(private val context: Context) {
                         title = itemObj.getString("title"),
                         secretContent = itemObj.getString("secretContent"),
                         category = itemObj.optString("category", "NOTE"),
-                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis())
+                        username = itemObj.optString("username", ""),
+                        websiteOrApp = itemObj.optString("websiteOrApp", ""),
+                        notes = itemObj.optString("notes", ""),
+                        isPinned = itemObj.optBoolean("isPinned", false),
+                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis()),
+                        isDeleted = itemObj.optBoolean("isDeleted", false),
+                        deletedTimestamp = itemObj.optLong("deletedTimestamp", 0L)
                     )
                     db.encryptedVaultDao().insertVaultItem(entity)
                 }
@@ -307,7 +325,13 @@ class OfflineBackupManager(private val context: Context) {
                         title = itemObj.getString("title"),
                         secretContent = itemObj.getString("secretContent"),
                         category = itemObj.optString("category", "NOTE"),
-                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis())
+                        username = itemObj.optString("username", ""),
+                        websiteOrApp = itemObj.optString("websiteOrApp", ""),
+                        notes = itemObj.optString("notes", ""),
+                        isPinned = itemObj.optBoolean("isPinned", false),
+                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis()),
+                        isDeleted = itemObj.optBoolean("isDeleted", false),
+                        deletedTimestamp = itemObj.optLong("deletedTimestamp", 0L)
                     )
                     db.encryptedVaultDao().insertVaultItem(entity)
                 }
