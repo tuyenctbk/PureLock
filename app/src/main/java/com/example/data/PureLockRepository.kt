@@ -95,7 +95,7 @@ class PureLockRepository(
 
     suspend fun updateEncryptedVaultItem(item: EncryptedVaultEntity) {
         encryptedVaultDao.updateVaultItem(item)
-        logSecurityEvent("VAULT_ITEM_UPDATED", "Encrypted $item.category credential updated: ${item.title}")
+        logSecurityEvent("VAULT_ITEM_UPDATED", "Encrypted ${item.category} credential updated: ${item.title}")
     }
 
     suspend fun toggleVaultItemPin(id: Long, isPinned: Boolean) {

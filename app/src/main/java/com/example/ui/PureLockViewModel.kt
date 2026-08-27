@@ -558,12 +558,27 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             val lines = csvData.lines().filter { it.isNotBlank() }
             if (lines.size <= 1) return false
             viewModelScope.launch {
-                lines.drop(1).forEach { line ->
-                    val parts = line.split(",")
-                    if (parts.size >= 4) {
-                        val pkg = parts[0].trim()
-                        val isLocked = parts[3].trim().toBooleanStrictOrNull() ?: false
-                        repository.setAppLockState(pkg, isLocked)
+                val header = lines.first()
+                if (header.startsWith("RecordType")) {
+                    // Full Human-Readable CSV format
+                    lines.drop(1).forEach { line ->
+                        val parts = line.split(",")
+                        if (parts.size >= 5 && parts[0].trim() == "APP") {
+                            val pkg = parts[3].trim()
+                            val lockedPart = parts[4].trim()
+                            val isLocked = lockedPart.contains("true", ignoreCase = true)
+                            repository.setAppLockState(pkg, isLocked)
+                        }
+                    }
+                } else {
+                    // Standard config CSV format
+                    lines.drop(1).forEach { line ->
+                        val parts = line.split(",")
+                        if (parts.size >= 4) {
+                            val pkg = parts[0].trim()
+                            val isLocked = parts[3].trim().toBooleanStrictOrNull() ?: false
+                            repository.setAppLockState(pkg, isLocked)
+                        }
                     }
                 }
             }

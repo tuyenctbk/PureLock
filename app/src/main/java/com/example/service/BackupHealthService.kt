@@ -29,7 +29,10 @@ class BackupHealthService(private val context: Context) {
                 val thirtyDaysMillis = 30L * 24L * 60L * 60L * 1000L
                 val currentTime = System.currentTimeMillis()
 
-                if (lastBackupTime == 0L || (currentTime - lastBackupTime) > thirtyDaysMillis) {
+                if (lastBackupTime == 0L) {
+                    // First run: establish initial baseline timestamp
+                    prefs.setLastBackupTimestamp(currentTime)
+                } else if ((currentTime - lastBackupTime) > thirtyDaysMillis) {
                     triggerBackupWarningNotification()
                 }
             } catch (e: Exception) {
@@ -66,7 +69,7 @@ class BackupHealthService(private val context: Context) {
             .setContentText("No encrypted backup performed in over 30 days! Tap to backup now.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(false)
+            .setAutoCancel(true)
             .build()
 
         notificationManager.notify(NOTIFICATION_ID, notification)
