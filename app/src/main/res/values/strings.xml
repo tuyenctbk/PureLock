@@ -35,4 +35,186 @@
     <string name="trash_purge">Auto-Purge Period</string>
     <string name="trash_purge_desc">Deleted secrets will be permanently purged after the chosen duration.</string>
     <string name="unlocked">Unlocked</string>
+
+    <!-- Notes, Vault & Deletion Dialog Strings -->
+    <string name="delete_note_title">Delete Encrypted Note?</string>
+    <string name="delete_note_message">Are you sure you want to delete \"%1$s\"? This item will be moved to the Trash Bin where it is protected for %2$d days before permanent purge.</string>
+    <string name="delete_note_permanent_title">Permanently Delete Secret?</string>
+    <string name="delete_note_permanent_message">Are you sure you want to permanently erase \"%1$s\" from hardware storage? This cryptographic deletion cannot be undone.</string>
+    <string name="delete_confirm">Delete</string>
+    <string name="delete_permanent_confirm">Erase Permanently</string>
+    <string name="cancel">Cancel</string>
+    <string name="restore">Restore</string>
+    <string name="save_encrypted">Save Encrypted</string>
+    <string name="add_secret_title">Add Encrypted Secret / Note</string>
+    <string name="edit_secret_title">Edit Encrypted Secret / Note</string>
+    <string name="title_service_name">Title / Service Name</string>
+    <string name="title_placeholder">e.g. Master Email, Banking PIN, Private Note</string>
+    <string name="secret_content_label">Secret Password / Note Content</string>
+    <string name="secret_content_placeholder">Enter or generate secret note content...</string>
+    <string name="search_vault_placeholder">Search notes, passwords, and secrets...</string>
+    <string name="clear_search">Clear Search</string>
+    <string name="no_matching_secrets">No Matching Secrets Found</string>
+    <string name="no_secrets_match_query">No items match \"%1$s\". Try a different search keyword.</string>
+    <string name="encrypted_vault_empty">Encrypted Vault is Empty</string>
+    <string name="store_first_secret">Store First Secret Note</string>
+    <string name="category_password">Password</string>
+    <string name="category_note">Secret Note</string>
+    <string name="category_pin">Bank PIN</string>
+
+    <!-- Password Strength Indicator Strings -->
+    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_fair">Fair</string>
+    <string name="password_strength_strong">Strong</string>
+    <string name="password_strength_very_strong">Very Strong</string>
+    <string name="entropy_bits_format">Entropy: %1$.1f bits</string>
+    <string name="strength_rule_upper">A-Z</string>
+    <string name="strength_rule_lower">a-z</string>
+    <string name="strength_rule_digits">0-9</string>
+    <string name="strength_rule_symbols">!@#</string>
+    <string name="strength_rule_length">12+ Chars</string>
+
+    <!-- Auto-Lock Configuration Strings -->
+    <string name="auto_lock_settings_title">Auto-Lock Inactivity Timeout</string>
+    <string name="auto_lock_settings_desc">Choose how quickly PureLock enforces an automatic security lockdown after inactivity.</string>
+    <string name="auto_lock_immediately">Immediately</string>
+    <string name="auto_lock_30s">30 Seconds</string>
+    <string name="auto_lock_1m">1 Minute</string>
+    <string name="auto_lock_2m">2 Minutes</string>
+    <string name="auto_lock_5m">5 Minutes</string>
+    <string name="auto_lock_10m">10 Minutes</string>
+    <string name="auto_lock_never">Never (Session Lock Only)</string>
+    <string name="auto_lock_dialog_title">Select Auto-Lock Interval</string>
+
+    <!-- Secure Export / Import Strings -->
+    <string name="export_notes_title">Secure Encrypted Notes Export</string>
+    <string name="export_notes_desc">Export your encrypted notes and secrets to a local encrypted file (.plk) protected with AES-256-GCM at rest.</string>
+    <string name="import_notes_title">Import Encrypted Notes File</string>
+    <string name="import_notes_desc">Restore notes and secrets from an AES-256-GCM encrypted local file or payload.</string>
+    <string name="export_passphrase_label">Encryption Passphrase</string>
+    <string name="import_passphrase_label">Decryption Passphrase</string>
+    <string name="export_passphrase_hint">Enter a strong passphrase to encrypt your notes file...</string>
+    <string name="import_passphrase_hint">Enter the passphrase used when the file was encrypted...</string>
+    <string name="btn_export_notes_file">Export Notes to File</string>
+    <string name="btn_import_notes_file">Import Notes File</string>
+    <string name="export_file_success">Encrypted notes successfully exported to: %1$s</string>
+    <string name="import_file_success">Encrypted notes successfully restored into hardware vault!</string>
+    <string name="import_file_error">Decryption failed. Incorrect passphrase or corrupt file.</string>
+    <string name="copied_clipboard_countdown">Copied! Clipboard clears in %1$ds</string>
+    <string name="clear_clipboard_now">Clear Now</string>
+
+    <!-- Clipboard Delay Configuration -->
+    <string name="clipboard_clear_delay_title">Clipboard Auto-Clear Delay</string>
+    <string name="clipboard_clear_delay_desc">Automatically purges copied secrets from clipboard memory to prevent background eavesdropping.</string>
+    <string name="clipboard_delay_10s">10 Seconds</string>
+    <string name="clipboard_delay_30s">30 Seconds (Default)</string>
+    <string name="clipboard_delay_60s">60 Seconds (1 Min)</string>
+    <string name="clipboard_delay_120s">120 Seconds (2 Min)</string>
+    <string name="clipboard_delay_disabled">Never (Manual Clear)</string>
+
+    <!-- Sorting Options -->
+    <string name="sort_notes_title">Sort Notes</string>
+    <string name="sort_date_desc">Date Created (Newest First)</string>
+    <string name="sort_date_asc">Date Created (Oldest First)</string>
+    <string name="sort_alphabetical_asc">Alphabetical (A → Z)</string>
+    <string name="sort_alphabetical_desc">Alphabetical (Z → A)</string>
+    <string name="sort_strength_desc">Password Strength (Strongest First)</string>
+    <string name="sort_strength_asc">Password Strength (Weakest First)</string>
+
+    <!-- Category System -->
+    <string name="category_all_notes">All Notes</string>
+    <string name="category_work">Work</string>
+    <string name="category_personal">Personal</string>
+    <string name="category_finance">Finance</string>
+    <string name="category_passwords">Passwords</string>
+    <string name="category_pins">PINs</string>
+    <string name="category_secure_notes">Secure Notes</string>
+    <string name="category_label">Category</string>
+    <string name="select_category">Select Category</string>
+
+    <!-- Lock Screen & Secondary Authentication Strings -->
+    <string name="lock_access_granted">Access Granted</string>
+    <string name="lock_security_shield">PureLock Security Shield</string>
+    <string name="lock_auth_success_opening">Authentication successful. Opening %1$s…</string>
+    <string name="lock_auth_required_for">Authentication required for %1$s</string>
+    <string name="lock_biometric_no_hardware">No hardware biometric sensor detected. Using secondary PIN or Pattern authentication.</string>
+    <string name="lock_biometric_not_enrolled">No biometrics enrolled on device. Using secondary PIN or Pattern lock.</string>
+    <string name="lock_failed_attempts_intruder">%1$d Failed Attempts! Intruder selfie captured locally.</string>
+    <string name="lock_mode_pin">PIN Pad</string>
+    <string name="lock_mode_pattern">Pattern</string>
+    <string name="lock_mode_biometric">Biometrics</string>
+    <string name="lock_incorrect_pin">Incorrect PIN. Try again.</string>
+    <string name="lock_incorrect_pattern">Incorrect pattern. Try again.</string>
+    <string name="lock_draw_pattern">Draw pattern to unlock</string>
+    <string name="lock_draw_pattern_invisible">Draw pattern (Invisible Trail Mode)</string>
+    <string name="lock_reset_pattern">Reset Pattern</string>
+    <string name="lock_touch_sensor_prompt">Touch Fingerprint Sensor or use Face ID to unlock %1$s</string>
+    <string name="lock_cancel_exit">Cancel &amp; Exit Shield</string>
+    <string name="lock_keypad_clear">Clear</string>
+    <string name="lock_keypad_backspace">⌫</string>
+    <string name="lock_panic_triggered">Duress PIN entered! Panic mode activated.</string>
+    <string name="secondary_auth_title">Secondary Authentication</string>
+    <string name="secondary_auth_desc">PIN or Pattern fallback protects the app if hardware biometric authentication is unavailable or fails.</string>
+
+    <!-- Password Generator Utility Strings -->
+    <string name="generator_title">Secure Password Generator</string>
+    <string name="generator_toggle_expand">Custom Password Generator</string>
+    <string name="generator_length_label">Length: %1$d characters</string>
+    <string name="generator_length_chars">Length: %1$d</string>
+    <string name="generator_preset_pin4">4-Digit PIN</string>
+    <string name="generator_preset_pin6">6-Digit PIN</string>
+    <string name="generator_preset_standard">16-Char Standard</string>
+    <string name="generator_preset_strong">24-Char Strong</string>
+    <string name="generator_preset_complex">32-Char Ultra</string>
+    <string name="generator_charset_upper">A-Z (Uppercase)</string>
+    <string name="generator_charset_lower">a-z (Lowercase)</string>
+    <string name="generator_charset_digits">0-9 (Digits)</string>
+    <string name="generator_charset_symbols">!@# (Symbols)</string>
+    <string name="generator_charset_no_ambiguous">No Ambiguous (0, O, 1, l)</string>
+    <string name="generator_btn_generate">Generate</string>
+    <string name="generator_btn_regenerate">Regenerate</string>
+    <string name="generator_btn_apply">Apply to Secret</string>
+    <string name="generator_btn_copy">Copy Generated</string>
+    <string name="generator_copied_toast">Generated password copied to clipboard</string>
+    <string name="generator_applied_toast">Generated password applied to secret</string>
+    <string name="generator_strength_entropy">Strength: %1$s (%2$.1f bits entropy)</string>
+
+    <!-- Settings Fallback & Auth Strings -->
+    <string name="settings_lock_active">Settings Lock Active</string>
+    <string name="settings_lock_desc">The Invisible Suite is secured by device biometrics and your secondary PIN code. Authenticate to modify configurations.</string>
+    <string name="settings_scan_biometrics">Scan Biometrics</string>
+    <string name="settings_use_fallback_pin">Use Master PIN Fallback</string>
+    <string name="settings_enter_master_pin_title">Enter Master PIN</string>
+    <string name="settings_enter_master_pin_desc">Please enter your master PIN code to unlock the settings suite.</string>
+    <string name="settings_incorrect_pin">Incorrect Master PIN</string>
+    <string name="settings_unlock_btn">Unlock</string>
+
+    <!-- Vault Insights Dashboard -->
+    <string name="vault_insights_title">Vault Insights</string>
+    <string name="vault_insights_subtitle">Cryptographic statistics and strength telemetry</string>
+    <string name="insights_total_records">Total Records</string>
+    <string name="insights_avg_strength">Average Strength</string>
+    <string name="insights_health_score">Security Health Index</string>
+    <string name="insights_strength_breakdown">Password Strength Breakdown</string>
+    <string name="insights_category_distribution">Category Distribution</string>
+    <string name="insights_usage_frequency">Usage &amp; Storage Frequency</string>
+    <string name="insights_security_audit">Vault Security Audit</string>
+    <!-- Additional Navigation & Quick Actions -->
+    <string name="export_btn_label">Export</string>
+    <string name="import_btn_label">Import</string>
+    <string name="insights_btn_label">Insights</string>
+    <string name="generator_quick_presets">Quick Presets:</string>
+
+    <!-- Empty State Illustrations & View Strings -->
+    <string name="empty_notes_main_title">Your Vault is Empty</string>
+    <string name="empty_notes_main_desc">Safeguard your passwords, private notes, bank PINs, and sensitive items locally with AES-256-GCM hardware protection.</string>
+    <string name="empty_category_title">No %1$s Items Found</string>
+    <string name="empty_category_desc">You have no encrypted items saved under the \"%1$s\" category. Add your first secret or note now.</string>
+    <string name="empty_intruder_title">Vault Secure — Zero Intruder Attempts</string>
+    <string name="empty_intruder_desc">If an unauthorized person attempts to open a locked application with wrong credentials, their intruder selfie snapshot will be captured and displayed here.</string>
+    <string name="empty_trash_title">Trash Bin is Empty</string>
+    <string name="empty_trash_desc">Deleted notes and secrets remain in the trash bin for %1$d days before permanent hardware removal.</string>
+    <string name="intruder_banner_info">Intruder photos are encrypted and stored exclusively inside app private memory. They never sync to clouds or gallery.</string>
+    <string name="trash_banner_info">Trash Bin safeguards soft-deleted items. Items are automatically purged after %1$d days.</string>
+    <string name="store_first_category_secret">Store Secret in %1$s</string>
 </resources>

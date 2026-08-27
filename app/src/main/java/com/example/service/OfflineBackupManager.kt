@@ -120,6 +120,129 @@ class OfflineBackupManager(private val context: Context) {
         return encryptedPackage.toString(2)
     }
 
+    suspend fun exportEncryptedNotesJson(passphrase: String): String {
+        val db = PureLockDatabase.getDatabase(context)
+        val vaultItems = db.encryptedVaultDao().getAllVaultItems().first()
+
+        val dataJson = JSONObject().apply {
+            put("timestamp", System.currentTimeMillis())
+            put("type", "ENCRYPTED_NOTES_VAULT")
+            put("app_version", "2.1.0")
+
+            val vaultArray = JSONArray()
+            vaultItems.forEach { item ->
+                vaultArray.put(JSONObject().apply {
+                    put("id", item.id)
+                    put("title", item.title)
+                    put("secretContent", item.secretContent)
+                    put("category", item.category)
+                    put("timestamp", item.timestamp)
+                })
+            }
+            put("vaultItems", vaultArray)
+        }
+
+        val plainBytes = dataJson.toString().toByteArray(StandardCharsets.UTF_8)
+        val random = SecureRandom()
+        val salt = ByteArray(SALT_LENGTH)
+        val iv = ByteArray(IV_LENGTH)
+        random.nextBytes(salt)
+        random.nextBytes(iv)
+
+        val secretKey = deriveKey(passphrase, salt)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val gcmSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec)
+        val ciphertext = cipher.doFinal(plainBytes)
+
+        val encryptedPackage = JSONObject().apply {
+            put("version", 1)
+            put("type", "PURELOCK_ENCRYPTED_NOTES")
+            put("algorithm", "AES-256-GCM")
+            put("salt", Base64.encodeToString(salt, Base64.NO_WRAP))
+            put("iv", Base64.encodeToString(iv, Base64.NO_WRAP))
+            put("ciphertext", Base64.encodeToString(ciphertext, Base64.NO_WRAP))
+        }
+
+        return encryptedPackage.toString(2)
+    }
+
+    fun getBackupDirectory(): java.io.File {
+        val dir = context.getExternalFilesDir("backups") ?: java.io.File(context.filesDir, "backups")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return dir
+    }
+
+    suspend fun exportEncryptedNotesToFile(passphrase: String): java.io.File {
+        val encryptedJson = exportEncryptedNotesJson(passphrase)
+        val backupDir = getBackupDirectory()
+        val fileName = "purelock_notes_encrypted_${System.currentTimeMillis()}.plk"
+        val file = java.io.File(backupDir, fileName)
+        file.writeText(encryptedJson, StandardCharsets.UTF_8)
+        return file
+    }
+
+    suspend fun importEncryptedNotesFromFile(file: java.io.File, passphrase: String): Boolean {
+        if (!file.exists()) return false
+        val content = file.readText(StandardCharsets.UTF_8)
+        return importEncryptedNotesJson(content, passphrase)
+    }
+
+    suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean {
+        return try {
+            val packageObj = JSONObject(jsonPackageStr)
+            val salt = Base64.decode(packageObj.getString("salt"), Base64.NO_WRAP)
+            val iv = Base64.decode(packageObj.getString("iv"), Base64.NO_WRAP)
+            val ciphertext = Base64.decode(packageObj.getString("ciphertext"), Base64.NO_WRAP)
+
+            val secretKey = deriveKey(passphrase, salt)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            val gcmSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec)
+            val plainBytes = cipher.doFinal(ciphertext)
+
+            val decryptedJsonStr = String(plainBytes, StandardCharsets.UTF_8)
+            val backupDataObj = JSONObject(decryptedJsonStr)
+            val db = PureLockDatabase.getDatabase(context)
+
+            if (backupDataObj.has("vaultItems")) {
+                val vaultArray = backupDataObj.getJSONArray("vaultItems")
+                for (i in 0 until vaultArray.length()) {
+                    val itemObj = vaultArray.getJSONObject(i)
+                    val entity = EncryptedVaultEntity(
+                        id = 0L,
+                        title = itemObj.getString("title"),
+                        secretContent = itemObj.getString("secretContent"),
+                        category = itemObj.optString("category", "NOTE"),
+                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis())
+                    )
+                    db.encryptedVaultDao().insertVaultItem(entity)
+                }
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun exportEncryptedBackupToFile(passphrase: String): java.io.File {
+        val encryptedJson = exportEncryptedBackup(passphrase)
+        val backupDir = getBackupDirectory()
+        val fileName = "purelock_full_backup_${System.currentTimeMillis()}.plk"
+        val file = java.io.File(backupDir, fileName)
+        file.writeText(encryptedJson, StandardCharsets.UTF_8)
+        return file
+    }
+
+    suspend fun importEncryptedBackupFromFile(file: java.io.File, passphrase: String): Boolean {
+        if (!file.exists()) return false
+        val content = file.readText(StandardCharsets.UTF_8)
+        return importEncryptedBackup(content, passphrase)
+    }
+
     suspend fun importEncryptedBackup(jsonPackageStr: String, passphrase: String): Boolean {
         return try {
             val packageObj = JSONObject(jsonPackageStr)

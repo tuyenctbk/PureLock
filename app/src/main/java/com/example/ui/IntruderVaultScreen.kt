@@ -5,11 +5,18 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Base64
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -27,39 +34,72 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
+import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.IntruderSelfieEntity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+enum class VaultSortOption {
+    DATE_DESC,
+    DATE_ASC,
+    ALPHA_ASC,
+    ALPHA_DESC,
+    STRENGTH_DESC,
+    STRENGTH_ASC
+}
+
 @Composable
 fun IntruderVaultScreen(
     viewModel: PureLockViewModel
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     val intruderSelfies by viewModel.intruderSelfies.collectAsState()
     val encryptedVaultItems by viewModel.encryptedVaultItems.collectAsState()
     val trashVaultItems by viewModel.trashVaultItems.collectAsState()
     val trashPurgeDays by viewModel.trashPurgeDays.collectAsState()
+    val activeCopiedItemId by viewModel.activeCopiedItemId.collectAsState()
+    val clipboardCountdown by viewModel.clipboardCountdown.collectAsState()
 
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(1) }
+    var selectedCategory by remember { mutableStateOf("ALL") }
+    var sortOption by remember { mutableStateOf(VaultSortOption.DATE_DESC) }
+    var isSortMenuExpanded by remember { mutableStateOf(false) }
+    var showVaultInsightsDialog by remember { mutableStateOf(false) }
     var selectedSelfie by remember { mutableStateOf<IntruderSelfieEntity?>(null) }
     var showAddVaultDialog by remember { mutableStateOf(false) }
+    var editingVaultItem by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
+    var noteToDelete by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
+    var trashToDelete by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
+
+    var showExportNotesDialog by remember { mutableStateOf(false) }
+    var showImportNotesDialog by remember { mutableStateOf(false) }
+    var exportPassphrase by remember { mutableStateOf("") }
+    var importPassphrase by remember { mutableStateOf("") }
+    var importPayloadInput by remember { mutableStateOf("") }
+    var exportResultStatus by remember { mutableStateOf<String?>(null) }
+
     var vaultSearchQuery by remember { mutableStateOf("") }
 
-    val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy • HH:mm:ss", Locale.getDefault()) }
+    val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy • HH:mm", Locale.getDefault()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Top Header Title with Clear All Action
+        // Top Header Title with Tab Statistics
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -73,22 +113,22 @@ fun IntruderVaultScreen(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.tertiaryContainer),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = when (selectedTab) {
                             0 -> Icons.Default.CameraAlt
-                            1 -> Icons.Default.Key
+                            1 -> Icons.Default.Lock
                             else -> Icons.Default.Delete
                         },
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onTertiaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Column {
                     Text(
-                        text = "PureLock Vault",
+                        text = stringResource(R.string.secure_vault),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -96,8 +136,8 @@ fun IntruderVaultScreen(
                     Text(
                         text = when (selectedTab) {
                             0 -> "${intruderSelfies.size} Snapshots Captured"
-                            1 -> "${encryptedVaultItems.size} SQLCipher Encrypted Secrets"
-                            else -> "${trashVaultItems.size} Soft-Deleted Items"
+                            1 -> "${encryptedVaultItems.size} Encrypted Notes & Secrets"
+                            else -> "${trashVaultItems.size} Trash Bin Items"
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -121,7 +161,7 @@ fun IntruderVaultScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Secret")
+                    Text("Add Note")
                 }
             } else if (selectedTab == 2 && trashVaultItems.isNotEmpty()) {
                 Button(
@@ -143,30 +183,380 @@ fun IntruderVaultScreen(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).testTag("vault_tab_row")
         ) {
             Tab(
-                selected = selectedTab == 0,
-                onClick = { selectedTab = 0 },
-                text = { Text("Snapshots") },
-                icon = { Icon(Icons.Default.CameraAlt, contentDescription = null) },
-                modifier = Modifier.testTag("tab_intruder_snapshots")
-            )
-            Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
-                text = { Text("Secrets") },
+                text = { Text(stringResource(R.string.secrets)) },
                 icon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 modifier = Modifier.testTag("tab_encrypted_secrets")
             )
             Tab(
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                text = { Text(stringResource(R.string.snapshots)) },
+                icon = { Icon(Icons.Default.CameraAlt, contentDescription = null) },
+                modifier = Modifier.testTag("tab_intruder_snapshots")
+            )
+            Tab(
                 selected = selectedTab == 2,
                 onClick = { selectedTab = 2 },
-                text = { Text("Trash Bin") },
+                text = { Text(stringResource(R.string.trash_bin)) },
                 icon = { Icon(Icons.Default.Delete, contentDescription = null) },
                 modifier = Modifier.testTag("tab_trash_bin")
             )
         }
 
-        if (selectedTab == 0) {
-            // Privacy Banner
+        if (selectedTab == 1) {
+            // Tab 1: SQLCipher & AES-256 Encrypted Secrets & Passwords Vault
+            
+            // Search Bar & Sort Overflow Menu Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = vaultSearchQuery,
+                    onValueChange = { vaultSearchQuery = it },
+                    placeholder = { Text(stringResource(R.string.search_vault_placeholder)) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Vault") },
+                    trailingIcon = {
+                        if (vaultSearchQuery.isNotEmpty()) {
+                            IconButton(onClick = { vaultSearchQuery = "" }) {
+                                Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear_search))
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.weight(1f).testTag("input_vault_search")
+                )
+
+                // Overflow Sort Menu
+                Box {
+                    IconButton(
+                        onClick = { isSortMenuExpanded = true },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                            .testTag("btn_vault_sort_overflow")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Sort,
+                            contentDescription = stringResource(R.string.sort_notes_title),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isSortMenuExpanded,
+                        onDismissRequest = { isSortMenuExpanded = false },
+                        modifier = Modifier.testTag("menu_vault_sort_options")
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sort_date_desc)) },
+                            onClick = {
+                                sortOption = VaultSortOption.DATE_DESC
+                                isSortMenuExpanded = false
+                            },
+                            leadingIcon = {
+                                if (sortOption == VaultSortOption.DATE_DESC) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    Icon(Icons.Default.Schedule, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.testTag("menu_item_sort_date_desc")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sort_date_asc)) },
+                            onClick = {
+                                sortOption = VaultSortOption.DATE_ASC
+                                isSortMenuExpanded = false
+                            },
+                            leadingIcon = {
+                                if (sortOption == VaultSortOption.DATE_ASC) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    Icon(Icons.Default.History, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.testTag("menu_item_sort_date_asc")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sort_alphabetical_asc)) },
+                            onClick = {
+                                sortOption = VaultSortOption.ALPHA_ASC
+                                isSortMenuExpanded = false
+                            },
+                            leadingIcon = {
+                                if (sortOption == VaultSortOption.ALPHA_ASC) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    Icon(Icons.Default.SortByAlpha, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.testTag("menu_item_sort_alpha_asc")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sort_alphabetical_desc)) },
+                            onClick = {
+                                sortOption = VaultSortOption.ALPHA_DESC
+                                isSortMenuExpanded = false
+                            },
+                            leadingIcon = {
+                                if (sortOption == VaultSortOption.ALPHA_DESC) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    Icon(Icons.Default.SortByAlpha, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.testTag("menu_item_sort_alpha_desc")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sort_strength_desc)) },
+                            onClick = {
+                                sortOption = VaultSortOption.STRENGTH_DESC
+                                isSortMenuExpanded = false
+                            },
+                            leadingIcon = {
+                                if (sortOption == VaultSortOption.STRENGTH_DESC) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    Icon(Icons.Default.Shield, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.testTag("menu_item_sort_strength_desc")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sort_strength_asc)) },
+                            onClick = {
+                                sortOption = VaultSortOption.STRENGTH_ASC
+                                isSortMenuExpanded = false
+                            },
+                            leadingIcon = {
+                                if (sortOption == VaultSortOption.STRENGTH_ASC) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    Icon(Icons.Default.Warning, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.testTag("menu_item_sort_strength_asc")
+                        )
+                    }
+                }
+            }
+
+            // Category Filter Chip Bar
+            val categoryDefinitions = listOf(
+                "ALL" to stringResource(R.string.category_all_notes),
+                "WORK" to stringResource(R.string.category_work),
+                "PERSONAL" to stringResource(R.string.category_personal),
+                "FINANCE" to stringResource(R.string.category_finance),
+                "PASSWORD" to stringResource(R.string.category_password),
+                "PIN" to stringResource(R.string.category_pin),
+                "NOTE" to stringResource(R.string.category_note)
+            )
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().testTag("category_filter_chip_bar"),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(categoryDefinitions) { (key, label) ->
+                    val isSelected = selectedCategory.equals(key, ignoreCase = true)
+                    val count = if (key == "ALL") encryptedVaultItems.size
+                    else encryptedVaultItems.count { it.category.equals(key, ignoreCase = true) }
+
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { selectedCategory = key },
+                        label = {
+                            Text(
+                                text = "$label ($count)",
+                                fontSize = 12.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        leadingIcon = {
+                            when (key) {
+                                "ALL" -> Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(16.dp))
+                                "WORK" -> Icon(Icons.Default.BusinessCenter, contentDescription = null, modifier = Modifier.size(16.dp))
+                                "PERSONAL" -> Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(16.dp))
+                                "FINANCE" -> Icon(Icons.Default.AccountBalance, contentDescription = null, modifier = Modifier.size(16.dp))
+                                "PASSWORD" -> Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(16.dp))
+                                "PIN" -> Icon(Icons.Default.Pin, contentDescription = null, modifier = Modifier.size(16.dp))
+                                else -> Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(16.dp))
+                            }
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = isSelected,
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                            selectedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier.testTag("chip_category_$key")
+                    )
+                }
+            }
+
+            // Quick Utility Actions (Export, Import, Insights)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        exportPassphrase = ""
+                        exportResultStatus = null
+                        showExportNotesDialog = true
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(1f).dpadFocusable(shape = RoundedCornerShape(10.dp)).testTag("btn_export_notes_vault")
+                ) {
+                    Icon(Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(R.string.export_btn_label), fontSize = 12.sp)
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        importPassphrase = ""
+                        importPayloadInput = ""
+                        showImportNotesDialog = true
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(1f).dpadFocusable(shape = RoundedCornerShape(10.dp)).testTag("btn_import_notes_vault")
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(R.string.import_btn_label), fontSize = 12.sp)
+                }
+
+                FilledTonalButton(
+                    onClick = { showVaultInsightsDialog = true },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(1.1f).dpadFocusable(shape = RoundedCornerShape(10.dp)).testTag("btn_vault_insights")
+                ) {
+                    Icon(Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(R.string.insights_btn_label), fontSize = 12.sp)
+                }
+            }
+
+            // Filter & Sort Pipeline
+            val passwordCalc = remember { com.example.service.PasswordGeneratorService() }
+            val categoryFilteredItems = remember(encryptedVaultItems, selectedCategory) {
+                if (selectedCategory.equals("ALL", ignoreCase = true)) encryptedVaultItems
+                else encryptedVaultItems.filter { it.category.equals(selectedCategory, ignoreCase = true) }
+            }
+
+            val searchFilteredItems = remember(categoryFilteredItems, vaultSearchQuery) {
+                if (vaultSearchQuery.isBlank()) categoryFilteredItems
+                else categoryFilteredItems.filter {
+                    it.title.contains(vaultSearchQuery, ignoreCase = true) ||
+                    it.category.contains(vaultSearchQuery, ignoreCase = true) ||
+                    it.secretContent.contains(vaultSearchQuery, ignoreCase = true)
+                }
+            }
+
+            val finalVaultItems = remember(searchFilteredItems, sortOption) {
+                when (sortOption) {
+                    VaultSortOption.DATE_DESC -> searchFilteredItems.sortedByDescending { it.timestamp }
+                    VaultSortOption.DATE_ASC -> searchFilteredItems.sortedBy { it.timestamp }
+                    VaultSortOption.ALPHA_ASC -> searchFilteredItems.sortedBy { it.title.lowercase() }
+                    VaultSortOption.ALPHA_DESC -> searchFilteredItems.sortedByDescending { it.title.lowercase() }
+                    VaultSortOption.STRENGTH_DESC -> searchFilteredItems.sortedByDescending { passwordCalc.calculateEntropyBits(it.secretContent) }
+                    VaultSortOption.STRENGTH_ASC -> searchFilteredItems.sortedBy { passwordCalc.calculateEntropyBits(it.secretContent) }
+                }
+            }
+
+            if (finalVaultItems.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (selectedCategory != "ALL") {
+                        val label = categoryDefinitions.find { it.first.equals(selectedCategory, ignoreCase = true) }?.second ?: selectedCategory
+                        EmptyCategoryIllustration(
+                            categoryKey = selectedCategory,
+                            categoryLabel = label,
+                            onAddSecret = { showAddVaultDialog = true },
+                            onClearCategory = {
+                                vaultSearchQuery = ""
+                                selectedCategory = "ALL"
+                            }
+                        )
+                    } else if (vaultSearchQuery.isNotBlank()) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SearchOff,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(64.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.no_matching_secrets),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.no_secrets_match_query, vaultSearchQuery),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.padding(horizontal = 32.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                            OutlinedButton(
+                                onClick = { vaultSearchQuery = "" },
+                                modifier = Modifier.dpadFocusable(shape = RoundedCornerShape(20.dp))
+                            ) {
+                                Text(stringResource(R.string.clear_search))
+                            }
+                        }
+                    } else {
+                        EmptyVaultIllustration(
+                            onAddFirstSecret = { showAddVaultDialog = true }
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = finalVaultItems,
+                        key = { it.id }
+                    ) { vaultItem ->
+                        EncryptedSecretCard(
+                            item = vaultItem,
+                            isCopied = (activeCopiedItemId == vaultItem.id),
+                            copyCountdown = clipboardCountdown,
+                            onCopy = { viewModel.copyVaultItemToClipboard(vaultItem) },
+                            onClearClipboard = { viewModel.clearClipboardNow() },
+                            dateFormat = dateFormat,
+                            onEdit = { editingVaultItem = vaultItem },
+                            onDelete = { noteToDelete = vaultItem }
+                        )
+                    }
+                }
+            }
+        } else if (selectedTab == 0) {
+            // Tab 0: Intruder Snapshots
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(12.dp),
@@ -184,14 +574,13 @@ fun IntruderVaultScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = "Intruder photos are encrypted and stored exclusively inside app private memory. They never sync to clouds or gallery.",
+                        text = stringResource(R.string.intruder_banner_info),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // Grid Content
             if (intruderSelfies.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -199,30 +588,7 @@ fun IntruderVaultScreen(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.GppGood,
-                            contentDescription = "Vault Secure",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Text(
-                            text = "Vault Secure — Zero Intruder Attempts",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "If an unauthorized user attempts to open a locked app 3 times, their snapshot will appear here.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.padding(horizontal = 32.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
+                    EmptyIntruderIllustration()
                 }
             } else {
                 LazyVerticalGrid(
@@ -240,122 +606,6 @@ fun IntruderVaultScreen(
                             dateFormat = dateFormat,
                             onClick = { selectedSelfie = selfie },
                             onDelete = { viewModel.deleteIntruderSelfie(selfie.id) }
-                        )
-                    }
-                }
-            }
-        } else if (selectedTab == 1) {
-            // Tab 1: SQLCipher Encrypted Secrets & Passwords Vault
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.VpnKey,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "256-bit SQLCipher Encrypted Vault. Secrets are saved locally in hardware-backed storage with zero cloud sync.",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            // Search Bar for Vault Secrets
-            OutlinedTextField(
-                value = vaultSearchQuery,
-                onValueChange = { vaultSearchQuery = it },
-                placeholder = { Text("Search passwords, notes, titles...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Vault") },
-                trailingIcon = {
-                    if (vaultSearchQuery.isNotEmpty()) {
-                        IconButton(onClick = { vaultSearchQuery = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear Search")
-                        }
-                    }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().testTag("input_vault_search")
-            )
-
-            val filteredVaultItems = remember(encryptedVaultItems, vaultSearchQuery) {
-                if (vaultSearchQuery.isBlank()) encryptedVaultItems
-                else encryptedVaultItems.filter {
-                    it.title.contains(vaultSearchQuery, ignoreCase = true) ||
-                    it.category.contains(vaultSearchQuery, ignoreCase = true) ||
-                    it.secretContent.contains(vaultSearchQuery, ignoreCase = true)
-                }
-            }
-
-            if (filteredVaultItems.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LockReset,
-                            contentDescription = "No Secrets Stored",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Text(
-                            text = if (vaultSearchQuery.isNotBlank()) "No Matching Secrets Found" else "Encrypted Vault is Empty",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = if (vaultSearchQuery.isNotBlank()) "No items match '$vaultSearchQuery'. Try a different keyword." else "Store your sensitive passwords, recovery keys, or secret notes securely.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.padding(horizontal = 32.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                        if (vaultSearchQuery.isNotBlank()) {
-                            OutlinedButton(onClick = { vaultSearchQuery = "" }) {
-                                Text("Clear Search Filter")
-                            }
-                        } else {
-                            Button(
-                                onClick = { showAddVaultDialog = true },
-                                modifier = Modifier.testTag("btn_empty_add_secret")
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = null)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Store First Secret Note")
-                            }
-                        }
-                    }
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(
-                        items = filteredVaultItems,
-                        key = { it.id }
-                    ) { vaultItem ->
-                        EncryptedSecretCard(
-                            item = vaultItem,
-                            dateFormat = dateFormat,
-                            onDelete = { viewModel.moveVaultItemToTrash(vaultItem.id) }
                         )
                     }
                 }
@@ -379,7 +629,7 @@ fun IntruderVaultScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = "Trash Bin safeguards soft-deleted items. Items are automatically purged after $trashPurgeDays days.",
+                        text = stringResource(R.string.trash_banner_info, trashPurgeDays),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
@@ -393,30 +643,7 @@ fun IntruderVaultScreen(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DeleteSweep,
-                            contentDescription = "Trash Bin Empty",
-                            tint = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Text(
-                            text = "Trash Bin is Empty",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Secrets deleted from your encrypted vault will remain here for $trashPurgeDays days before permanent removal.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.padding(horizontal = 32.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
+                    EmptyTrashIllustration(trashPurgeDays = trashPurgeDays)
                 }
             } else {
                 LazyColumn(
@@ -431,7 +658,7 @@ fun IntruderVaultScreen(
                             item = trashItem,
                             dateFormat = dateFormat,
                             onRestore = { viewModel.restoreVaultItemFromTrash(trashItem.id) },
-                            onPermanentDelete = { viewModel.deleteEncryptedVaultItem(trashItem.id) }
+                            onPermanentDelete = { trashToDelete = trashItem }
                         )
                     }
                 }
@@ -439,38 +666,164 @@ fun IntruderVaultScreen(
         }
     }
 
-    // Dialog for Adding New Encrypted Vault Secret
+    // Custom AlertDialog for Note Deletion (Preventing Accidental Data Loss)
+    if (noteToDelete != null) {
+        val item = noteToDelete!!
+        AlertDialog(
+            onDismissRequest = { noteToDelete = null },
+            icon = {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.errorContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteForever,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.delete_note_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete_note_message, item.title, trashPurgeDays),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.moveVaultItemToTrash(item.id)
+                        Toast.makeText(context, "Note moved to Trash Bin", Toast.LENGTH_SHORT).show()
+                        noteToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.testTag("btn_confirm_delete_note")
+                ) {
+                    Text(stringResource(R.string.delete_confirm))
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { noteToDelete = null },
+                    modifier = Modifier.testTag("btn_cancel_delete_note")
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Custom AlertDialog for Permanent Deletion from Trash Bin
+    if (trashToDelete != null) {
+        val item = trashToDelete!!
+        AlertDialog(
+            onDismissRequest = { trashToDelete = null },
+            icon = {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.errorContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.delete_note_permanent_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.delete_note_permanent_message, item.title),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deleteEncryptedVaultItem(item.id)
+                        Toast.makeText(context, "Note permanently erased", Toast.LENGTH_SHORT).show()
+                        trashToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.testTag("btn_confirm_permanent_delete")
+                ) {
+                    Text(stringResource(R.string.delete_permanent_confirm))
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { trashToDelete = null },
+                    modifier = Modifier.testTag("btn_cancel_permanent_delete")
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Dialog for Adding New Encrypted Vault Secret / Note
     if (showAddVaultDialog) {
         var secretTitle by remember { mutableStateOf("") }
         var secretValue by remember { mutableStateOf("") }
-        var secretCategory by remember { mutableStateOf("PASSWORD") }
+        var secretCategory by remember { mutableStateOf("NOTE") }
         var passLength by remember { mutableFloatStateOf(16f) }
         var incUpper by remember { mutableStateOf(true) }
         var incLower by remember { mutableStateOf(true) }
         var incDigits by remember { mutableStateOf(true) }
         var incSymbols by remember { mutableStateOf(true) }
-
         val passwordService = remember { com.example.service.PasswordGeneratorService() }
 
         AlertDialog(
             onDismissRequest = { showAddVaultDialog = false },
             title = {
                 Text(
-                    text = "Add Encrypted Secret",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = stringResource(R.string.add_secret_title),
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OutlinedTextField(
                         value = secretTitle,
                         onValueChange = { secretTitle = it },
-                        label = { Text("Title / Service Name") },
-                        placeholder = { Text("e.g. Master Email, Banking Pin, Seed Phrase") },
+                        label = { Text(stringResource(R.string.title_service_name)) },
+                        placeholder = { Text(stringResource(R.string.title_placeholder)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().testTag("input_secret_title")
                     )
@@ -478,109 +831,43 @@ fun IntruderVaultScreen(
                     OutlinedTextField(
                         value = secretValue,
                         onValueChange = { secretValue = it },
-                        label = { Text("Secret Password / Note") },
-                        placeholder = { Text("Enter or generate secret...") },
-                        modifier = Modifier.fillMaxWidth().testTag("input_secret_content")
+                        label = { Text(stringResource(R.string.secret_content_label)) },
+                        placeholder = { Text(stringResource(R.string.secret_content_placeholder)) },
+                        modifier = Modifier.fillMaxWidth().testTag("input_secret_value"),
+                        maxLines = 4
                     )
 
-                    // Real-time Visual Password Entropy & Strength Indicator Component
+                    // Real-Time Password Strength Indicator
                     PasswordStrengthIndicator(password = secretValue)
 
-                    // Cryptographic Password Generator Controls
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(10.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Generator (Length: ${passLength.toInt()})",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Button(
-                                    onClick = {
-                                        val config = com.example.service.PasswordGeneratorConfig(
-                                            length = passLength.toInt(),
-                                            includeUppercase = incUpper,
-                                            includeLowercase = incLower,
-                                            includeNumbers = incDigits,
-                                            includeSymbols = incSymbols
-                                        )
-                                        secretValue = passwordService.generatePassword(config)
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
-                                    modifier = Modifier.height(30.dp).testTag("btn_generate_password")
-                                ) {
-                                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(14.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Generate", fontSize = 11.sp)
-                                }
-                            }
-
-                            Slider(
-                                value = passLength,
-                                onValueChange = { passLength = it },
-                                valueRange = 8f..32f,
-                                steps = 23,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                FilterChip(
-                                    selected = incUpper,
-                                    onClick = { incUpper = !incUpper },
-                                    label = { Text("A-Z", fontSize = 10.sp) }
-                                )
-                                FilterChip(
-                                    selected = incLower,
-                                    onClick = { incLower = !incLower },
-                                    label = { Text("a-z", fontSize = 10.sp) }
-                                )
-                                FilterChip(
-                                    selected = incDigits,
-                                    onClick = { incDigits = !incDigits },
-                                    label = { Text("0-9", fontSize = 10.sp) }
-                                )
-                                FilterChip(
-                                    selected = incSymbols,
-                                    onClick = { incSymbols = !incSymbols },
-                                    label = { Text("!@#", fontSize = 10.sp) }
-                                )
-                            }
-                        }
-                    }
+                    // Secure Password Generator Utility Component
+                    PasswordGeneratorUtilityComponent(
+                        onPasswordGenerated = { generated -> secretValue = generated }
+                    )
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        FilterChip(
-                            selected = secretCategory == "PASSWORD",
-                            onClick = { secretCategory = "PASSWORD" },
-                            label = { Text("Password") }
-                        )
-                        FilterChip(
-                            selected = secretCategory == "NOTE",
-                            onClick = { secretCategory = "NOTE" },
-                            label = { Text("Secret Note") }
-                        )
-                        FilterChip(
-                            selected = secretCategory == "PIN",
-                            onClick = { secretCategory = "PIN" },
-                            label = { Text("Bank PIN") }
-                        )
+                        listOf(
+                            "WORK" to stringResource(R.string.category_work),
+                            "PERSONAL" to stringResource(R.string.category_personal),
+                            "FINANCE" to stringResource(R.string.category_finance),
+                            "PASSWORD" to stringResource(R.string.category_password),
+                            "PIN" to stringResource(R.string.category_pin),
+                            "NOTE" to stringResource(R.string.category_note)
+                        ).chunked(3).forEach { rowChips ->
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                rowChips.forEach { (catKey, catLabel) ->
+                                    FilterChip(
+                                        selected = secretCategory == catKey,
+                                        onClick = { secretCategory = catKey },
+                                        label = { Text(catLabel, fontSize = 11.sp) },
+                                        modifier = Modifier.testTag("chip_add_category_$catKey")
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -594,14 +881,276 @@ fun IntruderVaultScreen(
                     },
                     modifier = Modifier.testTag("btn_save_secret")
                 ) {
-                    Text("Save Encrypted")
+                    Text(stringResource(R.string.save_encrypted))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showAddVaultDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    // Dialog for Editing Existing Encrypted Vault Secret / Note
+    if (editingVaultItem != null) {
+        val item = editingVaultItem!!
+        var editTitle by remember { mutableStateOf(item.title) }
+        var editValue by remember { mutableStateOf(item.secretContent) }
+        var editCategory by remember { mutableStateOf(item.category) }
+
+        AlertDialog(
+            onDismissRequest = { editingVaultItem = null },
+            title = {
+                Text(
+                    text = stringResource(R.string.edit_secret_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedTextField(
+                        value = editTitle,
+                        onValueChange = { editTitle = it },
+                        label = { Text(stringResource(R.string.title_service_name)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().testTag("input_edit_secret_title")
+                    )
+
+                    OutlinedTextField(
+                        value = editValue,
+                        onValueChange = { editValue = it },
+                        label = { Text(stringResource(R.string.secret_content_label)) },
+                        modifier = Modifier.fillMaxWidth().testTag("input_edit_secret_value"),
+                        maxLines = 4
+                    )
+
+                    // Real-Time Password Strength Indicator for Edits
+                    PasswordStrengthIndicator(password = editValue)
+
+                    PasswordGeneratorUtilityComponent(
+                        onPasswordGenerated = { generated -> editValue = generated }
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(
+                            "WORK" to stringResource(R.string.category_work),
+                            "PERSONAL" to stringResource(R.string.category_personal),
+                            "FINANCE" to stringResource(R.string.category_finance),
+                            "PASSWORD" to stringResource(R.string.category_password),
+                            "PIN" to stringResource(R.string.category_pin),
+                            "NOTE" to stringResource(R.string.category_note)
+                        ).chunked(3).forEach { rowChips ->
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                rowChips.forEach { (catKey, catLabel) ->
+                                    FilterChip(
+                                        selected = editCategory == catKey,
+                                        onClick = { editCategory = catKey },
+                                        label = { Text(catLabel, fontSize = 11.sp) },
+                                        modifier = Modifier.testTag("chip_edit_category_$catKey")
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (editTitle.isNotBlank() && editValue.isNotBlank()) {
+                            viewModel.updateEncryptedVaultItem(
+                                item.copy(
+                                    title = editTitle,
+                                    secretContent = editValue,
+                                    category = editCategory,
+                                    timestamp = System.currentTimeMillis()
+                                )
+                            )
+                            editingVaultItem = null
+                            Toast.makeText(context, "Note updated successfully", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.testTag("btn_save_edited_secret")
+                ) {
+                    Text(stringResource(R.string.save_encrypted))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingVaultItem = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Dialog for Exporting Encrypted Notes (.plk file)
+    if (showExportNotesDialog) {
+        AlertDialog(
+            onDismissRequest = { showExportNotesDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.export_notes_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = stringResource(R.string.export_notes_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    OutlinedTextField(
+                        value = exportPassphrase,
+                        onValueChange = { exportPassphrase = it },
+                        label = { Text(stringResource(R.string.export_passphrase_label)) },
+                        placeholder = { Text(stringResource(R.string.export_passphrase_hint)) },
+                        singleLine = true,
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth().testTag("input_export_notes_passphrase")
+                    )
+
+                    if (exportResultStatus != null) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = exportResultStatus!!,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (exportPassphrase.isNotBlank()) {
+                            coroutineScope.launch {
+                                val file = viewModel.exportEncryptedNotesToFile(exportPassphrase)
+                                if (file != null && file.exists()) {
+                                    exportResultStatus = context.getString(R.string.export_file_success, file.name)
+                                    Toast.makeText(context, "Export complete: ${file.name}", Toast.LENGTH_LONG).show()
+                                } else {
+                                    exportResultStatus = "Export completed."
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.testTag("btn_confirm_export_notes_file")
+                ) {
+                    Text(stringResource(R.string.btn_export_notes_file))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExportNotesDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Dialog for Importing Encrypted Notes (.plk file / payload)
+    if (showImportNotesDialog) {
+        AlertDialog(
+            onDismissRequest = { showImportNotesDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.import_notes_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = stringResource(R.string.import_notes_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    OutlinedTextField(
+                        value = importPassphrase,
+                        onValueChange = { importPassphrase = it },
+                        label = { Text(stringResource(R.string.import_passphrase_label)) },
+                        placeholder = { Text(stringResource(R.string.import_passphrase_hint)) },
+                        singleLine = true,
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth().testTag("input_import_notes_passphrase")
+                    )
+
+                    OutlinedTextField(
+                        value = importPayloadInput,
+                        onValueChange = { importPayloadInput = it },
+                        label = { Text("Encrypted Payload or Filename") },
+                        placeholder = { Text("Paste JSON payload or enter filename (e.g. purelock_encrypted_notes.plk)") },
+                        modifier = Modifier.fillMaxWidth().testTag("input_import_notes_payload"),
+                        maxLines = 4
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (importPassphrase.isNotBlank()) {
+                            coroutineScope.launch {
+                                val success = if (importPayloadInput.startsWith("{")) {
+                                    viewModel.importEncryptedNotesJson(importPayloadInput, importPassphrase)
+                                } else {
+                                    val backupDir = context.getExternalFilesDir("backups") ?: context.filesDir
+                                    val targetFile = if (importPayloadInput.isNotBlank()) {
+                                        java.io.File(backupDir, importPayloadInput)
+                                    } else {
+                                        backupDir.listFiles { f -> f.extension == "plk" }?.maxByOrNull { it.lastModified() }
+                                    }
+                                    if (targetFile != null && targetFile.exists()) {
+                                        viewModel.importEncryptedNotesFromFile(targetFile, importPassphrase)
+                                    } else {
+                                        false
+                                    }
+                                }
+
+                                if (success) {
+                                    Toast.makeText(context, context.getString(R.string.import_file_success), Toast.LENGTH_LONG).show()
+                                    showImportNotesDialog = false
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.import_file_error), Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.testTag("btn_confirm_import_notes_file")
+                ) {
+                    Text(stringResource(R.string.btn_import_notes_file))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportNotesDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Vault Insights Dashboard Modal Dialog
+    if (showVaultInsightsDialog) {
+        VaultInsightsDialog(
+            vaultItems = encryptedVaultItems,
+            onDismiss = { showVaultInsightsDialog = false }
         )
     }
 
@@ -709,80 +1258,79 @@ private fun IntruderSelfieCard(
             .clickable { onClick() }
             .testTag("card_intruder_${selfie.id}")
     ) {
-        Column(
-            modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(130.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-                contentAlignment = Alignment.Center
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 if (bitmap != null) {
                     Image(
                         bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "Intruder Thumbnail",
+                        contentDescription = "Intruder Selfie",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    Icon(
-                        imageVector = Icons.Default.NoPhotography,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline
-                    )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.BrokenImage,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
 
-                // Failed Count Badge
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(6.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.error)
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                Surface(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = RoundedCornerShape(topStart = 0.dp, bottomEnd = 8.dp),
+                    modifier = Modifier.align(Alignment.TopStart)
                 ) {
                     Text(
-                        text = "${selfie.failedAttempts} Failures",
+                        text = "${selfie.failedAttempts} Failed",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onError
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = selfie.attemptedAppName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = dateFormat.format(Date(selfie.timestamp)),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline,
-                        maxLines = 1
-                    )
-                }
+                Text(
+                    text = selfie.attemptedAppName,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1
+                )
+                Text(
+                    text = dateFormat.format(Date(selfie.timestamp)),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
+                    maxLines = 1
+                )
 
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(28.dp).testTag("btn_delete_selfie_${selfie.id}")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(16.dp)
-                    )
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(24.dp).testTag("btn_delete_intruder_${selfie.id}")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Selfie",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -791,17 +1339,16 @@ private fun IntruderSelfieCard(
 
 @Composable
 private fun EncryptedSecretCard(
-    item: com.example.data.model.EncryptedVaultEntity,
+    item: EncryptedVaultEntity,
+    isCopied: Boolean,
+    copyCountdown: Int,
+    onCopy: () -> Unit,
+    onClearClipboard: () -> Unit,
     dateFormat: SimpleDateFormat,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     var isRevealed by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    var isCopied by remember { mutableStateOf(false) }
-    var copyCountdown by remember { mutableIntStateOf(0) }
-    var copyJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -820,7 +1367,8 @@ private fun EncryptedSecretCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
@@ -830,7 +1378,10 @@ private fun EncryptedSecretCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = when (item.category) {
+                            imageVector = when (item.category.uppercase()) {
+                                "WORK" -> Icons.Default.BusinessCenter
+                                "PERSONAL" -> Icons.Default.Person
+                                "FINANCE" -> Icons.Default.AccountBalance
                                 "PASSWORD" -> Icons.Default.Key
                                 "PIN" -> Icons.Default.Pin
                                 else -> Icons.Default.Description
@@ -849,22 +1400,37 @@ private fun EncryptedSecretCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Category: ${item.category} • ${dateFormat.format(Date(item.timestamp))}",
+                            text = "${item.category} • ${dateFormat.format(Date(item.timestamp))}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline
                         )
                     }
                 }
 
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.testTag("btn_delete_secret_${item.id}")
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Secret",
-                        tint = MaterialTheme.colorScheme.error
-                    )
+                    IconButton(
+                        onClick = onEdit,
+                        modifier = Modifier.testTag("btn_edit_secret_${item.id}")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Secret",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.testTag("btn_delete_secret_${item.id}")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Secret",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
 
@@ -903,24 +1469,9 @@ private fun EncryptedSecretCard(
                             )
                         }
 
-                        // Copy to Clipboard Button with 30s Auto-Clear
+                        // Copy to Clipboard Button using Centralized Auto-Clear Policy
                         IconButton(
-                            onClick = {
-                                copyJob?.cancel()
-                                copyJob = coroutineScope.launch {
-                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newPlainText("VaultSecret", item.secretContent)
-                                    clipboard.setPrimaryClip(clip)
-                                    isCopied = true
-                                    copyCountdown = 30
-                                    while (copyCountdown > 0) {
-                                        delay(1000L)
-                                        copyCountdown--
-                                    }
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("", ""))
-                                    isCopied = false
-                                }
-                            },
+                            onClick = onCopy,
                             modifier = Modifier.size(32.dp).testTag("btn_copy_secret_${item.id}")
                         ) {
                             Icon(
@@ -934,7 +1485,7 @@ private fun EncryptedSecretCard(
                 }
             }
 
-            // Clipboard Auto-Clear Countdown Banner
+            // Clipboard Auto-Clear Countdown Live Banner
             if (isCopied) {
                 Row(
                     modifier = Modifier
@@ -956,24 +1507,20 @@ private fun EncryptedSecretCard(
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
-                            text = "Copied! Clipboard clears in ${copyCountdown}s",
+                            text = if (copyCountdown > 0) {
+                                stringResource(R.string.copied_clipboard_countdown, copyCountdown)
+                            } else "Copied to clipboard",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     TextButton(
-                        onClick = {
-                            copyJob?.cancel()
-                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            clipboard.setPrimaryClip(ClipData.newPlainText("", ""))
-                            isCopied = false
-                            copyCountdown = 0
-                        },
+                        onClick = onClearClipboard,
                         contentPadding = PaddingValues(0.dp),
-                        modifier = Modifier.height(24.dp)
+                        modifier = Modifier.height(24.dp).testTag("btn_clear_clipboard_${item.id}")
                     ) {
-                        Text("Clear Now", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+                        Text(stringResource(R.string.clear_clipboard_now), style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                     }
                 }
             }
@@ -997,10 +1544,10 @@ fun PasswordStrengthIndicator(
     }
 
     val (strengthLabel, progressColor) = when (strength) {
-        com.example.service.PasswordStrength.WEAK -> "Weak" to MaterialTheme.colorScheme.error
-        com.example.service.PasswordStrength.MEDIUM -> "Fair" to MaterialTheme.colorScheme.tertiary
-        com.example.service.PasswordStrength.STRONG -> "Strong" to MaterialTheme.colorScheme.primary
-        com.example.service.PasswordStrength.VERY_STRONG -> "Very Strong" to androidx.compose.ui.graphics.Color(0xFF00C853)
+        com.example.service.PasswordStrength.WEAK -> stringResource(R.string.password_strength_weak) to MaterialTheme.colorScheme.error
+        com.example.service.PasswordStrength.MEDIUM -> stringResource(R.string.password_strength_fair) to MaterialTheme.colorScheme.tertiary
+        com.example.service.PasswordStrength.STRONG -> stringResource(R.string.password_strength_strong) to MaterialTheme.colorScheme.primary
+        com.example.service.PasswordStrength.VERY_STRONG -> stringResource(R.string.password_strength_very_strong) to androidx.compose.ui.graphics.Color(0xFF00C853)
     }
 
     val hasUpper = remember(password) { password.any { it.isUpperCase() } }
@@ -1032,7 +1579,7 @@ fun PasswordStrengthIndicator(
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "Entropy: ${String.format(Locale.US, "%.1f", entropyBits)} bits",
+                    text = stringResource(R.string.entropy_bits_format, entropyBits),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -1060,11 +1607,11 @@ fun PasswordStrengthIndicator(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            StrengthChip(label = "A-Z", active = hasUpper)
-            StrengthChip(label = "a-z", active = hasLower)
-            StrengthChip(label = "0-9", active = hasDigits)
-            StrengthChip(label = "!@#", active = hasSymbols)
-            StrengthChip(label = "12+ Chars", active = password.length >= 12)
+            StrengthChip(label = stringResource(R.string.strength_rule_upper), active = hasUpper)
+            StrengthChip(label = stringResource(R.string.strength_rule_lower), active = hasLower)
+            StrengthChip(label = stringResource(R.string.strength_rule_digits), active = hasDigits)
+            StrengthChip(label = stringResource(R.string.strength_rule_symbols), active = hasSymbols)
+            StrengthChip(label = stringResource(R.string.strength_rule_length), active = password.length >= 12)
         }
     }
 }
@@ -1092,7 +1639,7 @@ private fun StrengthChip(label: String, active: Boolean) {
 
 @Composable
 private fun TrashSecretCard(
-    item: com.example.data.model.EncryptedVaultEntity,
+    item: EncryptedVaultEntity,
     dateFormat: SimpleDateFormat,
     onRestore: () -> Unit,
     onPermanentDelete: () -> Unit
@@ -1163,7 +1710,7 @@ private fun TrashSecretCard(
                 ) {
                     Icon(Icons.Default.Restore, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Restore")
+                    Text(stringResource(R.string.restore))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
@@ -1173,7 +1720,181 @@ private fun TrashSecretCard(
                 ) {
                     Icon(Icons.Default.DeleteForever, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Delete")
+                    Text(stringResource(R.string.delete_confirm))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PasswordGeneratorUtilityComponent(
+    onPasswordGenerated: (String) -> Unit
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+    var length by remember { mutableFloatStateOf(16f) }
+    var incUpper by remember { mutableStateOf(true) }
+    var incLower by remember { mutableStateOf(true) }
+    var incDigits by remember { mutableStateOf(true) }
+    var incSymbols by remember { mutableStateOf(true) }
+    var excludeAmbiguous by remember { mutableStateOf(false) }
+    val generatorService = remember { com.example.service.PasswordGeneratorService() }
+
+    fun doGenerate(): String {
+        val config = com.example.service.PasswordGeneratorConfig(
+            length = length.toInt(),
+            includeUppercase = incUpper,
+            includeLowercase = incLower,
+            includeNumbers = incDigits,
+            includeSymbols = incSymbols,
+            excludeAmbiguous = excludeAmbiguous
+        )
+        return generatorService.generatePassword(config)
+    }
+
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isExpanded = !isExpanded },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.generator_toggle_expand),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Quick Presets
+                    Text(
+                        text = "Quick Presets:",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        SuggestionChip(
+                            onClick = {
+                                length = 4f; incDigits = true; incUpper = false; incLower = false; incSymbols = false
+                                onPasswordGenerated(doGenerate())
+                            },
+                            label = { Text(stringResource(R.string.generator_preset_pin4), fontSize = 10.sp) }
+                        )
+                        SuggestionChip(
+                            onClick = {
+                                length = 6f; incDigits = true; incUpper = false; incLower = false; incSymbols = false
+                                onPasswordGenerated(doGenerate())
+                            },
+                            label = { Text(stringResource(R.string.generator_preset_pin6), fontSize = 10.sp) }
+                        )
+                        SuggestionChip(
+                            onClick = {
+                                length = 16f; incDigits = true; incUpper = true; incLower = true; incSymbols = true
+                                onPasswordGenerated(doGenerate())
+                            },
+                            label = { Text(stringResource(R.string.generator_preset_standard), fontSize = 10.sp) }
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(R.string.generator_length_label, length.toInt()),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Slider(
+                        value = length,
+                        onValueChange = { length = it },
+                        valueRange = 4f..32f,
+                        steps = 27,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Character Set Options
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            FilterChip(
+                                selected = incUpper,
+                                onClick = { incUpper = !incUpper },
+                                label = { Text("A-Z", fontSize = 10.sp) }
+                            )
+                            FilterChip(
+                                selected = incLower,
+                                onClick = { incLower = !incLower },
+                                label = { Text("a-z", fontSize = 10.sp) }
+                            )
+                            FilterChip(
+                                selected = incDigits,
+                                onClick = { incDigits = !incDigits },
+                                label = { Text("0-9", fontSize = 10.sp) }
+                            )
+                            FilterChip(
+                                selected = incSymbols,
+                                onClick = { incSymbols = !incSymbols },
+                                label = { Text("!@#", fontSize = 10.sp) }
+                            )
+                        }
+
+                        FilterChip(
+                            selected = excludeAmbiguous,
+                            onClick = { excludeAmbiguous = !excludeAmbiguous },
+                            label = { Text(stringResource(R.string.generator_charset_no_ambiguous), fontSize = 10.sp) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Button(
+                        onClick = { onPasswordGenerated(doGenerate()) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("btn_generate_password_apply")
+                    ) {
+                        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(R.string.generator_btn_apply))
+                    }
                 }
             }
         }

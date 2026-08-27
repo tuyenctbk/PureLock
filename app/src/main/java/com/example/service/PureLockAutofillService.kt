@@ -71,6 +71,7 @@ class PureLockAutofillService : AutofillService() {
                     db.logDao(),
                     db.scheduleRuleDao(),
                     db.encryptedVaultDao(),
+                    db.userSettingDao(),
                     prefs
                 )
 

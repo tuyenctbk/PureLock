@@ -8,13 +8,16 @@ import com.example.data.dao.EncryptedVaultDao
 import com.example.data.dao.IntruderDao
 import com.example.data.dao.LogDao
 import com.example.data.dao.ScheduleRuleDao
+import com.example.data.dao.UserSettingDao
 import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.IntruderSelfieEntity
 import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
+import com.example.data.model.UserSettingEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.util.Calendar
 
 data class VaultIntegrityResult(
@@ -33,8 +36,11 @@ class PureLockRepository(
     private val logDao: LogDao,
     private val scheduleRuleDao: ScheduleRuleDao,
     private val encryptedVaultDao: EncryptedVaultDao,
+    private val userSettingDao: UserSettingDao,
     val preferences: PureLockPreferences
 ) {
+    val userSettings: UserSettingsManager = preferences.userSettings
+
     val allLockedApps: Flow<List<LockedAppEntity>> = appLockDao.getAllLockedApps()
     val activeLockedApps: Flow<List<LockedAppEntity>> = appLockDao.getActiveLockedApps()
     val intruderSelfies: Flow<List<IntruderSelfieEntity>> = intruderDao.getAllIntruderSelfies()
@@ -44,14 +50,57 @@ class PureLockRepository(
     val trashVaultItems: Flow<List<EncryptedVaultEntity>> = encryptedVaultDao.getTrashVaultItems()
     val encryptedVaultItems: Flow<List<EncryptedVaultEntity>> = activeVaultItems
 
-    suspend fun saveEncryptedVaultItem(title: String, secretContent: String, category: String = "NOTE") {
+    // Auto-Lock & Theme Preferences persisted via Room Database & DataStore
+    val roomInactivityTimeoutSec: Flow<Int?> = userSettingDao.getSettingFlow("inactivity_timeout_sec")
+        .map { it?.value?.toIntOrNull() }
+
+    val roomThemeMode: Flow<String?> = userSettingDao.getSettingFlow("theme_mode")
+        .map { it?.value }
+
+    suspend fun saveRoomSetting(key: String, value: String) {
+        userSettingDao.upsertSetting(UserSettingEntity(key = key, value = value))
+    }
+
+    fun searchVaultItems(query: String): Flow<List<EncryptedVaultEntity>> {
+        return if (query.isBlank()) encryptedVaultDao.getActiveVaultItems()
+        else encryptedVaultDao.searchActiveVaultItems(query)
+    }
+
+    fun getVaultItemsByCategory(category: String): Flow<List<EncryptedVaultEntity>> {
+        return if (category == "ALL") encryptedVaultDao.getActiveVaultItems()
+        else encryptedVaultDao.getVaultItemsByCategory(category)
+    }
+
+    suspend fun saveEncryptedVaultItem(
+        title: String,
+        secretContent: String,
+        category: String = "NOTE",
+        username: String = "",
+        websiteOrApp: String = "",
+        notes: String = "",
+        isPinned: Boolean = false
+    ) {
         val item = EncryptedVaultEntity(
             title = title,
             secretContent = secretContent,
-            category = category
+            category = category,
+            username = username,
+            websiteOrApp = websiteOrApp,
+            notes = notes,
+            isPinned = isPinned
         )
         encryptedVaultDao.insertVaultItem(item)
-        logSecurityEvent("VAULT_ITEM_ADDED", "Encrypted $category item stored locally in SQLCipher DB: $title")
+        logSecurityEvent("VAULT_ITEM_ADDED", "Encrypted $category credential stored in Room DB: $title")
+    }
+
+    suspend fun updateEncryptedVaultItem(item: EncryptedVaultEntity) {
+        encryptedVaultDao.updateVaultItem(item)
+        logSecurityEvent("VAULT_ITEM_UPDATED", "Encrypted $item.category credential updated: ${item.title}")
+    }
+
+    suspend fun toggleVaultItemPin(id: Long, isPinned: Boolean) {
+        encryptedVaultDao.setPinned(id, isPinned)
+        logSecurityEvent("VAULT_ITEM_PINNED", "Vault item #$id pin status updated to $isPinned")
     }
 
     suspend fun moveVaultItemToTrash(id: Long) {
@@ -79,7 +128,7 @@ class PureLockRepository(
 
     suspend fun deleteEncryptedVaultItem(id: Long) {
         encryptedVaultDao.deleteVaultItemById(id)
-        logSecurityEvent("VAULT_ITEM_DELETED", "Encrypted item #$id permanently removed from local SQLCipher DB.")
+        logSecurityEvent("VAULT_ITEM_DELETED", "Encrypted item #$id permanently removed from local DB.")
     }
 
     suspend fun initializeDefaultAppsIfNeeded() {

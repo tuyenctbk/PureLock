@@ -40,6 +40,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
                         db.logDao(),
                         db.scheduleRuleDao(),
                         db.encryptedVaultDao(),
+                        db.userSettingDao(),
                         prefs
                     )
 

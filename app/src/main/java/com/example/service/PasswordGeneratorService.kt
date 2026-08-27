@@ -7,7 +7,8 @@ data class PasswordGeneratorConfig(
     val includeUppercase: Boolean = true,
     val includeLowercase: Boolean = true,
     val includeNumbers: Boolean = true,
-    val includeSymbols: Boolean = true
+    val includeSymbols: Boolean = true,
+    val excludeAmbiguous: Boolean = false
 )
 
 enum class PasswordStrength {
@@ -22,35 +23,46 @@ class PasswordGeneratorService {
     private val random = SecureRandom()
 
     companion object {
-        private const val UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        private const val LOWER = "abcdefghijklmnopqrstuvwxyz"
-        private const val DIGITS = "0123456789"
-        private const val SYMBOLS = "!@#$%^&*()_+-=[]{}|;:,.<>?"
+        const val UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        const val LOWER = "abcdefghijklmnopqrstuvwxyz"
+        const val DIGITS = "0123456789"
+        const val SYMBOLS = "!@#$%^&*()_+-=[]{}|;:,.<>?"
+        
+        // Ambiguous characters: 0, O, o, 1, l, I, |
+        const val UPPER_NO_AMBIGUOUS = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+        const val LOWER_NO_AMBIGUOUS = "abcdefghijkmnopqrstuvwxyz"
+        const val DIGITS_NO_AMBIGUOUS = "23456789"
+        const val SYMBOLS_NO_AMBIGUOUS = "!@#$%^&*()_+-=[]{};:,.<>?"
     }
 
     fun generatePassword(config: PasswordGeneratorConfig): String {
+        val upperPool = if (config.excludeAmbiguous) UPPER_NO_AMBIGUOUS else UPPER
+        val lowerPool = if (config.excludeAmbiguous) LOWER_NO_AMBIGUOUS else LOWER
+        val digitsPool = if (config.excludeAmbiguous) DIGITS_NO_AMBIGUOUS else DIGITS
+        val symbolsPool = if (config.excludeAmbiguous) SYMBOLS_NO_AMBIGUOUS else SYMBOLS
+
         val charPool = StringBuilder()
         val guaranteedChars = mutableListOf<Char>()
 
         if (config.includeUppercase) {
-            charPool.append(UPPER)
-            guaranteedChars.add(UPPER[random.nextInt(UPPER.length)])
+            charPool.append(upperPool)
+            guaranteedChars.add(upperPool[random.nextInt(upperPool.length)])
         }
         if (config.includeLowercase) {
-            charPool.append(LOWER)
-            guaranteedChars.add(LOWER[random.nextInt(LOWER.length)])
+            charPool.append(lowerPool)
+            guaranteedChars.add(lowerPool[random.nextInt(lowerPool.length)])
         }
         if (config.includeNumbers) {
-            charPool.append(DIGITS)
-            guaranteedChars.add(DIGITS[random.nextInt(DIGITS.length)])
+            charPool.append(digitsPool)
+            guaranteedChars.add(digitsPool[random.nextInt(digitsPool.length)])
         }
         if (config.includeSymbols) {
-            charPool.append(SYMBOLS)
-            guaranteedChars.add(SYMBOLS[random.nextInt(SYMBOLS.length)])
+            charPool.append(symbolsPool)
+            guaranteedChars.add(symbolsPool[random.nextInt(symbolsPool.length)])
         }
 
         if (charPool.isEmpty()) {
-            charPool.append(LOWER) // Fallback
+            charPool.append(lowerPool)
         }
 
         val passwordChars = mutableListOf<Char>()
@@ -64,6 +76,14 @@ class PasswordGeneratorService {
 
         passwordChars.shuffle(random)
         return passwordChars.joinToString("")
+    }
+
+    fun generatePin(digitsCount: Int = 4): String {
+        val digits = StringBuilder()
+        for (i in 0 until digitsCount) {
+            digits.append(random.nextInt(10))
+        }
+        return digits.toString()
     }
 
     fun calculateEntropyBits(password: String): Double {
@@ -96,3 +116,4 @@ class PasswordGeneratorService {
         }
     }
 }
+
