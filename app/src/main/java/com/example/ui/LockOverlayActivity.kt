@@ -2,12 +2,12 @@ package com.example.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.data.PureLockDatabase
 import com.example.data.PureLockPreferences
@@ -15,7 +15,7 @@ import com.example.data.PureLockRepository
 import com.example.ui.theme.PureLockTheme
 import kotlinx.coroutines.launch
 
-class LockOverlayActivity : ComponentActivity() {
+class LockOverlayActivity : FragmentActivity() {
 
     companion object {
         const val EXTRA_LOCKED_PACKAGE = "extra_locked_package"
@@ -33,7 +33,7 @@ class LockOverlayActivity : ComponentActivity() {
 
         val db = PureLockDatabase.getDatabase(this)
         val prefs = PureLockPreferences(this)
-        repository = PureLockRepository(this, db.appLockDao(), db.intruderDao(), db.logDao(), db.scheduleRuleDao(), db.encryptedVaultDao(), prefs)
+        repository = PureLockRepository(this, db.appLockDao(), db.intruderDao(), db.logDao(), db.scheduleRuleDao(), db.encryptedVaultDao(), db.userSettingDao(), prefs)
 
         val lockedPackage = intent.getStringExtra(EXTRA_LOCKED_PACKAGE) ?: "com.android.settings"
 

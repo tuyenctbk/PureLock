@@ -1,8 +1,11 @@
 package com.example.ui
 
+import com.example.R
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.foundation.border
@@ -61,6 +64,7 @@ fun InvisibleSuiteScreen(
     val tvMode by viewModel.tvMode.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
     val inactivityTimeoutSec by viewModel.inactivityTimeoutSec.collectAsState()
+    val clipboardAutoClearSec by viewModel.clipboardAutoClearSec.collectAsState()
     val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
     val trashPurgeDays by viewModel.trashPurgeDays.collectAsState()
     val appLanguage by viewModel.appLanguage.collectAsState()
@@ -133,7 +137,7 @@ fun InvisibleSuiteScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Settings Lock Active",
+                text = stringResource(R.string.settings_lock_active),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -142,7 +146,7 @@ fun InvisibleSuiteScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "The Invisible Suite is secured by device biometrics. Authenticate to view and modify configurations.",
+                text = stringResource(R.string.settings_lock_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -166,7 +170,7 @@ fun InvisibleSuiteScreen(
             ) {
                 Icon(Icons.Default.Fingerprint, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Scan Biometrics")
+                Text(stringResource(R.string.settings_scan_biometrics))
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -184,18 +188,18 @@ fun InvisibleSuiteScreen(
             ) {
                 Icon(Icons.Default.Pin, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Use Master PIN Fallback")
+                Text(stringResource(R.string.settings_use_fallback_pin))
             }
         }
 
         if (showFallbackPinAuthDialog) {
             AlertDialog(
                 onDismissRequest = { showFallbackPinAuthDialog = false },
-                title = { Text("Enter Master PIN") },
+                title = { Text(stringResource(R.string.settings_enter_master_pin_title)) },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Please enter your master PIN code to unlock the settings suite.",
+                            text = stringResource(R.string.settings_enter_master_pin_desc),
                             style = MaterialTheme.typography.bodySmall
                         )
                         OutlinedTextField(
@@ -205,7 +209,7 @@ fun InvisibleSuiteScreen(
                                     fallbackPinInput = it
                                 }
                             },
-                            label = { Text("Master PIN") },
+                            label = { Text(stringResource(R.string.settings_enter_master_pin_title)) },
                             singleLine = true,
                             visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth().testTag("input_fallback_pin")
@@ -226,17 +230,17 @@ fun InvisibleSuiteScreen(
                                 hasAuthenticatedThisSession = true
                                 showFallbackPinAuthDialog = false
                             } else {
-                                fallbackAuthError = "Incorrect Master PIN"
+                                fallbackAuthError = context.getString(R.string.settings_incorrect_pin)
                             }
                         },
                         modifier = Modifier.testTag("btn_submit_fallback_pin")
                     ) {
-                        Text("Unlock")
+                        Text(stringResource(R.string.settings_unlock_btn))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showFallbackPinAuthDialog = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             )
@@ -666,46 +670,61 @@ fun InvisibleSuiteScreen(
         }
 
         // Section: App UI Inactivity Auto-Lock Timeout
+        // Section: Auto-Lock Inactivity Timeout Configuration Card (DataStore + Room Enforced)
+        var showAutoLockDialog by remember { mutableStateOf(false) }
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
             shape = RoundedCornerShape(16.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag("card_autolock_configuration")
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.HourglassEmpty,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "App UI Inactivity Auto-Lock",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.HourglassEmpty,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = stringResource(R.string.auto_lock_settings_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    TextButton(
+                        onClick = { showAutoLockDialog = true },
+                        modifier = Modifier.testTag("btn_configure_autolock_intervals")
+                    ) {
+                        Text("Configure")
+                    }
                 }
 
                 Text(
-                    text = "Automatically lock the PureLock application interface when left idle for a specified duration.",
+                    text = stringResource(R.string.auto_lock_settings_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 val timeoutOptions = listOf(
-                    0 to "Off",
-                    15 to "15s",
+                    0 to "Immediately",
                     30 to "30s",
                     60 to "1m",
                     120 to "2m",
-                    300 to "5m"
+                    300 to "5m",
+                    600 to "10m"
                 )
 
                 Row(
@@ -716,7 +735,7 @@ fun InvisibleSuiteScreen(
                         FilterChip(
                             selected = inactivityTimeoutSec == sec,
                             onClick = { viewModel.setInactivityTimeoutSec(sec) },
-                            label = { Text(label, fontSize = 12.sp) },
+                            label = { Text(label, fontSize = 11.sp) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
                                 selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
@@ -733,7 +752,311 @@ fun InvisibleSuiteScreen(
                         )
                     }
                 }
+
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Security,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Current policy: " + when (inactivityTimeoutSec) {
+                                0 -> "Immediately lock when idle"
+                                30 -> "Lock after 30 seconds of inactivity"
+                                60 -> "Lock after 1 minute of inactivity"
+                                120 -> "Lock after 2 minutes of inactivity"
+                                300 -> "Lock after 5 minutes of inactivity"
+                                600 -> "Lock after 10 minutes of inactivity"
+                                else -> "Lock after $inactivityTimeoutSec seconds"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
             }
+        }
+
+        if (showAutoLockDialog) {
+            data class AutoLockOption(val seconds: Int, val title: String, val description: String)
+            val intervals = listOf(
+                AutoLockOption(0, "Immediately", "Locks right when inactivity is detected (0s)."),
+                AutoLockOption(30, "30 Seconds", "Locks after 30 seconds of no interaction."),
+                AutoLockOption(60, "1 Minute", "Standard security threshold (recommended)."),
+                AutoLockOption(120, "2 Minutes", "Balanced convenience and protection."),
+                AutoLockOption(300, "5 Minutes", "Extended grace period for reading."),
+                AutoLockOption(600, "10 Minutes", "Maximum timeout before automatic lock.")
+            )
+
+            AlertDialog(
+                onDismissRequest = { showAutoLockDialog = false },
+                title = {
+                    Text(
+                        text = stringResource(R.string.auto_lock_dialog_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        intervals.forEach { opt ->
+                            Surface(
+                                color = if (inactivityTimeoutSec == opt.seconds) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                                shape = RoundedCornerShape(10.dp),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (inactivityTimeoutSec == opt.seconds) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.setInactivityTimeoutSec(opt.seconds)
+                                        showAutoLockDialog = false
+                                    }
+                                    .testTag("dialog_autolock_option_${opt.seconds}")
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    RadioButton(
+                                        selected = inactivityTimeoutSec == opt.seconds,
+                                        onClick = {
+                                            viewModel.setInactivityTimeoutSec(opt.seconds)
+                                            showAutoLockDialog = false
+                                        }
+                                    )
+                                    Column {
+                                        Text(
+                                            text = opt.title,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = opt.description,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { showAutoLockDialog = false }) {
+                        Text("Done")
+                    }
+                }
+            )
+        }
+
+        // Section: Clipboard Auto-Clear Timeout Configuration Card
+        var showClipboardDialog by remember { mutableStateOf(false) }
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+            shape = RoundedCornerShape(16.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+            modifier = Modifier.fillMaxWidth().testTag("card_clipboard_configuration")
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ContentPasteGo,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = stringResource(R.string.clipboard_clear_delay_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    TextButton(
+                        onClick = { showClipboardDialog = true },
+                        modifier = Modifier.testTag("btn_configure_clipboard_intervals")
+                    ) {
+                        Text("Configure")
+                    }
+                }
+
+                Text(
+                    text = stringResource(R.string.clipboard_clear_delay_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                val clipboardOptions = listOf(
+                    10 to "10s",
+                    30 to "30s",
+                    60 to "1m",
+                    120 to "2m",
+                    0 to "Never"
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    clipboardOptions.forEach { (sec, label) ->
+                        FilterChip(
+                            selected = clipboardAutoClearSec == sec,
+                            onClick = { viewModel.setClipboardAutoClearSec(sec) },
+                            label = { Text(label, fontSize = 11.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = clipboardAutoClearSec == sec,
+                                borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                                selectedBorderColor = MaterialTheme.colorScheme.primary
+                            ),
+                            modifier = Modifier.testTag("chip_clipboard_$label")
+                        )
+                    }
+                }
+
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Active policy: " + when (clipboardAutoClearSec) {
+                                0 -> "Manual clearing only"
+                                10 -> "Auto-purge clipboard after 10 seconds"
+                                30 -> "Auto-purge clipboard after 30 seconds (Default)"
+                                60 -> "Auto-purge clipboard after 1 minute"
+                                120 -> "Auto-purge clipboard after 2 minutes"
+                                else -> "Auto-purge after $clipboardAutoClearSec seconds"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
+        }
+
+        if (showClipboardDialog) {
+            data class ClipboardOption(val seconds: Int, val title: String, val description: String)
+            val clipIntervals = listOf(
+                ClipboardOption(10, "10 Seconds", "Fast auto-clear for maximum physical privacy."),
+                ClipboardOption(30, "30 Seconds", "Recommended balance for pasting into login forms."),
+                ClipboardOption(60, "1 Minute", "Extended window for multi-field forms."),
+                ClipboardOption(120, "2 Minutes", "Long window before wiping copied text."),
+                ClipboardOption(0, "Never", "Keep in clipboard until manually overwritten.")
+            )
+
+            AlertDialog(
+                onDismissRequest = { showClipboardDialog = false },
+                title = {
+                    Text(
+                        text = "Clipboard Auto-Purge Window",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        clipIntervals.forEach { opt ->
+                            Surface(
+                                color = if (clipboardAutoClearSec == opt.seconds) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                                shape = RoundedCornerShape(10.dp),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (clipboardAutoClearSec == opt.seconds) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.setClipboardAutoClearSec(opt.seconds)
+                                        showClipboardDialog = false
+                                    }
+                                    .testTag("dialog_clipboard_option_${opt.seconds}")
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    RadioButton(
+                                        selected = clipboardAutoClearSec == opt.seconds,
+                                        onClick = {
+                                            viewModel.setClipboardAutoClearSec(opt.seconds)
+                                            showClipboardDialog = false
+                                        }
+                                    )
+                                    Column {
+                                        Text(
+                                            text = opt.title,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = opt.description,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { showClipboardDialog = false }) {
+                        Text("Done")
+                    }
+                }
+            )
         }
 
         // Section: 60-Language Localisation Selection Card

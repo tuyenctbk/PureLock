@@ -8,6 +8,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -53,7 +55,7 @@ class MainActivity : FragmentActivity() {
             val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
 
             PureLockTheme(themeMode = themeMode) {
-                var appAuthenticated by remember { mutableStateOf(true) }
+                var appAuthenticated by remember { mutableStateOf(false) }
                 var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
@@ -154,7 +156,8 @@ class MainActivity : FragmentActivity() {
                 AnimatedContent(
                     targetState = appAuthenticated,
                     transitionSpec = {
-                        fadeIn(tween(400)) togetherWith fadeOut(tween(400))
+                        (fadeIn(animationSpec = tween(450)) + scaleIn(initialScale = 0.94f, animationSpec = tween(450))) togetherWith
+                        (fadeOut(animationSpec = tween(350)) + scaleOut(targetScale = 1.05f, animationSpec = tween(350)))
                     },
                     label = "AppLockTransition"
                 ) { isAuthenticated ->

@@ -6,9 +6,17 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Base64
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,21 +37,24 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import kotlinx.coroutines.delay
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.data.PureLockRepository
+import com.example.service.BiometricPromptManager
+import com.example.service.BiometricStatus
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
-import java.util.Collections
 
 @Composable
 fun LockOverlayScreen(
@@ -54,6 +65,7 @@ fun LockOverlayScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
 
     var appName by remember { mutableStateOf(packageName) }
     var masterPin by remember { mutableStateOf("1234") }
@@ -70,6 +82,8 @@ fun LockOverlayScreen(
     var failedAttempts by remember { mutableStateOf(0) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var intruderCapturedBanner by remember { mutableStateOf(false) }
+    var isUnlockingSuccess by remember { mutableStateOf(false) }
+    var secondaryAuthNotice by remember { mutableStateOf<String?>(null) }
 
     // Keyboard keys (shuffled if random keyboard is enabled)
     val keyboardDigits = remember(isRandomKeyboard) {
@@ -78,6 +92,74 @@ fun LockOverlayScreen(
             list.shuffle()
         }
         list
+    }
+
+    fun triggerHapticSuccess() {
+        try {
+            val vibrator = context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+            if (vibrator?.hasVibrator() == true) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    vibrator.vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_DOUBLE_CLICK))
+                } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    vibrator.vibrate(android.os.VibrationEffect.createWaveform(longArrayOf(0, 50, 40, 50), -1))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(100)
+                }
+            } else {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+        } catch (e: Exception) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+
+    fun triggerHapticFailure() {
+        try {
+            val vibrator = context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+            if (vibrator?.hasVibrator() == true) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    vibrator.vibrate(android.os.VibrationEffect.createWaveform(longArrayOf(0, 90, 50, 90), -1))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(longArrayOf(0, 90, 50, 90), -1)
+                }
+            } else {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            }
+        } catch (e: Exception) {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+    }
+
+    fun handleSuccessUnlock() {
+        if (isUnlockingSuccess) return
+        isUnlockingSuccess = true
+        triggerHapticSuccess()
+        scope.launch {
+            delay(400) // Smooth unlock visual animation spec transition delay
+            onUnlocked()
+        }
+    }
+
+    fun recordFailedAttempt(msg: String) {
+        errorMessage = msg
+        triggerHapticFailure()
+        failedAttempts++
+        if (failedAttempts >= 3) {
+            intruderCapturedBanner = true
+            if (isIntruderCapture) {
+                val sampleSnapshot = createIntruderSnapshotBitmap(appName)
+                scope.launch {
+                    repository.recordIntruderSelfie(
+                        packageName = packageName,
+                        appName = appName,
+                        photoData = sampleSnapshot,
+                        attempts = failedAttempts
+                    )
+                }
+            }
+        }
     }
 
     LaunchedEffect(packageName) {
@@ -98,22 +180,31 @@ fun LockOverlayScreen(
         isHidePatternPath = repository.preferences.hidePatternPath.first()
         isIntruderCapture = repository.preferences.intruderCapture.first()
         isTvMode = repository.preferences.tvMode.first()
-    }
 
-    fun recordFailedAttempt() {
-        failedAttempts++
-        if (failedAttempts >= 3) {
-            intruderCapturedBanner = true
-            if (isIntruderCapture) {
-                // Generate secure local selfie snapshot representation
-                val sampleSnapshot = createIntruderSnapshotBitmap(appName)
-                scope.launch {
-                    repository.recordIntruderSelfie(
-                        packageName = packageName,
-                        appName = appName,
-                        photoData = sampleSnapshot,
-                        attempts = failedAttempts
+        // Check biometric hardware presence & automatically fallback to secondary PIN/Pattern lock
+        val bioManager = BiometricPromptManager(context)
+        val bioStatus = bioManager.checkBiometricAvailability()
+
+        if (securityType == "BIOMETRIC") {
+            when (bioStatus) {
+                BiometricStatus.AVAILABLE -> {
+                    launchBiometricPrompt(
+                        context = context,
+                        onSuccess = { handleSuccessUnlock() },
+                        onError = { err -> recordFailedAttempt(err) }
                     )
+                }
+                BiometricStatus.NO_HARDWARE -> {
+                    securityType = "PIN"
+                    secondaryAuthNotice = context.getString(R.string.lock_biometric_no_hardware)
+                }
+                BiometricStatus.NOT_ENROLLED -> {
+                    securityType = "PIN"
+                    secondaryAuthNotice = context.getString(R.string.lock_biometric_not_enrolled)
+                }
+                BiometricStatus.UNAVAILABLE -> {
+                    securityType = "PIN"
+                    secondaryAuthNotice = context.getString(R.string.lock_biometric_no_hardware)
                 }
             }
         }
@@ -141,38 +232,97 @@ fun LockOverlayScreen(
                 .fillMaxWidth()
                 .widthIn(max = if (isTvMode) 640.dp else 420.dp)
         ) {
-            // Header Shield Badge
+            // Header Shield Badge with smooth unlock animation feedback
+            val animatedScale by animateFloatAsState(
+                targetValue = if (isUnlockingSuccess) 1.25f else 1.0f,
+                animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f),
+                label = "BadgeScale"
+            )
+
             Box(
                 modifier = Modifier
                     .size(64.dp)
+                    .graphicsLayer(scaleX = animatedScale, scaleY = animatedScale)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+                    .background(
+                        if (isUnlockingSuccess) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.primaryContainer
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = androidx.compose.ui.res.painterResource(id = com.example.R.drawable.splash_logo),
-                    contentDescription = "PureLock Shield",
-                    tint = androidx.compose.ui.graphics.Color.Unspecified,
-                    modifier = Modifier.size(44.dp)
-                )
+                if (isUnlockingSuccess) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = stringResource(R.string.lock_access_granted),
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(44.dp)
+                    )
+                } else {
+                    Icon(
+                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.splash_logo),
+                        contentDescription = stringResource(R.string.lock_security_shield),
+                        tint = androidx.compose.ui.graphics.Color.Unspecified,
+                        modifier = Modifier.size(44.dp)
+                    )
+                }
             }
 
             Text(
-                text = "PureLock Security Shield",
+                text = if (isUnlockingSuccess) stringResource(R.string.lock_access_granted) else stringResource(R.string.lock_security_shield),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Authentication required for $appName",
+                text = if (isUnlockingSuccess) {
+                    stringResource(R.string.lock_auth_success_opening, appName)
+                } else {
+                    stringResource(R.string.lock_auth_required_for, appName)
+                },
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center
             )
 
-            if (errorMessage != null) {
+            // Secondary Auth / Fallback Banner
+            AnimatedVisibility(
+                visible = secondaryAuthNotice != null,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Security,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = secondaryAuthNotice ?: "",
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+
+            // Error Message Banner
+            AnimatedVisibility(
+                visible = errorMessage != null,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut()
+            ) {
                 Surface(
                     color = MaterialTheme.colorScheme.errorContainer,
                     shape = RoundedCornerShape(8.dp)
@@ -186,7 +336,12 @@ fun LockOverlayScreen(
                 }
             }
 
-            if (intruderCapturedBanner) {
+            // Intruder Selfie Captured Alert
+            AnimatedVisibility(
+                visible = intruderCapturedBanner,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut()
+            ) {
                 Surface(
                     color = MaterialTheme.colorScheme.tertiaryContainer,
                     shape = RoundedCornerShape(8.dp)
@@ -202,7 +357,7 @@ fun LockOverlayScreen(
                             tint = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                         Text(
-                            text = "3 Failed Attempts! Intruder selfie saved locally.",
+                            text = stringResource(R.string.lock_failed_attempts_intruder, failedAttempts),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
@@ -210,230 +365,253 @@ fun LockOverlayScreen(
                 }
             }
 
-            // Security Selector Tabs if user wants quick mode toggle or Biometric fallback
+            // Security Mode Selector Chips
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FilterChip(
                     selected = securityType == "PIN",
-                    onClick = { securityType = "PIN" },
-                    label = { Text("PIN Pad") },
+                    onClick = {
+                        securityType = "PIN"
+                        secondaryAuthNotice = null
+                    },
+                    label = { Text(stringResource(R.string.lock_mode_pin)) },
                     leadingIcon = { Icon(Icons.Default.Pin, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("chip_pin_mode")
                 )
                 FilterChip(
                     selected = securityType == "PATTERN",
-                    onClick = { securityType = "PATTERN" },
-                    label = { Text("Pattern") },
+                    onClick = {
+                        securityType = "PATTERN"
+                        secondaryAuthNotice = null
+                    },
+                    label = { Text(stringResource(R.string.lock_mode_pattern)) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("chip_pattern_mode")
                 )
                 FilterChip(
                     selected = securityType == "BIOMETRIC",
-                    onClick = { securityType = "BIOMETRIC" },
-                    label = { Text("Biometrics") },
+                    onClick = {
+                        securityType = "BIOMETRIC"
+                        secondaryAuthNotice = null
+                    },
+                    label = { Text(stringResource(R.string.lock_mode_biometric)) },
                     leadingIcon = { Icon(Icons.Default.Fingerprint, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("chip_biometric_mode")
                 )
             }
 
-            // Authentication Interface Body
-            when (securityType) {
-                "PIN" -> {
-                    // PIN Indicators
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    ) {
-                        repeat(masterPin.length) { idx ->
-                            val filled = idx < inputPin.length
-                            Box(
-                                modifier = Modifier
-                                    .size(16.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (filled) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.surfaceVariant
+            // Animated Content for switching security modes with smooth visual feedback
+            AnimatedContent(
+                targetState = securityType,
+                transitionSpec = {
+                    (fadeIn() + slideInVertically { height -> height / 4 }) togetherWith (fadeOut() + slideOutVertically { height -> -height / 4 })
+                },
+                label = "LockModeTransition"
+            ) { currentMode ->
+                when (currentMode) {
+                    "PIN" -> {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // PIN Indicators
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(vertical = 12.dp)
+                            ) {
+                                repeat(masterPin.length) { idx ->
+                                    val filled = idx < inputPin.length
+                                    Box(
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (filled) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.surfaceVariant
+                                            )
+                                            .border(
+                                                width = 1.dp,
+                                                color = MaterialTheme.colorScheme.outline,
+                                                shape = CircleShape
+                                            )
                                     )
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = CircleShape
-                                    )
+                                }
+                            }
+
+                            // Keypad
+                            val rows = listOf(
+                                keyboardDigits.subList(0, 3),
+                                keyboardDigits.subList(3, 6),
+                                keyboardDigits.subList(6, 9)
                             )
-                        }
-                    }
 
-                    // Keypad
-                    val rows = listOf(
-                        keyboardDigits.subList(0, 3),
-                        keyboardDigits.subList(3, 6),
-                        keyboardDigits.subList(6, 9)
-                    )
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                rows.forEach { rowDigits ->
+                                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                        rowDigits.forEach { digit ->
+                                            KeypadButton(
+                                                text = digit.toString(),
+                                                isTvMode = isTvMode,
+                                                onClick = {
+                                                    if (inputPin.length < masterPin.length) {
+                                                        inputPin += digit
+                                                        errorMessage = null
+                                                        if (inputPin.length >= masterPin.length) {
+                                                            if (inputPin == masterPin) {
+                                                                handleSuccessUnlock()
+                                                            } else if (inputPin == duressPin) {
+                                                                scope.launch {
+                                                                    repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
+                                                                    repository.emptyTrashVault()
+                                                                }
+                                                                onCancelled()
+                                                            } else {
+                                                                inputPin = ""
+                                                                recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
 
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        rows.forEach { rowDigits ->
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                rowDigits.forEach { digit ->
+                                // Bottom Row (Clear, Last Digit, Backspace)
+                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     KeypadButton(
-                                        text = digit.toString(),
+                                        text = stringResource(R.string.lock_keypad_clear),
+                                        isTvMode = isTvMode,
+                                        isAction = true,
+                                        onClick = { inputPin = "" }
+                                    )
+                                    KeypadButton(
+                                        text = keyboardDigits[9].toString(),
                                         isTvMode = isTvMode,
                                         onClick = {
+                                            val digit = keyboardDigits[9]
                                             if (inputPin.length < masterPin.length) {
                                                 inputPin += digit
                                                 errorMessage = null
                                                 if (inputPin.length >= masterPin.length) {
                                                     if (inputPin == masterPin) {
-                                                        onUnlocked()
-                                                    } else if (inputPin == duressPin) {
-                                                        scope.launch {
-                                                            repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
-                                                            repository.emptyTrashVault()
-                                                        }
-                                                        onCancelled()
+                                                        handleSuccessUnlock()
                                                     } else {
-                                                        errorMessage = "Incorrect PIN. Try again."
                                                         inputPin = ""
-                                                        recordFailedAttempt()
+                                                        recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
                                                     }
                                                 }
+                                            }
+                                        }
+                                    )
+                                    KeypadButton(
+                                        text = stringResource(R.string.lock_keypad_backspace),
+                                        isTvMode = isTvMode,
+                                        isAction = true,
+                                        onClick = {
+                                            if (inputPin.isNotEmpty()) {
+                                                inputPin = inputPin.dropLast(1)
                                             }
                                         }
                                     )
                                 }
                             }
                         }
-
-                        // Bottom Row (Clear, 0 or Last Digit, Backspace)
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            KeypadButton(
-                                text = "Clear",
-                                isTvMode = isTvMode,
-                                isAction = true,
-                                onClick = { inputPin = "" }
-                            )
-                            KeypadButton(
-                                text = keyboardDigits[9].toString(),
-                                isTvMode = isTvMode,
-                                onClick = {
-                                    val digit = keyboardDigits[9]
-                                    if (inputPin.length < masterPin.length) {
-                                        inputPin += digit
-                                        errorMessage = null
-                                        if (inputPin.length >= masterPin.length) {
-                                            if (inputPin == masterPin) {
-                                                onUnlocked()
-                                            } else {
-                                                errorMessage = "Incorrect PIN. Try again."
-                                                inputPin = ""
-                                                recordFailedAttempt()
-                                            }
-                                        }
-                                    }
-                                }
-                            )
-                            KeypadButton(
-                                text = "⌫",
-                                isTvMode = isTvMode,
-                                isAction = true,
-                                onClick = {
-                                    if (inputPin.isNotEmpty()) {
-                                        inputPin = inputPin.dropLast(1)
-                                    }
-                                }
-                            )
-                        }
                     }
-                }
 
-                "PATTERN" -> {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = if (isHidePatternPath) "Draw pattern (Invisible Trail Mode)" else "Draw pattern to unlock",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // 3x3 Grid Pattern Drawer Component
-                        PatternGridDrawer(
-                            selectedNodes = patternSelectedNodes,
-                            hidePath = isHidePatternPath,
-                            onNodeSelected = { node ->
-                                if (!patternSelectedNodes.contains(node)) {
-                                    patternSelectedNodes = patternSelectedNodes + node
-                                }
-                            },
-                            onPatternCompleted = {
-                                val userPatternStr = patternSelectedNodes.joinToString(",")
-                                if (userPatternStr == masterPattern || userPatternStr == "1,2,5,8,9") {
-                                    onUnlocked()
+                    "PATTERN" -> {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = if (isHidePatternPath) {
+                                    stringResource(R.string.lock_draw_pattern_invisible)
                                 } else {
-                                    errorMessage = "Pattern incorrect. Try again."
-                                    recordFailedAttempt()
-                                }
-                                patternSelectedNodes = emptyList()
-                            }
-                        )
+                                    stringResource(R.string.lock_draw_pattern)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
 
-                        OutlinedButton(
-                            onClick = { patternSelectedNodes = emptyList() },
-                            modifier = Modifier.testTag("btn_reset_pattern")
-                        ) {
-                            Text("Reset Pattern")
+                            // 3x3 Grid Pattern Drawer Component
+                            PatternGridDrawer(
+                                selectedNodes = patternSelectedNodes,
+                                hidePath = isHidePatternPath,
+                                onNodeSelected = { node ->
+                                    if (!patternSelectedNodes.contains(node)) {
+                                        patternSelectedNodes = patternSelectedNodes + node
+                                    }
+                                },
+                                onPatternCompleted = {
+                                    val userPatternStr = patternSelectedNodes.joinToString(",")
+                                    if (userPatternStr == masterPattern || userPatternStr == "1,2,5,8,9") {
+                                        handleSuccessUnlock()
+                                    } else {
+                                        recordFailedAttempt(context.getString(R.string.lock_incorrect_pattern))
+                                    }
+                                    patternSelectedNodes = emptyList()
+                                }
+                            )
+
+                            OutlinedButton(
+                                onClick = { patternSelectedNodes = emptyList() },
+                                modifier = Modifier.testTag("btn_reset_pattern")
+                            ) {
+                                Text(stringResource(R.string.lock_reset_pattern))
+                            }
                         }
                     }
-                }
 
-                "BIOMETRIC" -> {
-                    LaunchedEffect(Unit) {
-                        launchBiometricPrompt(
-                            context = context,
-                            onSuccess = onUnlocked,
-                            onError = { err -> errorMessage = err }
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(vertical = 24.dp)
-                    ) {
-                        IconButton(
-                            onClick = {
-                                launchBiometricPrompt(
-                                    context = context,
-                                    onSuccess = onUnlocked,
-                                    onError = { err -> errorMessage = err }
-                                )
-                            },
-                            modifier = Modifier
-                                .size(96.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .testTag("btn_biometric_trigger")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Fingerprint,
-                                contentDescription = "Touch Sensor to Unlock",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(56.dp)
+                    "BIOMETRIC" -> {
+                        LaunchedEffect(Unit) {
+                            launchBiometricPrompt(
+                                context = context,
+                                onSuccess = { handleSuccessUnlock() },
+                                onError = { err -> recordFailedAttempt(err) }
                             )
                         }
 
-                        Text(
-                            text = "Touch Fingerprint Sensor or use Face ID to unlock $appName",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(vertical = 24.dp)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    launchBiometricPrompt(
+                                        context = context,
+                                        onSuccess = { handleSuccessUnlock() },
+                                        onError = { err -> recordFailedAttempt(err) }
+                                    )
+                                },
+                                modifier = Modifier
+                                    .size(96.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .testTag("btn_biometric_trigger")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Fingerprint,
+                                    contentDescription = stringResource(R.string.lock_touch_sensor_prompt, appName),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(56.dp)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.lock_touch_sensor_prompt, appName),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             }
@@ -441,7 +619,7 @@ fun LockOverlayScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             var isExiting by remember { mutableStateOf(false) }
-            val exitAlpha by androidx.compose.animation.core.animateFloatAsState(
+            val exitAlpha by animateFloatAsState(
                 targetValue = if (isExiting) 0f else 1f,
                 animationSpec = androidx.compose.animation.core.tween(300),
                 label = "exitAlpha"
@@ -462,7 +640,7 @@ fun LockOverlayScreen(
             ) {
                 Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Cancel & Exit Shield")
+                Text(stringResource(R.string.lock_cancel_exit))
             }
         }
     }

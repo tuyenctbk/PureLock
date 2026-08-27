@@ -7,9 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.PureLockDatabase
 import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
+import com.example.data.UserSettingsManager
 import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.IntruderSelfieEntity
 import com.example.data.model.LockedAppEntity
+import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -17,10 +19,12 @@ import kotlinx.coroutines.launch
 class PureLockViewModel(application: Application) : AndroidViewModel(application) {
 
     val repository: PureLockRepository
+    val userSettings: UserSettingsManager
 
     init {
         val db = PureLockDatabase.getDatabase(application)
         val prefs = PureLockPreferences(application)
+        userSettings = prefs.userSettings
         repository = PureLockRepository(
             application,
             db.appLockDao(),
@@ -28,6 +32,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             db.logDao(),
             db.scheduleRuleDao(),
             db.encryptedVaultDao(),
+            db.userSettingDao(),
             prefs
         )
 
@@ -54,9 +59,37 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             initialValue = emptyList()
         )
 
-    fun saveEncryptedVaultItem(title: String, secretContent: String, category: String = "NOTE") {
+    fun saveEncryptedVaultItem(
+        title: String,
+        secretContent: String,
+        category: String = "NOTE",
+        username: String = "",
+        websiteOrApp: String = "",
+        notes: String = "",
+        isPinned: Boolean = false
+    ) {
         viewModelScope.launch {
-            repository.saveEncryptedVaultItem(title, secretContent, category)
+            repository.saveEncryptedVaultItem(
+                title = title,
+                secretContent = secretContent,
+                category = category,
+                username = username,
+                websiteOrApp = websiteOrApp,
+                notes = notes,
+                isPinned = isPinned
+            )
+        }
+    }
+
+    fun updateEncryptedVaultItem(item: EncryptedVaultEntity) {
+        viewModelScope.launch {
+            repository.updateEncryptedVaultItem(item)
+        }
+    }
+
+    fun toggleVaultItemPin(id: Long, isPinned: Boolean) {
+        viewModelScope.launch {
+            repository.toggleVaultItemPin(id, isPinned)
         }
     }
 
@@ -84,14 +117,56 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun clearSensitiveState() {
-        // Purge clipboard data and in-memory sensitive cached buffers
+    // --- Centralized Clipboard Monitoring with User-Configured Auto-Clear ---
+    private val _activeCopiedItemId = MutableStateFlow<Long?>(null)
+    val activeCopiedItemId: StateFlow<Long?> = _activeCopiedItemId.asStateFlow()
+
+    private val _clipboardCountdown = MutableStateFlow(0)
+    val clipboardCountdown: StateFlow<Int> = _clipboardCountdown.asStateFlow()
+
+    private var clipboardJob: kotlinx.coroutines.Job? = null
+
+    fun copyVaultItemToClipboard(item: EncryptedVaultEntity) {
+        clipboardJob?.cancel()
+        try {
+            val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("VaultSecret", item.secretContent))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        _activeCopiedItemId.value = item.id
+        val timeoutSec = clipboardAutoClearSec.value
+        if (timeoutSec <= 0) {
+            _clipboardCountdown.value = 0
+            return
+        }
+
+        clipboardJob = viewModelScope.launch {
+            _clipboardCountdown.value = timeoutSec
+            while (_clipboardCountdown.value > 0) {
+                kotlinx.coroutines.delay(1000L)
+                _clipboardCountdown.value = _clipboardCountdown.value - 1
+            }
+            clearClipboardNow()
+        }
+    }
+
+    fun clearClipboardNow() {
+        clipboardJob?.cancel()
         try {
             val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
             clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("", ""))
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        _activeCopiedItemId.value = null
+        _clipboardCountdown.value = 0
+    }
+
+    fun clearSensitiveState() {
+        // Purge clipboard data and in-memory sensitive cached buffers
+        clearClipboardNow()
         viewModelScope.launch {
             repository.logSecurityEvent("SENSITIVE_STATE_CLEARED", "Screen lock / app background transition executed: sensitive state and clipboard purged.")
         }
@@ -133,63 +208,121 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             initialValue = emptyList()
         )
 
-    // Preference States
-    val masterPin: StateFlow<String> = repository.preferences.masterPin
+    // Preference States from UserSettingsManager & Room
+    val masterPin: StateFlow<String> = userSettings.masterPin
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1234")
 
-    val masterPattern: StateFlow<String> = repository.preferences.masterPattern
+    val masterPattern: StateFlow<String> = userSettings.masterPattern
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1,2,5,8,9")
 
-    val securityType: StateFlow<String> = repository.preferences.securityType
+    val securityType: StateFlow<String> = userSettings.securityType
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "PIN")
 
-    val gracePeriodMs: StateFlow<Long> = repository.preferences.gracePeriodMs
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30000L)
-
-    val randomKeyboard: StateFlow<Boolean> = repository.preferences.randomKeyboard
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    val stealthDecoy: StateFlow<Boolean> = repository.preferences.stealthDecoy
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    val hidePatternPath: StateFlow<Boolean> = repository.preferences.hidePatternPath
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    val intruderCapture: StateFlow<Boolean> = repository.preferences.intruderCapture
+    val biometricEnabled: StateFlow<Boolean> = userSettings.biometricEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    val tvMode: StateFlow<Boolean> = repository.preferences.tvMode
+    val dynamicColorEnabled: StateFlow<Boolean> = userSettings.dynamicColorEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val themeMode: StateFlow<String> = repository.preferences.themeMode
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM")
+    val hapticFeedbackEnabled: StateFlow<Boolean> = userSettings.hapticFeedbackEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    val inactivityTimeoutSec: StateFlow<Int> = repository.preferences.inactivityTimeoutSec
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
+    val soundFeedbackEnabled: StateFlow<Boolean> = userSettings.soundFeedbackEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val dashboardCardOrder: StateFlow<List<String>> = repository.preferences.dashboardCardOrder
+    val gracePeriodMs: StateFlow<Long> = userSettings.gracePeriodMs
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30000L)
+
+    val randomKeyboard: StateFlow<Boolean> = userSettings.randomKeyboard
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val stealthDecoy: StateFlow<Boolean> = userSettings.stealthDecoy
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val hidePatternPath: StateFlow<Boolean> = userSettings.hidePatternPath
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val intruderCapture: StateFlow<Boolean> = userSettings.intruderCapture
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val tvMode: StateFlow<Boolean> = userSettings.tvMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val themeMode: StateFlow<String> = combine(
+        userSettings.themeMode,
+        repository.roomThemeMode
+    ) { dsTheme, roomTheme ->
+        roomTheme ?: dsTheme
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM")
+
+    val inactivityTimeoutSec: StateFlow<Int> = combine(
+        userSettings.autoLockInactivitySec,
+        repository.roomInactivityTimeoutSec
+    ) { dsTimeout, roomTimeout ->
+        roomTimeout ?: dsTimeout
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
+
+    val dashboardCardOrder: StateFlow<List<String>> = userSettings.dashboardCardOrder
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("TIP", "TREND", "STATS", "BATTERY", "TRANSPARENCY", "APPS"))
 
-    val stealthModeActive: StateFlow<Boolean> = repository.preferences.stealthModeActive
+    val stealthModeActive: StateFlow<Boolean> = userSettings.stealthModeActive
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val biometricSettingsSecured: StateFlow<Boolean> = repository.preferences.biometricSettingsSecured
+    val biometricSettingsSecured: StateFlow<Boolean> = userSettings.biometricSettingsSecured
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val shakeToLock: StateFlow<Boolean> = repository.preferences.shakeToLock
+    val shakeToLock: StateFlow<Boolean> = userSettings.shakeToLock
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     val shakeToLockEnabled: StateFlow<Boolean> get() = shakeToLock
 
-    val trashPurgeDays: StateFlow<Int> = repository.preferences.trashPurgeDays
+    val trashPurgeDays: StateFlow<Int> = userSettings.trashPurgeDays
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
 
-    val appLanguage: StateFlow<String> = repository.preferences.appLanguage
+    val appLanguage: StateFlow<String> = userSettings.appLanguage
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM")
+
+    val clipboardAutoClearSec: StateFlow<Int> = userSettings.clipboardAutoClearSec
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
+
+    fun setClipboardAutoClearSec(sec: Int) {
+        viewModelScope.launch {
+            userSettings.setClipboardAutoClearSec(sec)
+            repository.logSecurityEvent("CLIPBOARD_SETTINGS_CHANGED", "Clipboard auto-clear delay set to $sec seconds.")
+        }
+    }
+
+    fun setBiometricEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userSettings.setBiometricEnabled(enabled)
+            repository.logSecurityEvent("SETTINGS_CHANGED", "Biometric authentication status set to $enabled.")
+        }
+    }
+
+    fun setDynamicColorEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userSettings.setDynamicColorEnabled(enabled)
+            repository.logSecurityEvent("SETTINGS_CHANGED", "Dynamic colors (Material You) set to $enabled.")
+        }
+    }
+
+    fun setHapticFeedbackEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userSettings.setHapticFeedbackEnabled(enabled)
+            repository.logSecurityEvent("SETTINGS_CHANGED", "Tactile haptic feedback set to $enabled.")
+        }
+    }
+
+    fun setSoundFeedbackEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userSettings.setSoundFeedbackEnabled(enabled)
+            repository.logSecurityEvent("SETTINGS_CHANGED", "Audio feedback set to $enabled.")
+        }
+    }
 
     fun setShakeToLock(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setShakeToLock(enabled)
+            userSettings.setShakeToLock(enabled)
             repository.logSecurityEvent("SETTINGS_CHANGED", "Shake to Lock gesture set to $enabled.")
         }
     }
@@ -198,7 +331,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     fun setTrashPurgeDays(days: Int) {
         viewModelScope.launch {
-            repository.preferences.setTrashPurgeDays(days)
+            userSettings.setTrashPurgeDays(days)
             repository.purgeTrashVault(days)
             repository.logSecurityEvent("SETTINGS_CHANGED", "Trash auto-purge period updated to $days days.")
         }
@@ -208,21 +341,21 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     fun setAppLanguage(langCode: String) {
         viewModelScope.launch {
-            repository.preferences.setAppLanguage(langCode)
+            userSettings.setAppLanguage(langCode)
             repository.logSecurityEvent("SETTINGS_CHANGED", "Application display language updated to $langCode.")
         }
     }
 
     fun setDashboardCardOrder(order: List<String>) {
         viewModelScope.launch {
-            repository.preferences.setDashboardCardOrder(order)
+            userSettings.setDashboardCardOrder(order)
             repository.logSecurityEvent("DASHBOARD_REORDERED", "Dashboard card layout customized.")
         }
     }
 
     fun toggleStealthMode(active: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setStealthModeActive(active)
+            userSettings.setStealthModeActive(active)
             if (active) {
                 try {
                     val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
@@ -255,55 +388,55 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     fun updateMasterPin(newPin: String) {
         viewModelScope.launch {
-            repository.preferences.setMasterPin(newPin)
+            userSettings.setMasterPin(newPin)
         }
     }
 
     fun updateMasterPattern(newPattern: String) {
         viewModelScope.launch {
-            repository.preferences.setMasterPattern(newPattern)
+            userSettings.setMasterPattern(newPattern)
         }
     }
 
     fun updateSecurityType(type: String) {
         viewModelScope.launch {
-            repository.preferences.setSecurityType(type)
+            userSettings.setSecurityType(type)
         }
     }
 
     fun updateGracePeriodMs(ms: Long) {
         viewModelScope.launch {
-            repository.preferences.setGracePeriodMs(ms)
+            userSettings.setGracePeriodMs(ms)
         }
     }
 
     fun setRandomKeyboard(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setRandomKeyboard(enabled)
+            userSettings.setRandomKeyboard(enabled)
         }
     }
 
     fun setStealthDecoy(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setStealthDecoy(enabled)
+            userSettings.setStealthDecoy(enabled)
         }
     }
 
     fun setHidePatternPath(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setHidePatternPath(enabled)
+            userSettings.setHidePatternPath(enabled)
         }
     }
 
     fun setIntruderCapture(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setIntruderCapture(enabled)
+            userSettings.setIntruderCapture(enabled)
         }
     }
 
     fun setTvMode(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setTvMode(enabled)
+            userSettings.setTvMode(enabled)
         }
     }
 
@@ -425,23 +558,45 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         return backupManager.importEncryptedBackup(backupJson, passphrase)
     }
 
+    suspend fun exportEncryptedNotesJson(passphrase: String): String {
+        return backupManager.exportEncryptedNotesJson(passphrase)
+    }
+
+    suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean {
+        return backupManager.importEncryptedNotesJson(jsonPackageStr, passphrase)
+    }
+
+    suspend fun exportEncryptedNotesToFile(passphrase: String): java.io.File {
+        return backupManager.exportEncryptedNotesToFile(passphrase)
+    }
+
+    suspend fun importEncryptedNotesFromFile(file: java.io.File, passphrase: String): Boolean {
+        return backupManager.importEncryptedNotesFromFile(file, passphrase)
+    }
+
+    fun getBackupDirectory(): java.io.File {
+        return backupManager.getBackupDirectory()
+    }
+
     fun setThemeMode(mode: String) {
         viewModelScope.launch {
-            repository.preferences.setThemeMode(mode)
-            repository.logSecurityEvent("THEME_CHANGED", "UI Theme switched to $mode mode.")
+            repository.saveRoomSetting("theme_mode", mode)
+            userSettings.setThemeMode(mode)
+            repository.logSecurityEvent("THEME_CHANGED", "UI Theme switched to $mode mode (persisted to Room DB & DataStore).")
         }
     }
 
     fun setInactivityTimeoutSec(sec: Int) {
         viewModelScope.launch {
-            repository.preferences.setInactivityTimeoutSec(sec)
-            repository.logSecurityEvent("INACTIVITY_TIMEOUT_UPDATED", "App UI Inactivity auto-lock set to $sec seconds.")
+            repository.saveRoomSetting("inactivity_timeout_sec", sec.toString())
+            userSettings.setAutoLockInactivitySec(sec)
+            repository.logSecurityEvent("INACTIVITY_TIMEOUT_UPDATED", "App UI Inactivity auto-lock set to $sec seconds (persisted to Room DB & DataStore).")
         }
     }
 
     fun setBiometricSettingsSecured(enabled: Boolean) {
         viewModelScope.launch {
-            repository.preferences.setBiometricSettingsSecured(enabled)
+            userSettings.setBiometricSettingsSecured(enabled)
             val logMsg = if (enabled) "Biometric protection enabled for settings screen." else "Biometric protection disabled for settings screen."
             repository.logSecurityEvent("BIOMETRIC_SETTINGS_TOGGLED", logMsg)
         }

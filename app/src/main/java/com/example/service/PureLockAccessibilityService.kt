@@ -30,6 +30,7 @@ class PureLockAccessibilityService : AccessibilityService() {
             db.logDao(),
             db.scheduleRuleDao(),
             db.encryptedVaultDao(),
+            db.userSettingDao(),
             prefs
         )
     }

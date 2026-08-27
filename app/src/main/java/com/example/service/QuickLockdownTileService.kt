@@ -30,6 +30,7 @@ class QuickLockdownTileService : TileService() {
                 db.logDao(),
                 db.scheduleRuleDao(),
                 db.encryptedVaultDao(),
+                db.userSettingDao(),
                 prefs
             )
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Greenish Safe Ambient Halo -->
+    <path android:pathData="M60,60 m-48,0 a48,48 0 1,0 96,0 a48,48 0 1,0 -96,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="60"
+                android:centerY="60"
+                android:gradientRadius="48"
+                android:type="radial">
+                <item android:color="#2610B981" android:offset="0.0" />
+                <item android:color="#00000000" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Radar Rings -->
+    <path
+        android:strokeColor="#10B981"
+        android:strokeWidth="1.2"
+        android:strokeAlpha="0.35"
+        android:pathData="M60,60 m-25,0 a25,25 0 1,0 50,0 a25,25 0 1,0 -50,0 M60,60 m-42,0 a42,42 0 1,0 84,0 a42,42 0 1,0 -84,0" />
+
+    <!-- Camera / Radar Shield Body -->
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M60,26 C46,32 34,34 30,40 C30,66 39,85 60,94 C81,85 90,66 90,40 C86,34 74,32 60,26 Z" />
+
+    <path
+        android:strokeColor="#10B981"
+        android:strokeWidth="2.5"
+        android:pathData="M60,28 C48,34 36,36 32,41 C32,64 41,82 60,91 C79,82 88,64 88,41 C84,36 72,34 60,28 Z" />
+
+    <!-- Verified Checkmark -->
+    <path
+        android:strokeColor="#10B981"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M48,58 L56,66 L74,48" />
+</vector>

@@ -3,6 +3,11 @@
     <string name="active_protections">Protecciones Activas</string>
     <string name="all">TODO</string>
     <string name="app_name">PureLock</string>
+    <string name="shortcut_vault_short">Ver Bóveda</string>
+    <string name="shortcut_vault_long">Abrir Bóveda de Secretos Cifrados</string>
+    <string name="shortcut_generator_short">Generador</string>
+    <string name="shortcut_generator_long">Generar Contraseña Segura</string>
+    <string name="accessibility_service_description">PureLock utiliza este servicio ligero estrictamente para detectar cuándo se inician las aplicaciones protegidas y mostrar la pantalla de bloqueo seguro. PureLock no contiene permisos de Internet y nunca envía ni comparte sus datos.</string>
     <string name="app_shield">Protección</string>
     <string name="autofill_btn">Habilitar Autocompletado</string>
     <string name="autofill_desc">Autocompleta credenciales de forma segura directamente desde la bóveda.</string>
@@ -29,4 +34,182 @@
     <string name="trash_purge">Período de Auto-Purga</string>
     <string name="trash_purge_desc">Los secretos se borrarán permanentemente después de la duración elegida.</string>
     <string name="unlocked">Desbloqueado</string>
+
+    <string name="delete_note_title">¿Eliminar nota cifrada?</string>
+    <string name="delete_note_message">¿Seguro que deseas eliminar \"%1$s\"? Este elemento se moverá a la Papelera durante %2$d días antes de ser eliminado permanentemente.</string>
+    <string name="delete_note_permanent_title">¿Eliminar secreto permanentemente?</string>
+    <string name="delete_note_permanent_message">¿Seguro que deseas borrar permanentemente \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="delete_confirm">Eliminar</string>
+    <string name="delete_permanent_confirm">Borrar Definitivamente</string>
+    <string name="cancel">Cancelar</string>
+    <string name="restore">Restaurar</string>
+    <string name="save_encrypted">Guardar Cifrado</string>
+    <string name="add_secret_title">Añadir Secreto / Nota Cifrada</string>
+    <string name="edit_secret_title">Editar Secreto / Nota Cifrada</string>
+    <string name="title_service_name">Título / Servicio</string>
+    <string name="title_placeholder">ej. Correo principal, PIN bancario, Nota privada</string>
+    <string name="secret_content_label">Contraseña o Nota Cifrada</string>
+    <string name="secret_content_placeholder">Introduce o genera el secreto...</string>
+    <string name="search_vault_placeholder">Buscar notas, contraseñas y secretos...</string>
+    <string name="clear_search">Borrar búsqueda</string>
+    <string name="no_matching_secrets">No se encontraron secretos coincidentes</string>
+    <string name="no_secrets_match_query">Ningún elemento coincide con \"%1$s\". Prueba otra palabra clave.</string>
+    <string name="encrypted_vault_empty">La bóveda cifrada está vacía</string>
+    <string name="store_first_secret">Guardar primera nota secreta</string>
+    <string name="category_password">Contraseña</string>
+    <string name="category_note">Nota Secreta</string>
+    <string name="category_pin">PIN Bancario</string>
+
+    <string name="password_strength_weak">Débil</string>
+    <string name="password_strength_fair">Aceptable</string>
+    <string name="password_strength_strong">Fuerte</string>
+    <string name="password_strength_very_strong">Muy Fuerte</string>
+    <string name="entropy_bits_format">Entropía: %1$.1f bits</string>
+    <string name="strength_rule_upper">A-Z</string>
+    <string name="strength_rule_lower">a-z</string>
+    <string name="strength_rule_digits">0-9</string>
+    <string name="strength_rule_symbols">!@#</string>
+    <string name="strength_rule_length">12+ Caracteres</string>
+
+    <string name="auto_lock_settings_title">Tiempo de Bloqueo Automático</string>
+    <string name="auto_lock_settings_desc">Elige qué tan rápido PureLock bloquea la aplicación por inactividad.</string>
+    <string name="auto_lock_immediately">Inmediatamente</string>
+    <string name="auto_lock_30s">30 Segundos</string>
+    <string name="auto_lock_1m">1 Minuto</string>
+    <string name="auto_lock_2m">2 Minutos</string>
+    <string name="auto_lock_5m">5 Minutos</string>
+    <string name="auto_lock_10m">10 Minutos</string>
+    <string name="auto_lock_never">Nunca (Bloqueo de sesión)</string>
+    <string name="auto_lock_dialog_title">Seleccionar Intervalo de Bloqueo</string>
+
+    <string name="export_notes_title">Exportación Segura de Notas Cifradas</string>
+    <string name="export_notes_desc">Exporta tus notas cifradas a un archivo local protegido con AES-256-GCM.</string>
+    <string name="import_notes_title">Importar Archivo de Notas Cifradas</string>
+    <string name="import_notes_desc">Restaura notas y secretos desde un archivo local cifrado AES-256-GCM.</string>
+    <string name="export_passphrase_label">Frase de Cifrado</string>
+    <string name="import_passphrase_label">Frase de Descifrado</string>
+    <string name="export_passphrase_hint">Introduce una contraseña fuerte para cifrar tu archivo...</string>
+    <string name="import_passphrase_hint">Introduce la contraseña utilizada al cifrar el archivo...</string>
+    <string name="btn_export_notes_file">Exportar Notas a Archivo</string>
+    <string name="btn_import_notes_file">Importar Archivo de Notas</string>
+    <string name="export_file_success">Notas cifradas exportadas con éxito a: %1$s</string>
+    <string name="import_file_success">¡Notas descifradas y restauradas en la bóveda!</string>
+    <string name="import_file_error">Error de descifrado. Contraseña incorrecta o archivo dañado.</string>
+    <string name="copied_clipboard_countdown">¡Copiado! El portapapeles se limpia en %1$ds</string>
+    <string name="clear_clipboard_now">Limpiar Ahora</string>
+
+    <!-- Clipboard Delay Configuration -->
+    <string name="clipboard_clear_delay_title">Retraso de Limpieza del Portapapeles</string>
+    <string name="clipboard_clear_delay_desc">Borra automáticamente los secretos copiados del portapapeles para evitar espionaje.</string>
+    <string name="clipboard_delay_10s">10 Segundos</string>
+    <string name="clipboard_delay_30s">30 Segundos (Predeterminado)</string>
+    <string name="clipboard_delay_60s">60 Segundos (1 Min)</string>
+    <string name="clipboard_delay_120s">120 Segundos (2 Min)</string>
+    <string name="clipboard_delay_disabled">Nunca (Limpieza Manual)</string>
+
+    <!-- Sorting Options -->
+    <string name="sort_notes_title">Ordenar Notas</string>
+    <string name="sort_date_desc">Fecha de Creación (Más recientes)</string>
+    <string name="sort_date_asc">Fecha de Creación (Más antiguas)</string>
+    <string name="sort_alphabetical_asc">Alfabético (A → Z)</string>
+    <string name="sort_alphabetical_desc">Alfabético (Z → A)</string>
+    <string name="sort_strength_desc">Seguridad de Contraseña (Mayor)</string>
+    <string name="sort_strength_asc">Seguridad de Contraseña (Menor)</string>
+
+    <!-- Category System -->
+    <string name="category_all_notes">Todas las Notas</string>
+    <string name="category_work">Trabajo</string>
+    <string name="category_personal">Personal</string>
+    <string name="category_finance">Finanzas</string>
+    <string name="category_passwords">Contraseñas</string>
+    <string name="category_pins">PINs</string>
+    <string name="category_secure_notes">Notas Seguras</string>
+    <string name="category_label">Categoría</string>
+    <string name="select_category">Seleccionar Categoría</string>
+
+    <!-- Lock Screen & Secondary Authentication Strings -->
+    <string name="lock_access_granted">Acceso Concedido</string>
+    <string name="lock_security_shield">Escudo de Seguridad PureLock</string>
+    <string name="lock_auth_success_opening">Autenticación exitosa. Abriendo %1$s…</string>
+    <string name="lock_auth_required_for">Autenticación requerida para %1$s</string>
+    <string name="lock_biometric_no_hardware">No se detectó sensor biométrico. Usando autenticación secundaria con PIN o Patrón.</string>
+    <string name="lock_biometric_not_enrolled">No hay biometría configurada. Usando PIN o Patrón secundario.</string>
+    <string name="lock_failed_attempts_intruder">¡%1$d intentos fallidos! Foto de intruso capturada localmente.</string>
+    <string name="lock_mode_pin">Teclado PIN</string>
+    <string name="lock_mode_pattern">Patrón</string>
+    <string name="lock_mode_biometric">Biometría</string>
+    <string name="lock_incorrect_pin">PIN incorrecto. Inténtalo de nuevo.</string>
+    <string name="lock_incorrect_pattern">Patrón incorrecto. Inténtalo de nuevo.</string>
+    <string name="lock_draw_pattern">Dibuja el patrón para desbloquear</string>
+    <string name="lock_draw_pattern_invisible">Dibuja el patrón (Modo de Trazo Invisible)</string>
+    <string name="lock_reset_pattern">Reiniciar Patrón</string>
+    <string name="lock_touch_sensor_prompt">Toca el sensor de huella o usa Face ID para desbloquear %1$s</string>
+    <string name="lock_cancel_exit">Cancelar y Salir del Escudo</string>
+    <string name="lock_keypad_clear">Borrar</string>
+    <string name="lock_keypad_backspace">⌫</string>
+    <string name="lock_panic_triggered">¡PIN de coacción ingresado! Modo de pánico activado.</string>
+    <string name="secondary_auth_title">Autenticación Secundaria</string>
+    <string name="secondary_auth_desc">El respaldo de PIN o Patrón protege la app si la autenticación biométrica no está disponible.</string>
+
+    <!-- Password Generator Utility Strings -->
+    <string name="generator_title">Generador de Contraseñas Seguras</string>
+    <string name="generator_toggle_expand">Generador de Contraseñas Personalizado</string>
+    <string name="generator_length_label">Longitud: %1$d caracteres</string>
+    <string name="generator_length_chars">Longitud: %1$d</string>
+    <string name="generator_preset_pin4">PIN de 4 Dígitos</string>
+    <string name="generator_preset_pin6">PIN de 6 Dígitos</string>
+    <string name="generator_preset_standard">Estándar 16 Caracteres</string>
+    <string name="generator_preset_strong">Fuerte 24 Caracteres</string>
+    <string name="generator_preset_complex">Ultra 32 Caracteres</string>
+    <string name="generator_charset_upper">A-Z (Mayúsculas)</string>
+    <string name="generator_charset_lower">a-z (Minúsculas)</string>
+    <string name="generator_charset_digits">0-9 (Dígitos)</string>
+    <string name="generator_charset_symbols">!@# (Símbolos)</string>
+    <string name="generator_charset_no_ambiguous">Sin Ambiguos (0, O, 1, l)</string>
+    <string name="generator_btn_generate">Generar</string>
+    <string name="generator_btn_regenerate">Regenerar</string>
+    <string name="generator_btn_apply">Aplicar a Secreto</string>
+    <string name="generator_btn_copy">Copiar Generada</string>
+    <string name="generator_copied_toast">Contraseña generada copiada al portapapeles</string>
+    <string name="generator_applied_toast">Contraseña generada aplicada al secreto</string>
+    <string name="generator_strength_entropy">Seguridad: %1$s (%2$.1f bits de entropía)</string>
+
+    <!-- Settings Fallback & Auth Strings -->
+    <string name="settings_lock_active">Bloqueo de Configuración Activo</string>
+    <string name="settings_lock_desc">La Suite Invisible está protegida por biometría y PIN secundario. Autentícate para modificar ajustes.</string>
+    <string name="settings_scan_biometrics">Escanear Biometría</string>
+    <string name="settings_use_fallback_pin">Usar PIN Maestro Secundario</string>
+    <string name="settings_enter_master_pin_title">Ingresar PIN Maestro</string>
+    <string name="settings_enter_master_pin_desc">Ingresa tu código PIN maestro para desbloquear los ajustes.</string>
+    <string name="settings_incorrect_pin">PIN Maestro Incorrecto</string>
+    <string name="settings_unlock_btn">Desbloquear</string>
+
+    <!-- Vault Insights Dashboard -->
+    <string name="vault_insights_title">Estadísticas de la Bóveda</string>
+    <string name="vault_insights_subtitle">Estadísticas criptográficas y telemetría de seguridad</string>
+    <string name="insights_total_records">Total de Registros</string>
+    <string name="insights_avg_strength">Seguridad Promedio</string>
+    <string name="insights_health_score">Índice de Salud de Seguridad</string>
+    <string name="insights_strength_breakdown">Distribución de Seguridad</string>
+    <string name="insights_category_distribution">Distribución por Categoría</string>
+    <string name="insights_usage_frequency">Frecuencia de Uso y Guardado</string>
+    <string name="insights_security_audit">Auditoría de Seguridad de la Bóveda</string>
+    <!-- Additional Navigation & Quick Actions -->
+    <string name="export_btn_label">Exportar</string>
+    <string name="import_btn_label">Importar</string>
+    <string name="insights_btn_label">Estadísticas</string>
+    <string name="generator_quick_presets">Ajustes Rápidos:</string>
+
+    <!-- Empty State Illustrations & View Strings -->
+    <string name="empty_notes_main_title">Tu Bóveda está Vacía</string>
+    <string name="empty_notes_main_desc">Protege tus contraseñas, notas privadas, PINs bancarios y datos confidenciales localmente con cifrado de hardware AES-256-GCM.</string>
+    <string name="empty_category_title">No se encontraron %1$s</string>
+    <string name="empty_category_desc">No tienes elementos cifrados guardados en la categoría \"%1$s\". Añade tu primer secreto o nota ahora.</string>
+    <string name="empty_intruder_title">Bóveda Segura — Cero Intentos de Intrusos</string>
+    <string name="empty_intruder_desc">Si una persona no autorizada intenta abrir una aplicación protegida con credenciales incorrectas, su foto de intruso se capturará y mostrará aquí.</string>
+    <string name="empty_trash_title">La Papelera está Vacía</string>
+    <string name="empty_trash_desc">Las notas y secretos eliminados permanecen en la papelera durante %1$d días antes de su eliminación permanente.</string>
+    <string name="intruder_banner_info">Las fotos de intrusos se cifran y guardan exclusivamente en la memoria privada. Nunca se sincronizan con la nube o galería.</string>
+    <string name="trash_banner_info">La papelera protege los elementos eliminados temporalmente. Se purgan automáticamente tras %1$d días.</string>
+    <string name="store_first_category_secret">Guardar Secreto en %1$s</string>
 </resources>

@@ -9,11 +9,13 @@ import com.example.data.dao.EncryptedVaultDao
 import com.example.data.dao.IntruderDao
 import com.example.data.dao.LogDao
 import com.example.data.dao.ScheduleRuleDao
+import com.example.data.dao.UserSettingDao
 import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.IntruderSelfieEntity
 import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
+import com.example.data.model.UserSettingEntity
 
 @Database(
     entities = [
@@ -21,9 +23,10 @@ import com.example.data.model.SecurityLogEntity
         IntruderSelfieEntity::class,
         SecurityLogEntity::class,
         ScheduleRuleEntity::class,
-        EncryptedVaultEntity::class
+        EncryptedVaultEntity::class,
+        UserSettingEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class PureLockDatabase : RoomDatabase() {
@@ -32,6 +35,7 @@ abstract class PureLockDatabase : RoomDatabase() {
     abstract fun logDao(): LogDao
     abstract fun scheduleRuleDao(): ScheduleRuleDao
     abstract fun encryptedVaultDao(): EncryptedVaultDao
+    abstract fun userSettingDao(): UserSettingDao
 
     companion object {
         @Volatile
