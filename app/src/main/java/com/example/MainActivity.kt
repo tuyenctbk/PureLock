@@ -13,12 +13,14 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
@@ -80,7 +82,7 @@ class MainActivity : FragmentActivity() {
                 }
 
                 LaunchedEffect(appAuthenticated, activeLockedAppsCount, totalVaultUnlocks, protectionScore) {
-                    if (appAuthenticated && isOnboardingCompleted) {
+                    if (appAuthenticated && isOnboardingCompleted == true) {
                         if (com.example.util.SmartPromptsManager.shouldShowSharePrompt(
                                 lockedAppsCount = activeLockedAppsCount,
                                 totalVaultUnlocks = totalVaultUnlocks,
@@ -179,50 +181,58 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                // Inactivity Auto-Lock Loop
+                // Inactivity Auto-Lock Loop using ViewModel Timer
+                val isAppAutoLocked by viewModel.isAppAutoLocked.collectAsState()
+
+                LaunchedEffect(isAppAutoLocked) {
+                    if (isAppAutoLocked) {
+                        appAuthenticated = false
+                    }
+                }
+
                 LaunchedEffect(appAuthenticated, inactivityTimeoutSec, lastInteractionTime) {
                     if (appAuthenticated && inactivityTimeoutSec > 0) {
-                        val timeoutMs = inactivityTimeoutSec * 1000L
-                        val elapsed = System.currentTimeMillis() - lastInteractionTime
-                        val remaining = timeoutMs - elapsed
-                        if (remaining > 0) {
-                            delay(remaining)
-                            if (System.currentTimeMillis() - lastInteractionTime >= timeoutMs) {
-                                appAuthenticated = false
-                                viewModel.clearSensitiveState()
-                            }
-                        } else {
+                        viewModel.onUserActivity {
                             appAuthenticated = false
-                            viewModel.clearSensitiveState()
                         }
                     }
                 }
 
-                AnimatedContent(
-                    targetState = Pair(isOnboardingCompleted, appAuthenticated),
-                    transitionSpec = {
-                        (fadeIn(animationSpec = tween(450)) + scaleIn(initialScale = 0.94f, animationSpec = tween(450))) togetherWith
-                        (fadeOut(animationSpec = tween(350)) + scaleOut(targetScale = 1.05f, animationSpec = tween(350)))
-                    },
-                    label = "AppLockTransition"
-                ) { (onboarded, isAuthenticated) ->
-                    if (!onboarded) {
-                        com.example.ui.OnboardingScreen(
-                            onOnboardingComplete = { pin, securityType ->
-                                viewModel.completeOnboarding(pin, securityType)
-                            }
-                        )
-                    } else if (!isAuthenticated) {
-                        LockOverlayScreen(
-                            packageName = "com.example",
-                            repository = viewModel.repository,
-                            onUnlocked = {
-                                appAuthenticated = true
-                                lastInteractionTime = System.currentTimeMillis()
-                            },
-                            onCancelled = { finish() }
-                        )
-                    } else {
+                if (isOnboardingCompleted == null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
+                } else {
+                    AnimatedContent(
+                        targetState = Pair(isOnboardingCompleted == true, appAuthenticated),
+                        transitionSpec = {
+                            (fadeIn(animationSpec = tween(450)) + scaleIn(initialScale = 0.94f, animationSpec = tween(450))) togetherWith
+                            (fadeOut(animationSpec = tween(350)) + scaleOut(targetScale = 1.05f, animationSpec = tween(350)))
+                        },
+                        label = "AppLockTransition"
+                    ) { (onboarded, isAuthenticated) ->
+                        if (!onboarded) {
+                            com.example.ui.OnboardingScreen(
+                                onOnboardingComplete = { pin, securityType, pattern ->
+                                    viewModel.completeOnboarding(pin, securityType, pattern)
+                                }
+                            )
+                        } else if (!isAuthenticated) {
+                            LockOverlayScreen(
+                                packageName = "com.example",
+                                repository = viewModel.repository,
+                                onUnlocked = {
+                                    appAuthenticated = true
+                                    lastInteractionTime = System.currentTimeMillis()
+                                },
+                                onCancelled = { finish() }
+                            )
+                        } else {
                         val navController = rememberNavController()
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentRoute = navBackStackEntry?.destination?.route ?: "shield"
@@ -234,6 +244,7 @@ class MainActivity : FragmentActivity() {
                                     detectTapGestures(
                                         onPress = {
                                             lastInteractionTime = System.currentTimeMillis()
+                                            viewModel.onUserActivity { appAuthenticated = false }
                                         }
                                     )
                                 }
@@ -411,5 +422,6 @@ class MainActivity : FragmentActivity() {
             }
         }
     }
+}
 }
 }

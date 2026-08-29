@@ -28,7 +28,7 @@ import com.example.util.FirebaseManager
 
 @Composable
 fun OnboardingScreen(
-    onOnboardingComplete: (pin: String, securityType: String) -> Unit
+    onOnboardingComplete: (pin: String, securityType: String, pattern: String) -> Unit = { _, _, _ -> }
 ) {
     val context = LocalContext.current
     var currentStep by remember { mutableIntStateOf(0) }
@@ -36,6 +36,7 @@ fun OnboardingScreen(
     var selectedSecurityType by remember { mutableStateOf("PIN") }
     var inputPin by remember { mutableStateOf("") }
     var confirmPin by remember { mutableStateOf("") }
+    var patternNodes by remember { mutableStateOf(listOf<Int>()) }
     var pinError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(currentStep) {
@@ -109,6 +110,8 @@ fun OnboardingScreen(
                         onPinChanged = { inputPin = it },
                         confirmPin = confirmPin,
                         onConfirmPinChanged = { confirmPin = it },
+                        patternNodes = patternNodes,
+                        onPatternNodesChanged = { patternNodes = it },
                         error = pinError
                     )
                     2 -> OnboardingStepPermissions(context = context)
@@ -139,11 +142,15 @@ fun OnboardingScreen(
                     onClick = {
                         if (currentStep == 1) {
                             if (inputPin.length < 4) {
-                                pinError = "PIN must be at least 4 digits."
+                                pinError = "Master PIN must be at least 4 digits."
                                 return@Button
                             }
                             if (inputPin != confirmPin) {
-                                pinError = "PIN confirmation does not match."
+                                pinError = "Master PIN confirmation does not match."
+                                return@Button
+                            }
+                            if (selectedSecurityType == "PATTERN" && patternNodes.size < 4) {
+                                pinError = "Pattern must connect at least 4 dots."
                                 return@Button
                             }
                             pinError = null
@@ -153,7 +160,8 @@ fun OnboardingScreen(
                             currentStep++
                         } else {
                             val finalPin = if (inputPin.isNotBlank()) inputPin else "1234"
-                            onOnboardingComplete(finalPin, selectedSecurityType)
+                            val finalPattern = if (patternNodes.isNotEmpty()) patternNodes.joinToString(",") else "1,2,5,8,9"
+                            onOnboardingComplete(finalPin, selectedSecurityType, finalPattern)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
@@ -226,12 +234,14 @@ private fun OnboardingStepSecuritySetup(
     onPinChanged: (String) -> Unit,
     confirmPin: String,
     onConfirmPinChanged: (String) -> Unit,
+    patternNodes: List<Int>,
+    onPatternNodesChanged: (List<Int>) -> Unit,
     error: String?
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -243,16 +253,20 @@ private fun OnboardingStepSecuritySetup(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Select your primary lock mode and create your master PIN.",
-            fontSize = 14.sp,
+            text = when (selectedSecurityType) {
+                "PATTERN" -> "Draw your master pattern (minimum 4 dots) and configure fallback PIN."
+                "BIOMETRIC" -> "Use system fingerprint/face unlock with fallback PIN."
+                else -> "Create a 4-8 digit master PIN key."
+            },
+            fontSize = 13.sp,
             color = Color(0xFF94A3B8),
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -263,17 +277,93 @@ private fun OnboardingStepSecuritySetup(
                     selected = selectedSecurityType == mode,
                     onClick = { onSecurityTypeSelected(mode) },
                     label = { Text(mode, fontWeight = FontWeight.SemiBold) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = Color(0xFF2563EB),
+                        selectedLabelColor = Color.White,
+                        containerColor = Color(0xFF1E293B),
+                        labelColor = Color(0xFF94A3B8)
+                    ),
                     modifier = Modifier.weight(1f)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
+        when (selectedSecurityType) {
+            "PATTERN" -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = if (patternNodes.isEmpty()) "Draw Master Pattern Below" else "Selected Nodes: ${patternNodes.joinToString("-")}",
+                        color = Color(0xFF38BDF8),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    PatternGridDrawer(
+                        selectedNodes = patternNodes,
+                        hidePath = false,
+                        onNodeSelected = { node ->
+                            if (!patternNodes.contains(node)) {
+                                onPatternNodesChanged(patternNodes + node)
+                            }
+                        },
+                        onPatternCompleted = {}
+                    )
+
+                    if (patternNodes.isNotEmpty()) {
+                        TextButton(onClick = { onPatternNodesChanged(emptyList()) }) {
+                            Text("Reset Pattern", color = Color(0xFFF87171), fontSize = 12.sp)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            "BIOMETRIC" -> {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Fingerprint,
+                            contentDescription = null,
+                            tint = Color(0xFF38BDF8),
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "Biometrics Enabled",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "Fingerprint or Face authentication will unlock PureLock instantly. Enter a Master PIN below for system reboots.",
+                                color = Color(0xFF94A3B8),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+
+        // Master PIN (Always required as primary or essential fallback)
         OutlinedTextField(
             value = pin,
             onValueChange = onPinChanged,
-            label = { Text("Master PIN") },
+            label = { Text(if (selectedSecurityType == "PIN") "Master PIN" else "Fallback Master PIN") },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -287,7 +377,7 @@ private fun OnboardingStepSecuritySetup(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = confirmPin,
@@ -307,7 +397,7 @@ private fun OnboardingStepSecuritySetup(
         )
 
         if (error != null) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = error,
                 color = MaterialTheme.colorScheme.error,

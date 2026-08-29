@@ -208,11 +208,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             initialValue = emptyList()
         )
 
-    val isOnboardingCompleted: StateFlow<Boolean> = repository.preferences.isOnboardingCompleted
+    val isOnboardingCompleted: StateFlow<Boolean?> = repository.preferences.isOnboardingCompleted
+        .map { it as Boolean? }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = true // Default true until DataStore emits to prevent initial flash
+            started = SharingStarted.Eagerly,
+            initialValue = null
         )
 
     val hasSharedApp: StateFlow<Boolean> = repository.preferences.hasSharedApp
@@ -236,9 +237,10 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     val totalVaultUnlocks: StateFlow<Int> = repository.preferences.totalVaultUnlocks
         .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0)
 
-    fun completeOnboarding(pin: String, securityType: String) {
+    fun completeOnboarding(pin: String, securityType: String, pattern: String = "1,2,5,8,9") {
         viewModelScope.launch {
             repository.preferences.setMasterPin(pin)
+            repository.preferences.setMasterPattern(pattern)
             repository.preferences.setSecurityType(securityType)
             repository.preferences.setOnboardingCompleted(true)
             com.example.util.FirebaseManager.logEvent("onboarding_complete", mapOf("security_type" to securityType))
@@ -657,11 +659,41 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    // ViewModel Auto-Lock Timer Logic
+    private var autoLockJob: kotlinx.coroutines.Job? = null
+    private val _isAppAutoLocked = MutableStateFlow(false)
+    val isAppAutoLocked: StateFlow<Boolean> get() = _isAppAutoLocked
+
+    fun resetAutoLockTimer(onTimeout: () -> Unit = {}) {
+        autoLockJob?.cancel()
+        _isAppAutoLocked.value = false
+        val sec = inactivityTimeoutSec.value
+        if (sec > 0) {
+            autoLockJob = viewModelScope.launch {
+                kotlinx.coroutines.delay(sec * 1000L)
+                _isAppAutoLocked.value = true
+                clearSensitiveState()
+                onTimeout()
+                logSecurityEvent("AUTO_LOCK_TRIGGERED", "App automatically locked after $sec seconds of inactivity.")
+            }
+        }
+    }
+
+    fun onUserActivity(onTimeout: () -> Unit = {}) {
+        resetAutoLockTimer(onTimeout)
+    }
+
+    fun unlockApp() {
+        _isAppAutoLocked.value = false
+        resetAutoLockTimer()
+    }
+
     fun setInactivityTimeoutSec(sec: Int) {
         viewModelScope.launch {
             repository.saveRoomSetting("inactivity_timeout_sec", sec.toString())
             userSettings.setAutoLockInactivitySec(sec)
             repository.logSecurityEvent("INACTIVITY_TIMEOUT_UPDATED", "App UI Inactivity auto-lock set to $sec seconds (persisted to Room DB & DataStore).")
+            resetAutoLockTimer()
         }
     }
 

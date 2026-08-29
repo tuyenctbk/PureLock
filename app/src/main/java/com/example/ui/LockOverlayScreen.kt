@@ -162,6 +162,27 @@ fun LockOverlayScreen(
         }
     }
 
+    fun handleDigitPressed(digit: Int) {
+        if (inputPin.length < masterPin.length) {
+            inputPin += digit
+            errorMessage = null
+            if (inputPin.length >= masterPin.length) {
+                if (inputPin == masterPin) {
+                    handleSuccessUnlock()
+                } else if (inputPin == duressPin) {
+                    scope.launch {
+                        repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
+                        repository.emptyTrashVault()
+                    }
+                    onCancelled()
+                } else {
+                    inputPin = ""
+                    recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
+                }
+            }
+        }
+    }
+
     LaunchedEffect(packageName) {
         // Load app name
         try {
@@ -458,26 +479,7 @@ fun LockOverlayScreen(
                                             KeypadButton(
                                                 text = digit.toString(),
                                                 isTvMode = isTvMode,
-                                                onClick = {
-                                                    if (inputPin.length < masterPin.length) {
-                                                        inputPin += digit
-                                                        errorMessage = null
-                                                        if (inputPin.length >= masterPin.length) {
-                                                            if (inputPin == masterPin) {
-                                                                handleSuccessUnlock()
-                                                            } else if (inputPin == duressPin) {
-                                                                scope.launch {
-                                                                    repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
-                                                                    repository.emptyTrashVault()
-                                                                }
-                                                                onCancelled()
-                                                            } else {
-                                                                inputPin = ""
-                                                                recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                                onClick = { handleDigitPressed(digit) }
                                             )
                                         }
                                     }
@@ -494,21 +496,7 @@ fun LockOverlayScreen(
                                     KeypadButton(
                                         text = keyboardDigits[9].toString(),
                                         isTvMode = isTvMode,
-                                        onClick = {
-                                            val digit = keyboardDigits[9]
-                                            if (inputPin.length < masterPin.length) {
-                                                inputPin += digit
-                                                errorMessage = null
-                                                if (inputPin.length >= masterPin.length) {
-                                                    if (inputPin == masterPin) {
-                                                        handleSuccessUnlock()
-                                                    } else {
-                                                        inputPin = ""
-                                                        recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        onClick = { handleDigitPressed(keyboardDigits[9]) }
                                     )
                                     KeypadButton(
                                         text = stringResource(R.string.lock_keypad_backspace),
@@ -685,7 +673,7 @@ private fun KeypadButton(
 }
 
 @Composable
-private fun PatternGridDrawer(
+fun PatternGridDrawer(
     selectedNodes: List<Int>,
     hidePath: Boolean,
     onNodeSelected: (Int) -> Unit,

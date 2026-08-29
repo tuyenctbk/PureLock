@@ -1,6 +1,7 @@
 package com.example.ui
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -624,16 +626,105 @@ private fun AppShieldItemCard(
                     }
                 }
 
-                // Lock Switch Toggle
-                Switch(
-                    checked = app.isLocked,
-                    onCheckedChange = { onToggle() },
-                    thumbContent = if (app.isLocked) {
-                        { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) }
-                    } else {
-                        { Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(12.dp)) }
-                    },
-                    modifier = Modifier.testTag("switch_lock_${app.packageName}")
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AnimatedLockToggleIcon(
+                        isLocked = app.isLocked,
+                        onToggle = onToggle
+                    )
+
+                    // Lock Switch Toggle
+                    Switch(
+                        checked = app.isLocked,
+                        onCheckedChange = { onToggle() },
+                        thumbContent = if (app.isLocked) {
+                            { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) }
+                        } else {
+                            { Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(12.dp)) }
+                        },
+                        modifier = Modifier.testTag("switch_lock_${app.packageName}")
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AnimatedLockToggleIcon(
+    isLocked: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val transition = updateTransition(targetState = isLocked, label = "LockToggleTransition")
+
+    val scale by transition.animateFloat(
+        transitionSpec = { spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium) },
+        label = "Scale"
+    ) { locked -> if (locked) 1.15f else 0.92f }
+
+    val rotation by transition.animateFloat(
+        transitionSpec = { tween(durationMillis = 350, easing = FastOutSlowInEasing) },
+        label = "Rotation"
+    ) { locked -> if (locked) 0f else -18f }
+
+    val containerColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 300) },
+        label = "ContainerColor"
+    ) { locked ->
+        if (locked) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    }
+
+    val iconColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 300) },
+        label = "IconColor"
+    ) { locked ->
+        if (locked) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+    }
+
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(containerColor)
+            .border(
+                width = if (isLocked) 1.5.dp else 1.dp,
+                color = if (isLocked) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                shape = CircleShape
+            )
+            .clickable { onToggle() }
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                rotationZ = rotation
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        AnimatedContent(
+            targetState = isLocked,
+            transitionSpec = {
+                (fadeIn(animationSpec = tween(220)) + scaleIn(initialScale = 0.6f)) togetherWith
+                        (fadeOut(animationSpec = tween(180)) + scaleOut(targetScale = 0.6f))
+            },
+            label = "LockIconContent"
+        ) { locked ->
+            if (locked) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Locked",
+                    tint = iconColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.LockOpen,
+                    contentDescription = "Unlocked",
+                    tint = iconColor,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

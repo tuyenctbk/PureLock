@@ -205,7 +205,7 @@ fun InvisibleSuiteScreen(
                         OutlinedTextField(
                             value = fallbackPinInput,
                             onValueChange = {
-                                if (it.all { char -> char.isDigit() } && it.length <= 6) {
+                                if (it.all { char -> char.isDigit() } && it.length <= 8) {
                                     fallbackPinInput = it
                                 }
                             },
