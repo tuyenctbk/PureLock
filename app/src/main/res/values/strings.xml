@@ -397,7 +397,7 @@
     <string name="suite_language_title">Application Language</string>
     <string name="suite_language_desc">Choose user interface language</string>
     <string name="suite_about_title">About PureLock</string>
-    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.0</string>
+    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.1</string>
     <string name="suite_hardware_keystore">Android Keystore Backed (AES-GCM-256)</string>
 
     <!-- Intruder Vault Additional Strings -->

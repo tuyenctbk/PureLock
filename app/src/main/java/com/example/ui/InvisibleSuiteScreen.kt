@@ -414,7 +414,7 @@ fun InvisibleSuiteScreen(
                     )
 
                     Text(
-                        text = "Version 1.7 • Hardware Keystore & SQLCipher AES-256",
+                        text = "Version 2.1 • Hardware Keystore & SQLCipher AES-256",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold

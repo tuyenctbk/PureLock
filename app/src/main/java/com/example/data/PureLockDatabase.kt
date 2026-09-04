@@ -16,7 +16,7 @@ import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
 import com.example.data.model.UserSettingEntity
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 @Database(
     entities = [
@@ -56,10 +56,16 @@ abstract class PureLockDatabase : RoomDatabase() {
             return randomBytes
         }
 
+        init {
+            try {
+                System.loadLibrary("sqlcipher")
+            } catch (_: Throwable) {}
+        }
+
         fun getDatabase(context: Context): PureLockDatabase {
             return INSTANCE ?: synchronized(this) {
                 val passphrase = getOrCreatePassphrase(context.applicationContext)
-                val factory = SupportFactory(passphrase)
+                val factory = SupportOpenHelperFactory(passphrase)
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     PureLockDatabase::class.java,
