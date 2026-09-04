@@ -12,11 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.R
 
 @Composable
 fun SmartShareDialog(
@@ -52,7 +54,7 @@ fun SmartShareDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Spread Zero-Knowledge Privacy",
+                    text = stringResource(R.string.smart_share_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -62,7 +64,7 @@ fun SmartShareDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Enjoying PureLock? Share maximum privacy protection with your friends and family!",
+                    text = stringResource(R.string.smart_share_desc),
                     fontSize = 14.sp,
                     color = Color(0xFF94A3B8),
                     textAlign = TextAlign.Center
@@ -79,7 +81,7 @@ fun SmartShareDialog(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF94A3B8))
                     ) {
-                        Text("Later")
+                        Text(stringResource(R.string.smart_share_later))
                     }
 
                     Button(
@@ -94,7 +96,7 @@ fun SmartShareDialog(
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Share", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.smart_share_btn), color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -136,7 +138,7 @@ fun SmartRateDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Enjoying PureLock?",
+                    text = stringResource(R.string.smart_rate_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -146,7 +148,7 @@ fun SmartRateDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Your 5-star review helps us keep PureLock 100% free and zero-cloud private for everyone!",
+                    text = stringResource(R.string.smart_rate_desc),
                     fontSize = 14.sp,
                     color = Color(0xFF94A3B8),
                     textAlign = TextAlign.Center
@@ -179,7 +181,7 @@ fun SmartRateDialog(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF94A3B8))
                     ) {
-                        Text("Not Now")
+                        Text(stringResource(R.string.smart_rate_not_now))
                     }
 
                     Button(
@@ -194,7 +196,7 @@ fun SmartRateDialog(
                             tint = Color.Black
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Rate Us", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.smart_rate_btn), color = Color.Black, fontWeight = FontWeight.Bold)
                     }
                 }
             }

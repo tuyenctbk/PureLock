@@ -20,10 +20,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,13 +96,13 @@ fun InvisibleSuiteScreen(
                     )
                     Column {
                         Text(
-                            text = "Security Settings",
+                            text = stringResource(R.string.nav_settings),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Stealth, Decoys & Authentication",
+                            text = stringResource(R.string.suite_header_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -109,9 +111,9 @@ fun InvisibleSuiteScreen(
             }
 
             // Section 1: Authentication Type & Credentials
-            SettingsSectionCard(title = "Credentials & Lock Type") {
+            SettingsSectionCard(title = stringResource(R.string.suite_section_credentials)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Lock Method", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.suite_lock_method), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -215,10 +217,10 @@ fun InvisibleSuiteScreen(
             }
 
             // Section 2: Camouflage & Stealth Decoys
-            SettingsSectionCard(title = "Camouflage & Stealth Decoys") {
+            SettingsSectionCard(title = stringResource(R.string.suite_section_stealth)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Lock Screen Decoy", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Deceives snoopers by displaying a fake screen before the lock prompt.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                    Text(stringResource(R.string.suite_decoy_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.suite_decoy_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -230,7 +232,7 @@ fun InvisibleSuiteScreen(
                                 viewModel.setDecoyType("NONE")
                                 viewModel.setStealthDecoy(false)
                             },
-                            label = { Text("None", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.suite_decoy_none), fontSize = 11.sp) },
                             modifier = Modifier.weight(1f).testTag("chip_decoy_none")
                         )
                         FilterChip(
@@ -239,7 +241,7 @@ fun InvisibleSuiteScreen(
                                 viewModel.setDecoyType("CALCULATOR")
                                 viewModel.setStealthDecoy(true)
                             },
-                            label = { Text("Calculator", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.suite_decoy_calculator), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Calculate, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_decoy_calculator")
                         )
@@ -249,7 +251,7 @@ fun InvisibleSuiteScreen(
                                 viewModel.setDecoyType("FAKE_CRASH")
                                 viewModel.setStealthDecoy(false)
                             },
-                            label = { Text("Fake Crash", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.suite_decoy_fake_crash), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_decoy_fake_crash")
                         )
@@ -261,7 +263,7 @@ fun InvisibleSuiteScreen(
                 // Duress PIN
                 SettingsActionRow(
                     icon = Icons.Default.GppBad,
-                    title = "Duress PIN",
+                    title = stringResource(R.string.suite_duress_title),
                     subtitle = if (duressPin.isNotBlank()) "Configured (••••)" else "Not configured",
                     onClick = {
                         newDuressPinInput = duressPin
@@ -277,7 +279,7 @@ fun InvisibleSuiteScreen(
                 // Intruder Capture
                 SettingsSwitchRow(
                     icon = Icons.Default.CameraAlt,
-                    title = "Intruder Selfie",
+                    title = stringResource(R.string.suite_intruder_selfie_title),
                     checked = intruderCapture,
                     onCheckedChange = { viewModel.setIntruderCapture(it) },
                     onInfoClick = {
@@ -289,9 +291,9 @@ fun InvisibleSuiteScreen(
             }
 
             // Section 3: Visual Theme & Security Palette
-            SettingsSectionCard(title = "Visual Theme & Security Palette") {
+            SettingsSectionCard(title = stringResource(R.string.suite_section_theme)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Color Palette", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.suite_palette_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
 
                     val themes = listOf(
                         "CYBER_MIDNIGHT" to "Midnight",
@@ -333,11 +335,11 @@ fun InvisibleSuiteScreen(
             }
 
             // Section 4: Relock & Emergency Triggers
-            SettingsSectionCard(title = "Triggers & Timeout") {
+            SettingsSectionCard(title = stringResource(R.string.suite_section_triggers)) {
                 // Shake to Lock
                 SettingsSwitchRow(
                     icon = Icons.Default.Vibration,
-                    title = "Shake to Lock",
+                    title = stringResource(R.string.suite_shake_title),
                     checked = shakeToLockEnabled,
                     onCheckedChange = { viewModel.setShakeToLock(it) },
                     onInfoClick = {
@@ -356,7 +358,7 @@ fun InvisibleSuiteScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("Auto-Lock Timeout", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.suite_autolock_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                         Text(
                             text = if (inactivityTimeoutSec <= 0) "Immediate (Always)" else "${inactivityTimeoutSec}s Inactivity",
                             style = MaterialTheme.typography.bodySmall,
@@ -444,7 +446,7 @@ fun InvisibleSuiteScreen(
                     infoDialogTitle = null
                     infoDialogMessage = null
                 }) {
-                    Text("Got It")
+                    Text(stringResource(R.string.ok))
                 }
             }
         )
@@ -480,7 +482,7 @@ fun InvisibleSuiteScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showChangePinDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showChangePinDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -515,7 +517,7 @@ fun InvisibleSuiteScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showChangePatternDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showChangePatternDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -618,7 +620,7 @@ fun InvisibleSuiteScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showChangeKnockDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showChangeKnockDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -647,11 +649,11 @@ fun InvisibleSuiteScreen(
                         Toast.makeText(context, "Duress PIN configured", Toast.LENGTH_SHORT).show()
                     }
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDuressPinDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDuressPinDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

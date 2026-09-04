@@ -322,4 +322,43 @@
     <string name="onboarding_draw_pattern_hint">Dibuje el patrón maestro abajo</string>
     <string name="onboarding_selected_nodes_format">Nodos seleccionados: %1$s</string>
     <string name="onboarding_reset_pattern">Reiniciar Patrón</string>
+
+    <!-- Smart Prompts & Suite Localization -->
+    <string name="smart_share_title">Comparte Privacidad Sin Nube</string>
+    <string name="smart_share_desc">¿Te gusta PureLock? ¡Comparte la máxima protección de privacidad con tus amigos y familiares!</string>
+    <string name="smart_share_later">Más tarde</string>
+    <string name="smart_share_btn">Compartir</string>
+    <string name="smart_rate_title">¿Te gusta PureLock?</string>
+    <string name="smart_rate_desc">¡Tu calificación de 5 estrellas nos ayuda a mantener PureLock 100% gratuito y sin nube para todos!</string>
+    <string name="smart_rate_not_now">Ahora no</string>
+    <string name="smart_rate_btn">Calificarnos</string>
+
+    <string name="suite_header_subtitle">Sigilo, Señuelos y Autenticación</string>
+    <string name="suite_section_credentials">Credenciales y Tipo de Bloqueo</string>
+    <string name="suite_lock_method">Método de Bloqueo</string>
+    <string name="suite_section_stealth">Camuflaje y Señuelos de Sigilo</string>
+    <string name="suite_decoy_label">Señuelo de Pantalla de Bloqueo</string>
+    <string name="suite_decoy_desc">Engaña a curiosos mostrando una pantalla falsa antes del bloqueo.</string>
+    <string name="suite_decoy_none">Ninguno</string>
+    <string name="suite_decoy_calculator">Calculadora</string>
+    <string name="suite_decoy_fake_crash">Falso Cierre</string>
+    <string name="suite_duress_title">PIN de Coacción</string>
+    <string name="suite_intruder_selfie_title">Selfie de Intruso</string>
+    <string name="suite_section_theme">Tema Visual y Paleta de Seguridad</string>
+    <string name="suite_palette_label">Paleta de Colores</string>
+    <string name="suite_section_triggers">Disparadores y Tiempo de Espera</string>
+    <string name="suite_shake_title">Agitar para Bloquear</string>
+    <string name="suite_autolock_label">Tiempo de Bloqueo Automático</string>
+    <string name="suite_export_backup_title">Exportar Registros de Auditoría</string>
+
+    <string name="lock_calc_exit">Salir</string>
+    <string name="lock_fake_crash_system_alert">Alerta del sistema</string>
+    <string name="lock_fake_crash_stopped">Desafortunadamente, %1$s se ha detenido.</string>
+    <string name="lock_fake_crash_exception_detail">La aplicación encontró una excepción no controlada y fue terminada por el sistema.</string>
+    <string name="lock_fake_crash_log_sent">Informe de error enviado al desarrollador.</string>
+    <string name="lock_fake_crash_send_feedback">Enviar comentarios</string>
+    <string name="lock_fake_crash_close_app">Cerrar aplicación</string>
+    <string name="lock_knock_incorrect">Patrón de toques incorrecto. Inténtalo de nuevo.</string>
+    <string name="lock_knock_stealth_rhythm">Toca el ritmo en los 4 cuadrantes (%1$d toques)</string>
+    <string name="lock_knock_clear">Borrar Toques</string>
 </resources>

@@ -327,4 +327,190 @@
     <string name="onboarding_draw_pattern_hint">Draw Master Pattern Below</string>
     <string name="onboarding_selected_nodes_format">Selected Nodes: %1$s</string>
     <string name="onboarding_reset_pattern">Reset Pattern</string>
+
+    <!-- Smart Prompts Dialogs -->
+    <string name="smart_share_title">Spread Zero-Knowledge Privacy</string>
+    <string name="smart_share_desc">Enjoying PureLock? Share maximum privacy protection with your friends and family!</string>
+    <string name="smart_share_later">Later</string>
+    <string name="smart_share_btn">Share</string>
+    <string name="smart_rate_title">Enjoying PureLock?</string>
+    <string name="smart_rate_desc">Your 5-star review helps us keep PureLock 100% free and zero-cloud private for everyone!</string>
+    <string name="smart_rate_not_now">Not Now</string>
+    <string name="smart_rate_btn">Rate Us</string>
+
+    <!-- App Shield Additional Strings -->
+    <string name="shield_search_apps_placeholder">Search installed apps…</string>
+    <string name="shield_no_apps_found">No apps installed or found</string>
+    <string name="shield_system_apps_toggle">System Apps</string>
+    <string name="shield_clear_all_locks">Clear All Locks</string>
+    <string name="shield_lock_all_apps">Lock All Apps</string>
+    <string name="shield_active_locks_count">%1$d active locks</string>
+    <string name="shield_unlocked_state">Unlocked</string>
+    <string name="shield_locked_state">Locked</string>
+    <string name="shield_custom_schedule_title">Custom Lock Schedules</string>
+    <string name="shield_schedule_desc">Enforce app lock rules only during specific time intervals</string>
+    <string name="shield_add_schedule">Add Schedule Rule</string>
+    <string name="shield_rule_name">Rule Name</string>
+    <string name="shield_start_time">Start Time</string>
+    <string name="shield_end_time">End Time</string>
+    <string name="shield_rule_days">Active Days</string>
+    <string name="shield_delete_schedule">Delete Schedule</string>
+    <string name="shield_all_apps_locked_toast">All %1$d apps locked</string>
+    <string name="shield_all_apps_unlocked_toast">All apps unlocked</string>
+
+    <!-- Invisible Suite Additional Strings -->
+    <string name="suite_stealth_title">Camouflage &amp; Stealth Decoys</string>
+    <string name="suite_stealth_subtitle">Disguise PureLock icon and decoy fake crash or calculator overlays</string>
+    <string name="suite_decoy_calc_title">Calculator Decoy Lock</string>
+    <string name="suite_decoy_calc_desc">Disguises lock screen as a working scientific calculator. Type Master PIN then \'=\' to unlock.</string>
+    <string name="suite_decoy_crash_title">Fake Crash Dialog Decoy</string>
+    <string name="suite_decoy_crash_desc">Shows \'App has stopped\' fake system crash dialog. Long-press \'Close app\' to reveal real lock.</string>
+    <string name="suite_invisible_pattern_title">Invisible Pattern Trail</string>
+    <string name="suite_invisible_pattern_desc">Hides line drawing animations on pattern unlock to prevent shoulder surfing.</string>
+    <string name="suite_random_keypad_title">Randomized Keypad Scramble</string>
+    <string name="suite_random_keypad_desc">Shuffles 0-9 digits on lock screen every time to prevent fingerprint smudge deduction.</string>
+    <string name="suite_intruder_selfie_title">Intruder Selfie Snapshot</string>
+    <string name="suite_intruder_selfie_desc">Silently captures front camera photo after failed unlock attempts.</string>
+    <string name="suite_intruder_threshold_title">Failed Attempts Before Snapshot</string>
+    <string name="suite_intruder_threshold_format">%1$d failed attempts</string>
+    <string name="suite_panic_switch_title">Panic Duress PIN</string>
+    <string name="suite_panic_switch_desc">Entering this PIN on the lock screen immediately triggers stealth fake data decoy mode.</string>
+    <string name="suite_panic_pin_label">Panic PIN</string>
+    <string name="suite_panic_pin_dialog_title">Configure Panic Duress PIN</string>
+    <string name="suite_panic_pin_dialog_desc">If coerced, enter this emergency PIN to show an empty fake vault instead of your real encrypted data.</string>
+    <string name="suite_re_lock_policy_title">Re-lock Delay Policy</string>
+    <string name="suite_re_lock_immediate">Immediately upon exit</string>
+    <string name="suite_re_lock_1min">1 minute after exit</string>
+    <string name="suite_re_lock_3min">3 minutes after exit</string>
+    <string name="suite_re_lock_screen_off">When screen turns off</string>
+    <string name="suite_trash_retention_title">Trash Bin Retention</string>
+    <string name="suite_trash_retention_format">%1$d days retention</string>
+    <string name="suite_clipboard_autoclear_title">Clipboard Auto-Wipe Timeout</string>
+    <string name="suite_clipboard_autoclear_format">%1$d seconds</string>
+    <string name="suite_security_logs_title">Hardware Security Logs</string>
+    <string name="suite_security_logs_desc">View local security events, unlock logs, and sensor alerts</string>
+    <string name="suite_clear_logs">Clear Logs</string>
+    <string name="suite_export_backup_title">AES-256 Encrypted Backup</string>
+    <string name="suite_export_backup_desc">Export all encrypted notes and locked app configurations to a password-protected JSON backup.</string>
+    <string name="suite_import_backup_title">Restore Encrypted Backup</string>
+    <string name="suite_import_backup_desc">Restore notes and configurations from an AES-256 backup file.</string>
+    <string name="suite_language_title">Application Language</string>
+    <string name="suite_language_desc">Choose user interface language</string>
+    <string name="suite_about_title">About PureLock</string>
+    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.0</string>
+    <string name="suite_hardware_keystore">Android Keystore Backed (AES-GCM-256)</string>
+
+    <!-- Intruder Vault Additional Strings -->
+    <string name="intruder_title">Intruder Snapshot Vault</string>
+    <string name="intruder_subtitle">Hardware-isolated frontal photos of unauthorized unlock attempts</string>
+    <string name="intruder_delete_all">Delete All</string>
+    <string name="intruder_delete_all_dialog_title">Delete All Intruder Photos?</string>
+    <string name="intruder_delete_all_dialog_message">Are you sure you want to permanently erase all %1$d intruder snapshots?</string>
+    <string name="intruder_delete_single_dialog_title">Delete Snapshot?</string>
+    <string name="intruder_delete_single_dialog_message">Are you sure you want to delete this intruder snapshot?</string>
+    <string name="intruder_attempt_at">Attempt: %1$s</string>
+    <string name="intruder_attempt_app">Target: %1$s</string>
+    <string name="intruder_attempt_reason">Trigger: %1$s</string>
+    <string name="intruder_failed_pin">Wrong PIN entered</string>
+    <string name="intruder_failed_pattern">Wrong Pattern drawn</string>
+    <string name="intruder_failed_biometric">Biometric mismatch</string>
+    <string name="intruder_all_deleted_toast">All intruder snapshots deleted</string>
+    <string name="intruder_deleted_toast">Snapshot deleted</string>
+
+    <!-- Privacy Shield & Audit Strings -->
+    <string name="privacy_audit_title">Privacy Shield &amp; Permission Audit</string>
+    <string name="privacy_audit_subtitle">Inspect risky permissions across installed apps with zero cloud tracking</string>
+    <string name="privacy_score_title">Device Privacy Score</string>
+    <string name="privacy_score_excellent">Excellent Protection</string>
+    <string name="privacy_score_good">Good Protection</string>
+    <string name="privacy_score_warning">Attention Needed</string>
+    <string name="privacy_risk_high">High Risk</string>
+    <string name="privacy_risk_medium">Medium Risk</string>
+    <string name="privacy_risk_low">Safe</string>
+    <string name="privacy_perm_camera">Camera Access</string>
+    <string name="privacy_perm_location">Precise Location</string>
+    <string name="privacy_perm_microphone">Microphone / Audio</string>
+    <string name="privacy_perm_contacts">Contacts List</string>
+    <string name="privacy_perm_sms">SMS / Messages</string>
+    <string name="privacy_perm_storage">Storage Access</string>
+    <string name="privacy_apps_inspected">%1$d Apps Audited</string>
+    <string name="privacy_no_risky_apps">No high risk permission vulnerabilities detected.</string>
+    <string name="privacy_recommendation_title">Privacy Recommendations</string>
+    <string name="privacy_recommendation_lock_sensitive">Consider locking apps that have access to Camera or Location.</string>
+
+    <!-- Security Analytics Dashboard Strings -->
+    <string name="analytics_title">Security Analytics</string>
+    <string name="analytics_subtitle">Local device telemetry &amp; security posture</string>
+    <string name="analytics_total_events">Total Events</string>
+    <string name="analytics_failed_unlocks">Failed Unlocks</string>
+    <string name="analytics_successful_unlocks">Successful Unlocks</string>
+    <string name="analytics_vault_access">Vault Accesses</string>
+    <string name="analytics_threat_level">Threat Level: %1$s</string>
+    <string name="analytics_threat_low">Low (Safe)</string>
+    <string name="analytics_threat_medium">Moderate</string>
+    <string name="analytics_threat_high">Elevated</string>
+    <string name="analytics_recent_events">Recent Security Audit Logs</string>
+    <string name="analytics_clear_all_logs">Clear Security Logs</string>
+    <string name="analytics_logs_cleared_toast">Security logs cleared</string>
+    <string name="analytics_no_logs">No security logs recorded yet</string>
+
+    <!-- Vault Insights Dashboard Strings -->
+    <string name="insights_total_notes">Total Notes</string>
+    <string name="insights_encrypted_at_rest">Encrypted at Rest</string>
+    <string name="insights_health_index">Health Index</string>
+    <string name="insights_avg_strength_entropy">Average Password Strength &amp; Entropy</string>
+    <string name="insights_avg_entropy_format">Average entropy is %1$.1f bits per secret. %2$s</string>
+    <string name="insights_high_resistance">Your credentials have high cryptographic resistance to brute-force attacks.</string>
+    <string name="insights_mix_special">Consider using longer passwords with mixed special characters.</string>
+    <string name="insights_entropy_empty">Add your encrypted notes and credentials to see real-time security entropy metrics.</string>
+    <string name="insights_no_category_data">No category data available yet.</string>
+    <string name="insights_zero_cloud_title">Zero-Cloud Hardware Protection</string>
+    <string name="insights_zero_cloud_desc">All vault insights are computed on-device with zero network telemetry or tracking.</string>
+    <string name="insights_bits_avg">bits avg</string>
+    <string name="insights_strength_very_strong">Very Strong</string>
+    <string name="insights_strength_strong">Strong</string>
+    <string name="insights_strength_fair">Fair</string>
+    <string name="insights_strength_weak">Weak</string>
+    <string name="insights_tier_strong">Strong (75+ bits)</string>
+    <string name="insights_tier_good">Good (55-74 bits)</string>
+    <string name="insights_tier_fair">Fair (35-54 bits)</string>
+    <string name="insights_tier_weak">Weak (&lt;35 bits)</string>
+    <string name="insights_period_24h">Past 24h</string>
+    <string name="insights_period_7d">Past 7d</string>
+    <string name="insights_period_30d">Past 30d</string>
+    <string name="insights_period_older">Older (&gt;30d)</string>
+
+    <!-- Lock Overlay & Decoy View Strings -->
+    <string name="lock_calc_exit">Exit</string>
+    <string name="lock_fake_crash_system_alert">System alert</string>
+    <string name="lock_fake_crash_stopped">Unfortunately, %1$s has stopped.</string>
+    <string name="lock_fake_crash_exception_detail">The app encountered an unhandled exception and was terminated by the system.</string>
+    <string name="lock_fake_crash_log_sent">Crash log sent to developer.</string>
+    <string name="lock_fake_crash_send_feedback">Send feedback</string>
+    <string name="lock_fake_crash_close_app">Close app</string>
+    <string name="lock_knock_stealth_rhythm">Tap 4-quadrant stealth rhythm (%1$d knocks)</string>
+    <string name="lock_knock_incorrect">Incorrect Knock pattern. Try again.</string>
+    <string name="lock_knock_clear">Clear Knocks</string>
+    <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="category_all">ALL</string>
+
+    <string name="suite_header_subtitle">Stealth, Decoys &amp; Authentication</string>
+    <string name="suite_section_credentials">Credentials &amp; Lock Type</string>
+    <string name="suite_lock_method">Lock Method</string>
+    <string name="suite_section_stealth">Camouflage &amp; Stealth Decoys</string>
+    <string name="suite_decoy_label">Lock Screen Decoy</string>
+    <string name="suite_decoy_desc">Deceives snoopers by displaying a fake screen before the lock prompt.</string>
+    <string name="suite_decoy_none">None</string>
+    <string name="suite_decoy_calculator">Calculator</string>
+    <string name="suite_decoy_fake_crash">Fake Crash</string>
+    <string name="suite_duress_title">Duress PIN</string>
+    <string name="suite_section_theme">Visual Theme &amp; Security Palette</string>
+    <string name="suite_palette_label">Color Palette</string>
+    <string name="suite_section_triggers">Triggers &amp; Timeout</string>
+    <string name="suite_shake_title">Shake to Lock</string>
+    <string name="suite_autolock_label">Auto-Lock Timeout</string>
+
+    <string name="lock_biometric_unrecognized">Biometrics not recognized. Please retry or enter PIN.</string>
 </resources>

@@ -21,10 +21,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.data.model.SecurityLogEntity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -80,13 +82,13 @@ fun PrivacyShieldScreen(
                     )
                     Column {
                         Text(
-                            text = "Privacy & Audit",
+                            text = stringResource(R.string.nav_audit),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Zero Telemetry",
+                            text = stringResource(R.string.splash_badge_offline),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -107,7 +109,7 @@ fun PrivacyShieldScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Privacy Info",
+                            contentDescription = stringResource(R.string.shield_details_title),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -136,8 +138,8 @@ fun PrivacyShieldScreen(
                     ) {
                         Icon(Icons.Default.Speed, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                         Column {
-                            Text("Accessibility Detection", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                            Text("Fast 10ms foreground app lock overlay", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                            Text(stringResource(R.string.onboarding_perm_acc_title), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.onboarding_perm_acc_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
                         }
                     }
 
@@ -146,7 +148,7 @@ fun PrivacyShieldScreen(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                         modifier = Modifier.height(34.dp).testTag("btn_grant_accessibility")
                     ) {
-                        Text("Configure", fontSize = 12.sp)
+                        Text(stringResource(R.string.onboarding_perm_usage_btn), fontSize = 12.sp)
                     }
                 }
             }
@@ -168,7 +170,7 @@ fun PrivacyShieldScreen(
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
             icon = { Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text("Zero-Knowledge Privacy", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.insights_zero_cloud_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("• PureLock contains ZERO internet permissions ('android.permission.INTERNET' is omitted).", style = MaterialTheme.typography.bodySmall)
@@ -177,7 +179,7 @@ fun PrivacyShieldScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showInfoDialog = false }) { Text("Got It") }
+                TextButton(onClick = { showInfoDialog = false }) { Text(stringResource(R.string.ok)) }
             }
         )
     }
@@ -187,15 +189,15 @@ fun PrivacyShieldScreen(
         AlertDialog(
             onDismissRequest = { showAccessibilityDisclosure = false },
             icon = { Icon(Icons.Default.AccessibilityNew, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text("Accessibility Service Disclosure", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.onboarding_disclosure_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "PureLock uses Android's AccessibilityService API solely to detect when protected apps are launched in the foreground and render the lock screen overlay.",
+                        text = stringResource(R.string.onboarding_disclosure_why_desc),
                         style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        text = "No user keystrokes, personal data, or screen content are recorded or transmitted.",
+                        text = stringResource(R.string.onboarding_disclosure_privacy_desc),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -213,11 +215,11 @@ fun PrivacyShieldScreen(
                         }
                     }
                 ) {
-                    Text("Open Settings")
+                    Text(stringResource(R.string.onboarding_disclosure_agree))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showAccessibilityDisclosure = false }) { Text("Cancel") }
+                TextButton(onClick = { showAccessibilityDisclosure = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -237,7 +239,7 @@ fun PrivacyShieldScreen(
         AlertDialog(
             onDismissRequest = { showExportDialog = false },
             icon = { Icon(Icons.Default.FileDownload, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text("Export Audit Logs", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.suite_export_backup_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Copy CSV formatted audit log history (${securityLogs.size} records):", style = MaterialTheme.typography.bodySmall)
@@ -258,11 +260,11 @@ fun PrivacyShieldScreen(
                         showExportDialog = false
                     }
                 ) {
-                    Text("Copy CSV")
+                    Text(stringResource(R.string.generator_btn_copy))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showExportDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showExportDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

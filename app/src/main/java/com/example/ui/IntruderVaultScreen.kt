@@ -26,10 +26,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.IntruderSelfieEntity
 import java.text.SimpleDateFormat
@@ -463,7 +465,7 @@ fun IntruderVaultScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showVaultInfoDialog = false }) { Text("Got It") }
+                TextButton(onClick = { showVaultInfoDialog = false }) { Text(stringResource(R.string.ok)) }
             }
         )
     }
@@ -514,7 +516,7 @@ fun IntruderVaultScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { selectedSelfie = null }) { Text("Close") }
+                TextButton(onClick = { selectedSelfie = null }) { Text(stringResource(R.string.cancel)) }
             },
             dismissButton = {
                 TextButton(
@@ -544,11 +546,11 @@ fun IntruderVaultScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Clear All")
+                    Text(stringResource(R.string.clear))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showClearAllSelfiesConfirm = false }) { Text("Cancel") }
+                TextButton(onClick = { showClearAllSelfiesConfirm = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -617,7 +619,7 @@ fun IntruderVaultScreen(
                         }
                     }
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
             dismissButton = {
@@ -625,7 +627,7 @@ fun IntruderVaultScreen(
                     showAddVaultDialog = false
                     editingVaultItem = null
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -647,11 +649,11 @@ fun IntruderVaultScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete_confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { itemToDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { itemToDelete = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

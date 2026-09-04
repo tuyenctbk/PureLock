@@ -1197,7 +1197,7 @@ fun CalculatorDisguiseView(
             ) {
                 Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Exit", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.lock_calc_exit), style = MaterialTheme.typography.bodySmall)
             }
         }
     }
@@ -1274,7 +1274,7 @@ fun FakeCrashDecoyView(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "System alert",
+                            text = stringResource(R.string.lock_fake_crash_system_alert),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -1282,14 +1282,14 @@ fun FakeCrashDecoyView(
                 }
 
                 Text(
-                    text = "Unfortunately, $appName has stopped.",
+                    text = stringResource(R.string.lock_fake_crash_stopped, appName),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
-                    text = "The app encountered an unhandled exception and was terminated by the system.",
+                    text = stringResource(R.string.lock_fake_crash_exception_detail),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -1300,7 +1300,7 @@ fun FakeCrashDecoyView(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "Crash log sent to developer.",
+                            text = stringResource(R.string.lock_fake_crash_log_sent),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
@@ -1316,7 +1316,7 @@ fun FakeCrashDecoyView(
                     TextButton(
                         onClick = { showReportToast = true }
                     ) {
-                        Text("Send feedback")
+                        Text(stringResource(R.string.lock_fake_crash_send_feedback))
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -1337,7 +1337,7 @@ fun FakeCrashDecoyView(
                             )
                         }
                     ) {
-                        Text("Close app", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.lock_fake_crash_close_app), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -1353,6 +1353,7 @@ fun KnockCodeDrawer(
 ) {
     val haptic = LocalHapticFeedback.current
     var currentKnocks by remember { mutableStateOf(listOf<Int>()) }
+    val knockFailedMsg = stringResource(R.string.lock_knock_incorrect)
 
     fun handleKnock(quadrant: Int) {
         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -1366,7 +1367,7 @@ fun KnockCodeDrawer(
                 onUnlock()
             } else {
                 currentKnocks = emptyList()
-                onFailed("Incorrect Knock pattern. Try again.")
+                onFailed(knockFailedMsg)
             }
         }
     }
@@ -1376,7 +1377,7 @@ fun KnockCodeDrawer(
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
-            text = "Tap 4-quadrant stealth rhythm (${currentKnocks.size} knocks)",
+            text = stringResource(R.string.lock_knock_stealth_rhythm, currentKnocks.size),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline
         )
@@ -1406,7 +1407,7 @@ fun KnockCodeDrawer(
             onClick = { currentKnocks = emptyList() },
             modifier = Modifier.testTag("btn_clear_knocks")
         ) {
-            Text("Clear Knocks")
+            Text(stringResource(R.string.lock_knock_clear))
         }
     }
 }

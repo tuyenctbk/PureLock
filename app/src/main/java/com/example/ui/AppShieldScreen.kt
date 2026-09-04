@@ -25,10 +25,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.data.model.LockedAppEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +95,7 @@ fun AppShieldScreen(
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Text(
-                                text = "App Shield",
+                                text = stringResource(R.string.nav_shield),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -103,7 +105,7 @@ fun AppShieldScreen(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
-                                    text = "$activeCount/${allApps.size} Locked",
+                                    text = stringResource(R.string.shield_locked_count, activeCount, allApps.size),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -132,7 +134,7 @@ fun AppShieldScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Lock,
-                            contentDescription = "Lock All",
+                            contentDescription = stringResource(R.string.shield_lock_all),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(18.dp)
                         )
@@ -152,7 +154,7 @@ fun AppShieldScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.LockOpen,
-                            contentDescription = "Unlock All",
+                            contentDescription = stringResource(R.string.shield_unlock_all),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -169,7 +171,7 @@ fun AppShieldScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Protection Details",
+                            contentDescription = stringResource(R.string.shield_details_title),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -184,12 +186,12 @@ fun AppShieldScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("input_app_search"),
-                placeholder = { Text("Search apps...", style = MaterialTheme.typography.bodyMedium) },
+                placeholder = { Text(stringResource(R.string.shield_search_apps_placeholder), style = MaterialTheme.typography.bodyMedium) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear search", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear), tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
                         }
                     }
                 },
@@ -215,7 +217,7 @@ fun AppShieldScreen(
                         onClick = { selectedCategory = category },
                         label = {
                             Text(
-                                text = if (category == "ALL") "All" else category.lowercase().replaceFirstChar { it.uppercase() },
+                                text = if (category == "ALL") stringResource(R.string.category_all) else category.lowercase().replaceFirstChar { it.uppercase() },
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -270,7 +272,7 @@ fun AppShieldScreen(
                             modifier = Modifier.size(40.dp)
                         )
                         Text(
-                            text = "No apps found",
+                            text = stringResource(R.string.shield_no_apps_found),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -311,7 +313,7 @@ fun AppShieldScreen(
             },
             title = {
                 Text(
-                    text = "App Shield Protection",
+                    text = stringResource(R.string.shield_details_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -352,7 +354,7 @@ fun AppShieldScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showInfoDialog = false }) {
-                    Text("Got It")
+                    Text(stringResource(R.string.ok))
                 }
             }
         )
@@ -512,7 +514,7 @@ fun AnimatedLockToggleIcon(
         ) { locked ->
             Icon(
                 imageVector = if (locked) Icons.Default.Lock else Icons.Default.LockOpen,
-                contentDescription = if (locked) "Locked" else "Unlocked",
+                contentDescription = if (locked) stringResource(R.string.shield_locked_state) else stringResource(R.string.shield_unlocked_state),
                 tint = iconColor,
                 modifier = Modifier.size(16.dp)
             )
