@@ -24,6 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -32,7 +35,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ui.*
 import com.example.ui.theme.PureLockTheme
-import kotlinx.coroutines.delay
 
 class MainActivity : FragmentActivity() {
 
@@ -40,11 +42,6 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Privacy Overlay: Prevents screenshotting and automatically blurs/obscures app contents in Recent Apps overview
-        window.setFlags(
-            android.view.WindowManager.LayoutParams.FLAG_SECURE,
-            android.view.WindowManager.LayoutParams.FLAG_SECURE
-        )
         enableEdgeToEdge()
 
         // Perform periodic background checks
@@ -57,59 +54,21 @@ class MainActivity : FragmentActivity() {
             val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
             val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState()
 
-            val activeLockedAppsCount by viewModel.activeLockedAppsCount.collectAsState()
-            val totalVaultUnlocks by viewModel.totalVaultUnlocks.collectAsState()
-            val hasSharedApp by viewModel.hasSharedApp.collectAsState()
-            val sharePromptCount by viewModel.sharePromptCount.collectAsState()
-            val lastSharePromptTimestamp by viewModel.lastSharePromptTimestamp.collectAsState()
-
-            val hasRatedApp by viewModel.hasRatedApp.collectAsState()
-            val ratePromptCount by viewModel.ratePromptCount.collectAsState()
-            val lastRatePromptTimestamp by viewModel.lastRatePromptTimestamp.collectAsState()
-            val allApps by viewModel.allApps.collectAsState()
-
-            var showShareDialog by remember { mutableStateOf(false) }
-            var showRateDialog by remember { mutableStateOf(false) }
-
             PureLockTheme(themeMode = themeMode) {
+                var hasSplashFinished by remember { mutableStateOf(false) }
                 var appAuthenticated by remember { mutableStateOf(false) }
                 var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
-                val protectionScore = remember(allApps, activeLockedAppsCount) {
-                    if (allApps.isNotEmpty()) (activeLockedAppsCount * 100) / allApps.size else 100
-                }
-
-                LaunchedEffect(appAuthenticated, activeLockedAppsCount, totalVaultUnlocks, protectionScore) {
-                    if (appAuthenticated && isOnboardingCompleted == true) {
-                        if (com.example.util.SmartPromptsManager.shouldShowSharePrompt(
-                                lockedAppsCount = activeLockedAppsCount,
-                                totalVaultUnlocks = totalVaultUnlocks,
-                                hasShared = hasSharedApp,
-                                promptCount = sharePromptCount,
-                                lastTimestamp = lastSharePromptTimestamp
-                            )
-                        ) {
-                            delay(1200)
-                            showShareDialog = true
-                        } else if (com.example.util.SmartPromptsManager.shouldShowRatePrompt(
-                                protectionScore = protectionScore,
-                                lockedAppsCount = activeLockedAppsCount,
-                                hasRated = hasRatedApp,
-                                promptCount = ratePromptCount,
-                                lastTimestamp = lastRatePromptTimestamp
-                            )
-                        ) {
-                            delay(1200)
-                            showRateDialog = true
-                        }
-                    }
-                }
-
                 val shortcutAction = remember { intent?.getStringExtra("shortcut_action") }
                 val startRoute = remember(shortcutAction) {
-                    if (shortcutAction == "VIEW_VAULT" || shortcutAction == "GENERATE_PASSWORD") "vault" else "shield"
+                    when (shortcutAction) {
+                        "VIEW_SHIELD" -> "shield"
+                        "VIEW_INTRUDER" -> "intruder"
+                        "VIEW_AUDIT" -> "audit"
+                        else -> "vault"
+                    }
                 }
 
                 // Shake to Lock Accelerometer Sensor Listener
@@ -151,7 +110,9 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                // Screen-Off Receiver & Lifecycle Navigation Away Listener
+                // Auto-Lock on App Background Movement & Screen-Off
+                var appBackgroundTimestamp by remember { mutableLongStateOf(0L) }
+
                 DisposableEffect(lifecycleOwner) {
                     val screenOffReceiver = object : android.content.BroadcastReceiver() {
                         override fun onReceive(c: android.content.Context?, intent: android.content.Intent?) {
@@ -165,8 +126,24 @@ class MainActivity : FragmentActivity() {
                     context.registerReceiver(screenOffReceiver, filter)
 
                     val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-                        if (event == androidx.lifecycle.Lifecycle.Event.ON_STOP) {
-                            viewModel.clearSensitiveState()
+                        when (event) {
+                            androidx.lifecycle.Lifecycle.Event.ON_STOP -> {
+                                appBackgroundTimestamp = System.currentTimeMillis()
+                                viewModel.clearSensitiveState()
+                            }
+                            androidx.lifecycle.Lifecycle.Event.ON_START -> {
+                                if (appBackgroundTimestamp > 0L) {
+                                    // Auto-lock whenever app returns from background
+                                    appAuthenticated = false
+                                    viewModel.clearSensitiveState()
+                                    viewModel.logSecurityEvent(
+                                        "BACKGROUND_AUTO_LOCK",
+                                        "PureLock secured on background return. Biometric authentication required."
+                                    )
+                                    appBackgroundTimestamp = 0L
+                                }
+                            }
+                            else -> {}
                         }
                     }
                     lifecycleOwner.lifecycle.addObserver(observer)
@@ -198,15 +175,10 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                if (isOnboardingCompleted == null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    }
+                if (isOnboardingCompleted == null || !hasSplashFinished) {
+                    SecuritySplashScreen(
+                        onSplashFinished = { hasSplashFinished = true }
+                    )
                 } else {
                     AnimatedContent(
                         targetState = Pair(isOnboardingCompleted == true, appAuthenticated),
@@ -233,188 +205,186 @@ class MainActivity : FragmentActivity() {
                                 onCancelled = { finish() }
                             )
                         } else {
-                        val navController = rememberNavController()
-                        val navBackStackEntry by navController.currentBackStackEntryAsState()
-                        val currentRoute = navBackStackEntry?.destination?.route ?: "shield"
+                            val navController = rememberNavController()
+                            val navBackStackEntry by navController.currentBackStackEntryAsState()
+                            val currentRoute = navBackStackEntry?.destination?.route ?: "vault"
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onPress = {
-                                            lastInteractionTime = System.currentTimeMillis()
-                                            viewModel.onUserActivity { appAuthenticated = false }
-                                        }
-                                    )
-                                }
-                        ) {
-                        Scaffold(
-                            modifier = Modifier.fillMaxSize(),
-                            bottomBar = {
-                                NavigationBar(
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                    contentColor = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier
-                                        .windowInsetsPadding(WindowInsets.navigationBars)
-                                        .testTag("main_navigation_bar")
-                                ) {
-                                    val navColors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = androidx.compose.ui.graphics.Color.White,
-                                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                                        indicatorColor = MaterialTheme.colorScheme.primary,
-                                        unselectedIconColor = androidx.compose.ui.graphics.Color(0xFF64748B),
-                                        unselectedTextColor = androidx.compose.ui.graphics.Color(0xFF64748B)
-                                    )
-
-                                    NavigationBarItem(
-                                        selected = currentRoute == "shield",
-                                        colors = navColors,
-                                        onClick = {
-                                            lastInteractionTime = System.currentTimeMillis()
-                                            navController.navigate("shield") {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        },
-                                        icon = { Icon(Icons.Default.Shield, contentDescription = "Shield") },
-                                        label = { Text("App Shield") },
-                                        modifier = Modifier.testTag("nav_item_shield")
-                                    )
-
-                                    NavigationBarItem(
-                                        selected = currentRoute == "suite",
-                                        colors = navColors,
-                                        onClick = {
-                                            lastInteractionTime = System.currentTimeMillis()
-                                            navController.navigate("suite") {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        },
-                                        icon = { Icon(Icons.Default.VisibilityOff, contentDescription = "Invisible Suite") },
-                                        label = { Text("Invisible Suite") },
-                                        modifier = Modifier.testTag("nav_item_suite")
-                                    )
-
-                                    NavigationBarItem(
-                                        selected = currentRoute == "vault",
-                                        colors = navColors,
-                                        onClick = {
-                                            lastInteractionTime = System.currentTimeMillis()
-                                            navController.navigate("vault") {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        },
-                                        icon = { Icon(Icons.Default.CameraAlt, contentDescription = "Vault") },
-                                        label = { Text("Intruder Vault") },
-                                        modifier = Modifier.testTag("nav_item_vault")
-                                    )
-
-                                    NavigationBarItem(
-                                        selected = currentRoute == "audit",
-                                        colors = navColors,
-                                        onClick = {
-                                            lastInteractionTime = System.currentTimeMillis()
-                                            navController.navigate("audit") {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        },
-                                        icon = { Icon(Icons.Default.VerifiedUser, contentDescription = "Privacy Audit") },
-                                        label = { Text("Privacy Audit") },
-                                        modifier = Modifier.testTag("nav_item_audit")
-                                    )
-                                }
-                            }
-                        ) { innerPadding ->
-                            NavHost(
-                                navController = navController,
-                                startDestination = startRoute,
+                            Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(innerPadding),
-                                enterTransition = {
-                                    fadeIn(animationSpec = tween(300)) + slideInHorizontally(
-                                        initialOffsetX = { it / 8 },
-                                        animationSpec = tween(300)
-                                    )
-                                },
-                                exitTransition = {
-                                    fadeOut(animationSpec = tween(250)) + slideOutHorizontally(
-                                        targetOffsetX = { -it / 8 },
-                                        animationSpec = tween(250)
-                                    )
-                                },
-                                popEnterTransition = {
-                                    fadeIn(animationSpec = tween(300)) + slideInHorizontally(
-                                        initialOffsetX = { -it / 8 },
-                                        animationSpec = tween(300)
-                                    )
-                                },
-                                popExitTransition = {
-                                    fadeOut(animationSpec = tween(250)) + slideOutHorizontally(
-                                        targetOffsetX = { it / 8 },
-                                        animationSpec = tween(250)
-                                    )
-                                }
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onPress = {
+                                                lastInteractionTime = System.currentTimeMillis()
+                                                viewModel.onUserActivity { appAuthenticated = false }
+                                            }
+                                        )
+                                    }
                             ) {
-                                composable("shield") {
-                                    AppShieldScreen(
-                                        viewModel = viewModel,
-                                        onNavigateToSettings = { navController.navigate("suite") }
-                                    )
-                                }
-                                composable("suite") {
-                                    InvisibleSuiteScreen(viewModel = viewModel)
-                                }
-                                composable("vault") {
-                                    IntruderVaultScreen(viewModel = viewModel)
-                                }
-                                composable("audit") {
-                                    PrivacyShieldScreen(viewModel = viewModel)
-                                }
-                            }
+                                Scaffold(
+                                    modifier = Modifier.fillMaxSize(),
+                                    bottomBar = {
+                                        NavigationBar(
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            contentColor = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier
+                                                .windowInsetsPadding(WindowInsets.navigationBars)
+                                                .testTag("main_navigation_bar")
+                                        ) {
+                                            val navColors = NavigationBarItemDefaults.colors(
+                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                                indicatorColor = MaterialTheme.colorScheme.primary,
+                                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                            )
 
-                            if (showShareDialog) {
-                                com.example.ui.SmartShareDialog(
-                                    onShareClicked = {
-                                        com.example.util.SmartPromptsManager.shareApp(context)
-                                        viewModel.recordSharePromptShown(hasShared = true)
-                                        showShareDialog = false
-                                    },
-                                    onDismiss = {
-                                        viewModel.recordSharePromptShown(hasShared = false)
-                                        showShareDialog = false
-                                    }
-                                )
-                            }
+                                            NavigationBarItem(
+                                                selected = currentRoute == "vault",
+                                                colors = navColors,
+                                                onClick = {
+                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    navController.navigate("vault") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                icon = { Icon(Icons.Default.Lock, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_vault)) },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_vault), fontSize = 11.sp, fontWeight = if (currentRoute == "vault") FontWeight.Bold else FontWeight.Normal) },
+                                                modifier = Modifier.testTag("nav_item_vault")
+                                            )
 
-                            if (showRateDialog) {
-                                com.example.ui.SmartRateDialog(
-                                    onRateClicked = {
-                                        com.example.util.SmartPromptsManager.openPlayStoreForRating(context)
-                                        viewModel.recordRatePromptShown(hasRated = true)
-                                        showRateDialog = false
-                                    },
-                                    onDismiss = {
-                                        viewModel.recordRatePromptShown(hasRated = false)
-                                        showRateDialog = false
+                                            NavigationBarItem(
+                                                selected = currentRoute == "shield",
+                                                colors = navColors,
+                                                onClick = {
+                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    navController.navigate("shield") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                icon = { Icon(Icons.Default.Shield, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_shield)) },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_shield), fontSize = 11.sp, fontWeight = if (currentRoute == "shield") FontWeight.Bold else FontWeight.Normal) },
+                                                modifier = Modifier.testTag("nav_item_shield")
+                                            )
+
+                                            NavigationBarItem(
+                                                selected = currentRoute == "intruder",
+                                                colors = navColors,
+                                                onClick = {
+                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    navController.navigate("intruder") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                icon = { Icon(Icons.Default.CameraAlt, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_intruder)) },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_intruder), fontSize = 11.sp, fontWeight = if (currentRoute == "intruder") FontWeight.Bold else FontWeight.Normal) },
+                                                modifier = Modifier.testTag("nav_item_intruder")
+                                            )
+
+                                            NavigationBarItem(
+                                                selected = currentRoute == "suite",
+                                                colors = navColors,
+                                                onClick = {
+                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    navController.navigate("suite") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                icon = { Icon(Icons.Default.Tune, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_settings)) },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_settings), fontSize = 11.sp, fontWeight = if (currentRoute == "suite") FontWeight.Bold else FontWeight.Normal) },
+                                                modifier = Modifier.testTag("nav_item_suite")
+                                            )
+
+                                            NavigationBarItem(
+                                                selected = currentRoute == "audit",
+                                                colors = navColors,
+                                                onClick = {
+                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    navController.navigate("audit") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                icon = { Icon(Icons.Default.VerifiedUser, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_audit)) },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_audit), fontSize = 11.sp, fontWeight = if (currentRoute == "audit") FontWeight.Bold else FontWeight.Normal) },
+                                                modifier = Modifier.testTag("nav_item_audit")
+                                            )
+                                        }
                                     }
-                                )
+                                ) { innerPadding ->
+                                    NavHost(
+                                        navController = navController,
+                                        startDestination = startRoute,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(innerPadding),
+                                        enterTransition = {
+                                            fadeIn(animationSpec = tween(250)) + slideInHorizontally(
+                                                initialOffsetX = { it / 10 },
+                                                animationSpec = tween(250)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
+                                                targetOffsetX = { -it / 10 },
+                                                animationSpec = tween(200)
+                                            )
+                                        },
+                                        popEnterTransition = {
+                                            fadeIn(animationSpec = tween(250)) + slideInHorizontally(
+                                                initialOffsetX = { -it / 10 },
+                                                animationSpec = tween(250)
+                                            )
+                                        },
+                                        popExitTransition = {
+                                            fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
+                                                targetOffsetX = { it / 10 },
+                                                animationSpec = tween(200)
+                                            )
+                                        }
+                                    ) {
+                                        composable("vault") {
+                                            EncryptedVaultDashboardScreen(
+                                                viewModel = viewModel,
+                                                onNavigateToSettings = { navController.navigate("suite") }
+                                            )
+                                        }
+                                        composable("shield") {
+                                            AppShieldScreen(
+                                                viewModel = viewModel,
+                                                onNavigateToSettings = { navController.navigate("suite") }
+                                            )
+                                        }
+                                        composable("intruder") {
+                                            IntruderVaultScreen(viewModel = viewModel)
+                                        }
+                                        composable("suite") {
+                                            InvisibleSuiteScreen(viewModel = viewModel)
+                                        }
+                                        composable("audit") {
+                                            PrivacyShieldScreen(viewModel = viewModel)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -422,6 +392,4 @@ class MainActivity : FragmentActivity() {
             }
         }
     }
-}
-}
 }

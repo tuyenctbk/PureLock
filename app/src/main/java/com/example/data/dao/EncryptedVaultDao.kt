@@ -11,19 +11,22 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EncryptedVaultDao {
 
-    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 ORDER BY isPinned DESC, isFavorite DESC, updatedTimestamp DESC")
     fun getActiveVaultItems(): Flow<List<EncryptedVaultEntity>>
 
-    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 AND (title LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR websiteOrApp LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%') ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 AND (title LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR websiteOrApp LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%') ORDER BY isPinned DESC, isFavorite DESC, updatedTimestamp DESC")
     fun searchActiveVaultItems(query: String): Flow<List<EncryptedVaultEntity>>
 
-    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 AND category = :category ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 AND category = :category ORDER BY isPinned DESC, isFavorite DESC, updatedTimestamp DESC")
     fun getVaultItemsByCategory(category: String): Flow<List<EncryptedVaultEntity>>
+
+    @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 AND isFavorite = 1 ORDER BY isPinned DESC, updatedTimestamp DESC")
+    fun getFavoriteVaultItems(): Flow<List<EncryptedVaultEntity>>
 
     @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 1 ORDER BY deletedTimestamp DESC")
     fun getTrashVaultItems(): Flow<List<EncryptedVaultEntity>>
 
-    @Query("SELECT * FROM encrypted_vault_items ORDER BY timestamp DESC")
+    @Query("SELECT * FROM encrypted_vault_items ORDER BY updatedTimestamp DESC")
     fun getAllVaultItems(): Flow<List<EncryptedVaultEntity>>
 
     @Query("SELECT * FROM encrypted_vault_items WHERE id = :id LIMIT 1")
@@ -37,6 +40,9 @@ interface EncryptedVaultDao {
 
     @Query("UPDATE encrypted_vault_items SET isPinned = :isPinned WHERE id = :id")
     suspend fun setPinned(id: Long, isPinned: Boolean)
+
+    @Query("UPDATE encrypted_vault_items SET isFavorite = :isFavorite WHERE id = :id")
+    suspend fun setFavorite(id: Long, isFavorite: Boolean)
 
     @Query("UPDATE encrypted_vault_items SET isDeleted = 1, deletedTimestamp = :deletedTimestamp WHERE id = :id")
     suspend fun moveToTrash(id: Long, deletedTimestamp: Long = System.currentTimeMillis())

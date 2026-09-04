@@ -33,6 +33,27 @@ class PasswordGeneratorService {
         const val LOWER_NO_AMBIGUOUS = "abcdefghijkmnopqrstuvwxyz"
         const val DIGITS_NO_AMBIGUOUS = "23456789"
         const val SYMBOLS_NO_AMBIGUOUS = "!@#$%^&*()_+-=[]{};:,.<>?"
+
+        fun generateSecurePassword(
+            length: Int = 16,
+            includeUppercase: Boolean = true,
+            includeLowercase: Boolean = true,
+            includeDigits: Boolean = true,
+            includeSymbols: Boolean = true,
+            excludeAmbiguous: Boolean = false
+        ): String {
+            val service = PasswordGeneratorService()
+            return service.generatePassword(
+                PasswordGeneratorConfig(
+                    length = length,
+                    includeUppercase = includeUppercase,
+                    includeLowercase = includeLowercase,
+                    includeNumbers = includeDigits,
+                    includeSymbols = includeSymbols,
+                    excludeAmbiguous = excludeAmbiguous
+                )
+            )
+        }
     }
 
     fun generatePassword(config: PasswordGeneratorConfig): String {

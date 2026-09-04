@@ -212,4 +212,114 @@
     <string name="intruder_banner_info">Las fotos de intrusos se cifran y guardan exclusivamente en la memoria privada. Nunca se sincronizan con la nube o galería.</string>
     <string name="trash_banner_info">La papelera protege los elementos eliminados temporalmente. Se purgan automáticamente tras %1$d días.</string>
     <string name="store_first_category_secret">Guardar Secreto en %1$s</string>
+
+    <!-- Vault Dashboard UI Strings -->
+    <string name="vault_dashboard_title">Bóveda Cifrada</string>
+    <string name="vault_dashboard_subtitle">AES-256 SQLCipher • Cero Conocimiento</string>
+    <string name="vault_clipboard_protected">Portapapeles Protegido</string>
+    <string name="vault_clipboard_wiping_in">Borrando datos confidenciales en %1$ds</string>
+    <string name="vault_clipboard_wiped_toast">Portapapeles borrado de inmediato</string>
+    <string name="vault_search_placeholder">Buscar elementos cifrados…</string>
+    <string name="vault_empty_trash_button">Vaciar</string>
+    <string name="vault_trash_empty_title">La Papelera está Vacía</string>
+    <string name="vault_trash_empty_desc">Los secretos eliminados se han borrado permanentemente.</string>
+    <string name="vault_empty_no_match">No hay elementos que coincidan con \"%1$s\"</string>
+    <string name="vault_empty_category_desc">Toca \'+\' para guardar contraseñas, notas, tarjetas o códigos 2FA.</string>
+    <string name="vault_empty_in_category">No hay elementos en %1$s</string>
+    <string name="vault_item_moved_to_trash">\"%1$s\" movido a la Papelera</string>
+    <string name="vault_item_restored">\"%1$s\" restaurado</string>
+    <string name="vault_item_updated">Elemento cifrado actualizado</string>
+    <string name="vault_item_saved_securely">Guardado de forma segura con cifrado AES-256</string>
+    <string name="vault_item_deleted_permanently">Secreto eliminado permanentemente</string>
+    <string name="vault_trash_emptied">Papelera vaciada</string>
+    <string name="vault_empty_trash_dialog_title">¿Vaciar Papelera?</string>
+    <string name="vault_empty_trash_dialog_message">Todos los %1$d elementos de la papelera se eliminarán permanentemente.</string>
+    <string name="vault_empty_trash_confirm">Vaciar Papelera</string>
+    <string name="vault_delete_dialog_title">¿Eliminar Secreto Permanentemente?</string>
+    <string name="vault_delete_dialog_message">¿Seguro que deseas eliminar \"%1$s\"? Este elemento cifrado no se puede recuperar.</string>
+    <string name="vault_delete_dialog_confirm">Eliminar Permanentemente</string>
+    <string name="vault_add_new_title">Nuevo Secreto Cifrado</string>
+    <string name="vault_edit_title">Editar Elemento Cifrado</string>
+    <string name="vault_field_category">Categoría</string>
+    <string name="vault_field_title_label">Título / Servicio *</string>
+    <string name="vault_field_title_placeholder">ej., ProtonMail, GitHub, Nota Segura</string>
+    <string name="vault_field_secret_label">Contraseña / Secreto *</string>
+    <string name="vault_field_note_content_label">Contenido Secreto *</string>
+    <string name="vault_field_username_label">Usuario / Correo</string>
+    <string name="vault_field_username_placeholder">usuario@ejemplo.com</string>
+    <string name="vault_field_website_label">Sitio Web o App</string>
+    <string name="vault_field_website_placeholder">https://ejemplo.com</string>
+    <string name="vault_field_notes_label">Notas Cifradas (Opcional)</string>
+    <string name="vault_field_pin_top">Fijar arriba</string>
+    <string name="vault_field_favorite">Favorito</string>
+    <string name="vault_btn_save">Guardar Cifrado</string>
+    <string name="vault_btn_generate">Generar</string>
+    <string name="vault_generator_helper">Generar clave de alta entropía de 20 caracteres</string>
+    <string name="vault_filter_all">Todos</string>
+    <string name="vault_filter_passwords">Contraseñas</string>
+    <string name="vault_filter_notes">Notas</string>
+    <string name="vault_filter_cards">Tarjetas</string>
+    <string name="vault_filter_2fa">2FA / Códigos</string>
+    <string name="vault_filter_pins">PINs</string>
+    <string name="vault_filter_favorites">Favoritos</string>
+    <string name="vault_filter_trash">Papelera</string>
+
+    <!-- Navigation Bar Strings -->
+    <string name="nav_vault">Bóveda</string>
+    <string name="nav_shield">Bloqueo de Apps</string>
+    <string name="nav_intruder">Intruso</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="nav_audit">Auditoría</string>
+
+    <!-- Splash Screen Strings -->
+    <string name="splash_tagline">Seguridad Fuera de Línea Zero-Knowledge</string>
+    <string name="splash_status_initializing">Inicializando bóveda AES-256…</string>
+    <string name="splash_status_keystore">Keystore de hardware activo</string>
+    <string name="splash_status_ready">Escudo de seguridad listo</string>
+    <string name="splash_badge_offline">100% Fuera de Línea • Cero Telemetría</string>
+
+    <!-- App Shield UI Strings -->
+    <string name="shield_locked_count">%1$d/%2$d Bloqueadas</string>
+    <string name="shield_lock_all">Bloquear Todo</string>
+    <string name="shield_unlock_all">Desbloquear Todo</string>
+    <string name="shield_details_title">Detalles de Protección</string>
+    <string name="shield_no_apps_match">No hay aplicaciones que coincidan con \"%1$s\"</string>
+
+    <!-- Onboarding UI Strings -->
+    <string name="onboarding_welcome_title">Bienvenido a PureLock</string>
+    <string name="onboarding_welcome_desc">Motor de seguridad sin conexión.\nProteja sus aplicaciones, fotos y secretos con cifrado local de grado militar.</string>
+    <string name="onboarding_setup_key_title">Configurar Clave de Seguridad Maestra</string>
+    <string name="onboarding_setup_pattern_desc">Dibuje su patrón maestro (mínimo 4 puntos) y configure el PIN de respaldo.</string>
+    <string name="onboarding_setup_pin_desc">Cree su PIN maestro para desbloquear PureLock y las apps protegidas.</string>
+    <string name="onboarding_btn_continue">Continuar</string>
+    <string name="onboarding_btn_enter">Entrar a PureLock</string>
+    <string name="onboarding_btn_back">Atrás</string>
+    <string name="onboarding_pin_min_length_error">El PIN maestro debe tener al menos 4 dígitos.</string>
+    <string name="onboarding_pin_mismatch_error">La confirmación del PIN maestro no coincide.</string>
+    <string name="onboarding_pattern_min_nodes_error">El patrón debe conectar al menos 4 puntos.</string>
+    <string name="onboarding_disclosure_title">Divulgación de Servicios de Accesibilidad</string>
+    <string name="onboarding_disclosure_why_title">Por Qué PureLock Necesita Permiso de Accesibilidad:</string>
+    <string name="onboarding_disclosure_why_desc">PureLock utiliza la API AccessibilityService estrictamente para detectar cuándo se abren sus aplicaciones protegidas y mostrar el bloqueo de inmediato.</string>
+    <string name="onboarding_disclosure_privacy_title">Garantía de Privacidad y Recolección de Datos:</string>
+    <string name="onboarding_disclosure_privacy_desc">PureLock NO rastrea, guarda ni transmite ningún dato confidencial, contraseñas o contenido personal. Es 100% fuera de línea.</string>
+    <string name="onboarding_disclosure_agree">Aceptar y Activar</string>
+    <string name="onboarding_disclosure_decline">Rechazar</string>
+    <string name="onboarding_perm_title">Activar Escudo de Privacidad</string>
+    <string name="onboarding_perm_desc">Conceda permisos para que PureLock detecte el inicio de aplicaciones al instante.</string>
+    <string name="onboarding_perm_acc_title">Servicio de Accesibilidad</string>
+    <string name="onboarding_perm_acc_desc">Detecta aplicaciones en primer plano al instante.</string>
+    <string name="onboarding_perm_acc_btn">Conceder Permiso de Accesibilidad</string>
+    <string name="onboarding_perm_usage_title">Permiso de Acceso de Uso</string>
+    <string name="onboarding_perm_usage_desc">Monitorea el estado de las aplicaciones de forma segura.</string>
+    <string name="onboarding_perm_usage_btn">Conceder Acceso de Uso</string>
+    <string name="onboarding_complete_title">¡Protección Activa!</string>
+    <string name="onboarding_complete_desc">Su bóveda de privacidad zero-knowledge está lista.\nTodas las claves maestras y elementos cifrados se guardan únicamente en su dispositivo.</string>
+    <string name="onboarding_master_pin_label">PIN Maestro</string>
+    <string name="onboarding_fallback_pin_label">PIN Maestro de Respaldo</string>
+    <string name="onboarding_confirm_pin_label">Confirmar PIN Maestro</string>
+    <string name="onboarding_biometrics_title">Biometría Activada</string>
+    <string name="onboarding_biometrics_desc">La huella dactilar o el reconocimiento facial desbloquearán PureLock al instante. Ingrese un PIN maestro de respaldo a continuación.</string>
+    <string name="onboarding_draw_pattern_hint">Dibuje el patrón maestro abajo</string>
+    <string name="onboarding_selected_nodes_format">Nodos seleccionados: %1$s</string>
+    <string name="onboarding_reset_pattern">Reiniciar Patrón</string>
 </resources>

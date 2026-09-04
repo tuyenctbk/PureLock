@@ -103,6 +103,11 @@ class PureLockRepository(
         logSecurityEvent("VAULT_ITEM_PINNED", "Vault item #$id pin status updated to $isPinned")
     }
 
+    suspend fun toggleVaultItemFavorite(id: Long, isFavorite: Boolean) {
+        encryptedVaultDao.setFavorite(id, isFavorite)
+        logSecurityEvent("VAULT_ITEM_FAVORITED", "Vault item #$id favorite status updated to $isFavorite")
+    }
+
     suspend fun moveVaultItemToTrash(id: Long) {
         encryptedVaultDao.moveToTrash(id)
         logSecurityEvent("VAULT_ITEM_TRASHED", "Encrypted secret #$id moved to Trash Bin.")
@@ -407,5 +412,9 @@ class PureLockRepository(
         val now = System.currentTimeMillis()
         val elapsed = now - app.lastUnlockedTimestamp
         return elapsed > gracePeriod
+    }
+
+    suspend fun clearSecurityLogs() {
+        logDao.clearLogs()
     }
 }

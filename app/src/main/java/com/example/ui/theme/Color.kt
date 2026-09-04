@@ -25,3 +25,16 @@ val MinimalOnPrimaryContainer = Color(0xFF0F172A)
 val MinimalOnSurface = Color(0xFF0F172A)
 val MinimalOnSurfaceVariant = Color(0xFF475569)
 val MinimalMutedText = Color(0xFF64748B)
+
+// Emerald Vault Palette
+val EmeraldPrimary = Color(0xFF10B981)
+val EmeraldSurface = Color(0xFF061A14)
+val EmeraldSurfaceVariant = Color(0xFF0F2D24)
+val EmeraldAccent = Color(0xFF34D399)
+
+// Sapphire Frost Palette
+val SapphirePrimary = Color(0xFF38BDF8)
+val SapphireSurface = Color(0xFF0B1528)
+val SapphireSurfaceVariant = Color(0xFF13233F)
+val SapphireAccent = Color(0xFF7DD3FC)
+

@@ -28,6 +28,8 @@ class PureLockPreferences(context: Context) {
     val gracePeriodMs: Flow<Long> = userSettings.gracePeriodMs
     val randomKeyboard: Flow<Boolean> = userSettings.randomKeyboard
     val stealthDecoy: Flow<Boolean> = userSettings.stealthDecoy
+    val decoyType: Flow<String> = userSettings.decoyType
+    val masterKnock: Flow<String> = userSettings.masterKnock
     val hidePatternPath: Flow<Boolean> = userSettings.hidePatternPath
     val intruderCapture: Flow<Boolean> = userSettings.intruderCapture
     val tvMode: Flow<Boolean> = userSettings.tvMode
@@ -52,6 +54,8 @@ class PureLockPreferences(context: Context) {
     suspend fun setGracePeriodMs(ms: Long) = userSettings.setGracePeriodMs(ms)
     suspend fun setRandomKeyboard(enabled: Boolean) = userSettings.setRandomKeyboard(enabled)
     suspend fun setStealthDecoy(enabled: Boolean) = userSettings.setStealthDecoy(enabled)
+    suspend fun setDecoyType(type: String) = userSettings.setDecoyType(type)
+    suspend fun setMasterKnock(knock: String) = userSettings.setMasterKnock(knock)
     suspend fun setHidePatternPath(enabled: Boolean) = userSettings.setHidePatternPath(enabled)
     suspend fun setIntruderCapture(enabled: Boolean) = userSettings.setIntruderCapture(enabled)
     suspend fun setTvMode(enabled: Boolean) = userSettings.setTvMode(enabled)

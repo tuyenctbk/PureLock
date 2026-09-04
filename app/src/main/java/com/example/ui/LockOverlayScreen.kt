@@ -22,6 +22,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -68,14 +70,20 @@ fun LockOverlayScreen(
     val haptic = LocalHapticFeedback.current
 
     var appName by remember { mutableStateOf(packageName) }
+    var appIconBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var masterPin by remember { mutableStateOf("1234") }
     var duressPin by remember { mutableStateOf("0000") }
     var masterPattern by remember { mutableStateOf("1,2,5,8,9") }
+    var masterKnock by remember { mutableStateOf("1,2,4,3") }
     var securityType by remember { mutableStateOf("PIN") }
     var isRandomKeyboard by remember { mutableStateOf(false) }
     var isHidePatternPath by remember { mutableStateOf(false) }
     var isIntruderCapture by remember { mutableStateOf(true) }
     var isTvMode by remember { mutableStateOf(false) }
+    var isStealthDecoy by remember { mutableStateOf(false) }
+    var decoyType by remember { mutableStateOf("NONE") }
+    var isCalculatorDisguiseActive by remember { mutableStateOf(false) }
+    var isFakeCrashActive by remember { mutableStateOf(false) }
 
     var inputPin by remember { mutableStateOf("") }
     var patternSelectedNodes by remember { mutableStateOf(listOf<Int>()) }
@@ -184,11 +192,13 @@ fun LockOverlayScreen(
     }
 
     LaunchedEffect(packageName) {
-        // Load app name
+        // Load app name and genuine target application icon
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(packageName, 0)
             appName = pm.getApplicationLabel(info).toString()
+            val rawIcon = pm.getApplicationIcon(info)
+            appIconBitmap = drawableToBitmap(rawIcon)
         } catch (e: Exception) {
             appName = packageName.substringAfterLast('.')
         }
@@ -196,11 +206,20 @@ fun LockOverlayScreen(
         masterPin = repository.preferences.masterPin.first()
         duressPin = repository.preferences.duressPin.first()
         masterPattern = repository.preferences.masterPattern.first()
+        masterKnock = repository.preferences.masterKnock.first()
         securityType = repository.preferences.securityType.first()
         isRandomKeyboard = repository.preferences.randomKeyboard.first()
         isHidePatternPath = repository.preferences.hidePatternPath.first()
         isIntruderCapture = repository.preferences.intruderCapture.first()
         isTvMode = repository.preferences.tvMode.first()
+        isStealthDecoy = repository.preferences.stealthDecoy.first()
+        decoyType = repository.preferences.decoyType.first()
+
+        if (decoyType == "CALCULATOR" || (isStealthDecoy && decoyType == "NONE")) {
+            isCalculatorDisguiseActive = true
+        } else if (decoyType == "FAKE_CRASH") {
+            isFakeCrashActive = true
+        }
 
         // Check biometric hardware presence & automatically fallback to secondary PIN/Pattern lock
         val bioManager = BiometricPromptManager(context)
@@ -209,11 +228,7 @@ fun LockOverlayScreen(
         if (securityType == "BIOMETRIC") {
             when (bioStatus) {
                 BiometricStatus.AVAILABLE -> {
-                    launchBiometricPrompt(
-                        context = context,
-                        onSuccess = { handleSuccessUnlock() },
-                        onError = { err -> recordFailedAttempt(err) }
-                    )
+                    // Biometric prompt will be triggered by the active BIOMETRIC view
                 }
                 BiometricStatus.NO_HARDWARE -> {
                     securityType = "PIN"
@@ -229,6 +244,34 @@ fun LockOverlayScreen(
                 }
             }
         }
+    }
+
+    if (isFakeCrashActive) {
+        FakeCrashDecoyView(
+            appName = appName,
+            appIcon = appIconBitmap,
+            onCancel = onCancelled,
+            onBypass = { isFakeCrashActive = false }
+        )
+        return
+    }
+
+    if (isCalculatorDisguiseActive) {
+        CalculatorDisguiseView(
+            masterPin = masterPin,
+            duressPin = duressPin,
+            onUnlock = { handleSuccessUnlock() },
+            onDuress = {
+                scope.launch {
+                    repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered via Calculator disguise! Panic mode triggered.")
+                    repository.emptyTrashVault()
+                }
+                onCancelled()
+            },
+            onCancel = onCancelled,
+            onSwitchToDirectLock = { isCalculatorDisguiseActive = false }
+        )
+        return
     }
 
     Box(
@@ -278,12 +321,19 @@ fun LockOverlayScreen(
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(44.dp)
                     )
+                } else if (appIconBitmap != null) {
+                    androidx.compose.foundation.Image(
+                        bitmap = appIconBitmap!!.asImageBitmap(),
+                        contentDescription = appName,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                    )
                 } else {
-                    Icon(
-                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.splash_logo),
-                        contentDescription = stringResource(R.string.lock_security_shield),
-                        tint = androidx.compose.ui.graphics.Color.Unspecified,
-                        modifier = Modifier.size(44.dp)
+                    PureLockLogoEmblem(
+                        size = 52.dp,
+                        showGlowRing = false,
+                        badgeBackground = androidx.compose.ui.graphics.Color.Transparent
                     )
                 }
             }
@@ -412,6 +462,16 @@ fun LockOverlayScreen(
                     modifier = Modifier.testTag("chip_pattern_mode")
                 )
                 FilterChip(
+                    selected = securityType == "KNOCK",
+                    onClick = {
+                        securityType = "KNOCK"
+                        secondaryAuthNotice = null
+                    },
+                    label = { Text("Knock") },
+                    leadingIcon = { Icon(Icons.Default.TouchApp, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    modifier = Modifier.testTag("chip_knock_mode")
+                )
+                FilterChip(
                     selected = securityType == "BIOMETRIC",
                     onClick = {
                         securityType = "BIOMETRIC"
@@ -509,6 +569,31 @@ fun LockOverlayScreen(
                                         }
                                     )
                                 }
+
+                                val isBioAvailable = remember {
+                                    com.example.service.BiometricPromptManager(context).isBiometricAvailable()
+                                }
+                                if (isBioAvailable) {
+                                    TextButton(
+                                        onClick = {
+                                            launchBiometricPrompt(
+                                                context = context,
+                                                onSuccess = { handleSuccessUnlock() },
+                                                onError = { err -> recordFailedAttempt(err) }
+                                            )
+                                        },
+                                        modifier = Modifier.testTag("btn_quick_biometric_pin")
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Fingerprint,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text("Unlock with Biometrics")
+                                    }
+                                }
                             }
                         }
                     }
@@ -548,11 +633,40 @@ fun LockOverlayScreen(
                                 }
                             )
 
-                            OutlinedButton(
-                                onClick = { patternSelectedNodes = emptyList() },
-                                modifier = Modifier.testTag("btn_reset_pattern")
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(stringResource(R.string.lock_reset_pattern))
+                                OutlinedButton(
+                                    onClick = { patternSelectedNodes = emptyList() },
+                                    modifier = Modifier.testTag("btn_reset_pattern")
+                                ) {
+                                    Text(stringResource(R.string.lock_reset_pattern))
+                                }
+
+                                val isBioAvailable = remember {
+                                    com.example.service.BiometricPromptManager(context).isBiometricAvailable()
+                                }
+                                if (isBioAvailable) {
+                                    FilledTonalButton(
+                                        onClick = {
+                                            launchBiometricPrompt(
+                                                context = context,
+                                                onSuccess = { handleSuccessUnlock() },
+                                                onError = { err -> recordFailedAttempt(err) }
+                                            )
+                                        },
+                                        modifier = Modifier.testTag("btn_quick_biometric_pattern")
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Fingerprint,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Biometrics")
+                                    }
+                                }
                             }
                         }
                     }
@@ -600,6 +714,14 @@ fun LockOverlayScreen(
                                 textAlign = TextAlign.Center
                             )
                         }
+                    }
+
+                    "KNOCK" -> {
+                        KnockCodeDrawer(
+                            masterKnock = masterKnock,
+                            onUnlock = { handleSuccessUnlock() },
+                            onFailed = { msg -> recordFailedAttempt(msg) }
+                        )
                     }
                 }
             }
@@ -834,31 +956,492 @@ private fun createIntruderSnapshotBitmap(appName: String): String {
 
 fun launchBiometricPrompt(
     context: android.content.Context,
+    title: String = "PureLock Biometric Security",
+    subtitle: String = "Scan Fingerprint or Face ID to Unlock",
     onSuccess: () -> Unit,
     onError: (String) -> Unit
 ) {
-    val activity = context as? androidx.fragment.app.FragmentActivity
-    if (activity != null) {
-        val manager = com.example.service.BiometricPromptManager(context)
-        when (manager.checkBiometricAvailability()) {
-            com.example.service.BiometricStatus.AVAILABLE -> {
-                manager.showBiometricPrompt(
-                    activity = activity,
-                    title = "PureLock Biometric Security",
-                    subtitle = "Scan Fingerprint or Face ID to Unlock",
-                    negativeButtonText = "Use PIN / Pattern",
-                    onSuccess = onSuccess,
-                    onError = onError
-                )
+    val manager = com.example.service.BiometricPromptManager(context)
+    manager.authenticate(
+        context = context,
+        title = title,
+        subtitle = subtitle,
+        negativeButtonText = "Use PIN / Pattern",
+        onSuccess = onSuccess,
+        onError = onError
+    )
+}
+
+@Composable
+fun CalculatorDisguiseView(
+    masterPin: String,
+    duressPin: String,
+    onUnlock: () -> Unit,
+    onDuress: () -> Unit,
+    onCancel: () -> Unit,
+    onSwitchToDirectLock: () -> Unit
+) {
+    var displayExpr by remember { mutableStateOf("") }
+    var resultText by remember { mutableStateOf("0") }
+    val haptic = LocalHapticFeedback.current
+
+    fun evaluateMath(expr: String): String {
+        return try {
+            val sanitized = expr.replace("×", "*").replace("÷", "/")
+            val parts = sanitized.split(Regex("(?<=[-+*/])|(?=[-+*/])")).filter { it.isNotBlank() }
+            if (parts.size >= 3) {
+                var res = parts[0].toDoubleOrNull() ?: return "0"
+                var i = 1
+                while (i < parts.size - 1) {
+                    val op = parts[i]
+                    val nextVal = parts[i + 1].toDoubleOrNull() ?: return "0"
+                    when (op) {
+                        "+" -> res += nextVal
+                        "-" -> res -= nextVal
+                        "*" -> res *= nextVal
+                        "/" -> if (nextVal != 0.0) res /= nextVal else return "Error"
+                    }
+                    i += 2
+                }
+                if (res % 1.0 == 0.0) res.toLong().toString() else "%.2f".format(res)
+            } else {
+                val single = sanitized.toDoubleOrNull()
+                if (single != null) {
+                    if (single % 1.0 == 0.0) single.toLong().toString() else single.toString()
+                } else "0"
             }
-            com.example.service.BiometricStatus.NOT_ENROLLED -> {
-                onError("No biometrics enrolled. Please use PIN or Pattern.")
+        } catch (e: Exception) {
+            "0"
+        }
+    }
+
+    fun handleEquals() {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        val cleanInput = displayExpr.trim()
+        if (cleanInput == masterPin) {
+            onUnlock()
+        } else if (cleanInput == duressPin) {
+            onDuress()
+        } else {
+            resultText = evaluateMath(cleanInput)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = 420.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Header Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.clickable { onSwitchToDirectLock() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Calculate,
+                        contentDescription = "Calculator",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Calculator",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                IconButton(
+                    onClick = { onSwitchToDirectLock() },
+                    modifier = Modifier.size(36.dp).testTag("btn_switch_from_calculator")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Direct Lock",
+                        tint = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
-            com.example.service.BiometricStatus.NO_HARDWARE, com.example.service.BiometricStatus.UNAVAILABLE -> {
-                onError("Biometric sensor unavailable. Please use PIN or Pattern.")
+
+            // Calculation Display Surface
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = displayExpr.ifEmpty { " " },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.outline,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = if (displayExpr.isEmpty()) "0" else (if (resultText != "0" && displayExpr.contains(Regex("[-+×÷]"))) resultText else displayExpr),
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
+                }
+            }
+
+            // Keypad Grid (4 columns)
+            val buttons = listOf(
+                listOf("C", "÷", "×", "⌫"),
+                listOf("7", "8", "9", "-"),
+                listOf("4", "5", "6", "+"),
+                listOf("1", "2", "3", "%"),
+                listOf("0", ".", "±", "=")
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                buttons.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        row.forEach { key ->
+                            val isAction = key in listOf("=", "÷", "×", "-", "+", "%")
+                            val isSpecial = key in listOf("C", "⌫", "±")
+                            val isEquals = key == "="
+
+                            Surface(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    when (key) {
+                                        "C" -> {
+                                            displayExpr = ""
+                                            resultText = "0"
+                                        }
+                                        "⌫" -> {
+                                            if (displayExpr.isNotEmpty()) {
+                                                displayExpr = displayExpr.dropLast(1)
+                                            }
+                                        }
+                                        "±" -> {
+                                            if (displayExpr.startsWith("-")) {
+                                                displayExpr = displayExpr.drop(1)
+                                            } else if (displayExpr.isNotEmpty()) {
+                                                displayExpr = "-$displayExpr"
+                                            }
+                                        }
+                                        "=" -> handleEquals()
+                                        else -> displayExpr += key
+                                    }
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                color = when {
+                                    isEquals -> MaterialTheme.colorScheme.primary
+                                    isAction -> MaterialTheme.colorScheme.secondaryContainer
+                                    isSpecial -> MaterialTheme.colorScheme.surfaceVariant
+                                    else -> MaterialTheme.colorScheme.surface
+                                },
+                                border = if (!isEquals && !isAction) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)) else null,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(58.dp)
+                                    .testTag("calc_key_$key")
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = key,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = if (isEquals || isAction) FontWeight.Bold else FontWeight.Normal,
+                                        color = when {
+                                            isEquals -> MaterialTheme.colorScheme.onPrimary
+                                            isAction -> MaterialTheme.colorScheme.onSecondaryContainer
+                                            else -> MaterialTheme.colorScheme.onSurface
+                                        },
+                                        fontSize = if (key == "=") 22.sp else 18.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Discreet Home / Cancel Button
+            TextButton(
+                onClick = { onCancel() },
+                modifier = Modifier.padding(top = 4.dp).testTag("btn_calculator_cancel")
+            ) {
+                Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Exit", style = MaterialTheme.typography.bodySmall)
             }
         }
-    } else {
-        onError("Unable to launch biometric prompt. Please use PIN or Pattern.")
     }
+}
+
+@Composable
+fun FakeCrashDecoyView(
+    appName: String,
+    appIcon: Bitmap?,
+    onCancel: () -> Unit,
+    onBypass: () -> Unit
+) {
+    val haptic = LocalHapticFeedback.current
+    var showReportToast by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.85f))
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = 360.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    modifier = Modifier.clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onBypass()
+                    }
+                ) {
+                    if (appIcon != null) {
+                        androidx.compose.foundation.Image(
+                            bitmap = appIcon.asImageBitmap(),
+                            contentDescription = appName,
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.errorContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+
+                    Column {
+                        Text(
+                            text = appName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "System alert",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Unfortunately, $appName has stopped.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = "The app encountered an unhandled exception and was terminated by the system.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+
+                if (showReportToast) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "Crash log sent to developer.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = { showReportToast = true }
+                    ) {
+                        Text("Send feedback")
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = { onCancel() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = { onCancel() },
+                                onLongPress = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onBypass()
+                                }
+                            )
+                        }
+                    ) {
+                        Text("Close app", fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun KnockCodeDrawer(
+    masterKnock: String,
+    onUnlock: () -> Unit,
+    onFailed: (String) -> Unit
+) {
+    val haptic = LocalHapticFeedback.current
+    var currentKnocks by remember { mutableStateOf(listOf<Int>()) }
+
+    fun handleKnock(quadrant: Int) {
+        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        val updated = currentKnocks + quadrant
+        currentKnocks = updated
+
+        val expected = masterKnock.split(',').mapNotNull { it.trim().toIntOrNull() }
+        if (updated.size >= expected.size) {
+            if (updated == expected) {
+                currentKnocks = emptyList()
+                onUnlock()
+            } else {
+                currentKnocks = emptyList()
+                onFailed("Incorrect Knock pattern. Try again.")
+            }
+        }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Text(
+            text = "Tap 4-quadrant stealth rhythm (${currentKnocks.size} knocks)",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline
+        )
+
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
+            modifier = Modifier.size(220.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(modifier = Modifier.weight(1f)) {
+                    KnockQuadrant(number = 1, label = "I", onClick = { handleKnock(1) }, modifier = Modifier.weight(1f).fillMaxHeight())
+                    VerticalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), thickness = 1.dp)
+                    KnockQuadrant(number = 2, label = "II", onClick = { handleKnock(2) }, modifier = Modifier.weight(1f).fillMaxHeight())
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), thickness = 1.dp)
+                Row(modifier = Modifier.weight(1f)) {
+                    KnockQuadrant(number = 3, label = "III", onClick = { handleKnock(3) }, modifier = Modifier.weight(1f).fillMaxHeight())
+                    VerticalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), thickness = 1.dp)
+                    KnockQuadrant(number = 4, label = "IV", onClick = { handleKnock(4) }, modifier = Modifier.weight(1f).fillMaxHeight())
+                }
+            }
+        }
+
+        OutlinedButton(
+            onClick = { currentKnocks = emptyList() },
+            modifier = Modifier.testTag("btn_clear_knocks")
+        ) {
+            Text("Clear Knocks")
+        }
+    }
+}
+
+@Composable
+private fun KnockQuadrant(
+    number: Int,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clickable { onClick() }
+            .testTag("knock_quadrant_$number"),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Light,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+        )
+    }
+}
+
+fun drawableToBitmap(drawable: android.graphics.drawable.Drawable): Bitmap {
+    if (drawable is android.graphics.drawable.BitmapDrawable && drawable.bitmap != null) {
+        return drawable.bitmap
+    }
+    val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 96
+    val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 96
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    drawable.setBounds(0, 0, canvas.width, canvas.height)
+    drawable.draw(canvas)
+    return bitmap
 }

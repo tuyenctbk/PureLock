@@ -93,6 +93,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun toggleVaultItemFavorite(id: Long, isFavorite: Boolean) {
+        viewModelScope.launch {
+            repository.toggleVaultItemFavorite(id, isFavorite)
+        }
+    }
+
     fun moveVaultItemToTrash(id: Long) {
         viewModelScope.launch {
             repository.moveVaultItemToTrash(id)
@@ -117,51 +123,27 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    // --- Centralized Clipboard Monitoring with User-Configured Auto-Clear ---
+    // --- Centralized Clipboard Security with EXTRA_IS_SENSITIVE and Auto-Wipe ---
     private val _activeCopiedItemId = MutableStateFlow<Long?>(null)
     val activeCopiedItemId: StateFlow<Long?> = _activeCopiedItemId.asStateFlow()
 
-    private val _clipboardCountdown = MutableStateFlow(0)
-    val clipboardCountdown: StateFlow<Int> = _clipboardCountdown.asStateFlow()
-
-    private var clipboardJob: kotlinx.coroutines.Job? = null
+    val clipboardCountdown: StateFlow<Int> = com.example.util.ClipboardSecurityManager.clipboardClearCountdown
+    val isSensitiveClipActive: StateFlow<Boolean> = com.example.util.ClipboardSecurityManager.isSensitiveClipActive
 
     fun copyVaultItemToClipboard(item: EncryptedVaultEntity) {
-        clipboardJob?.cancel()
-        try {
-            val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("VaultSecret", item.secretContent))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
+        val duration = clipboardAutoClearSec.value
         _activeCopiedItemId.value = item.id
-        val timeoutSec = clipboardAutoClearSec.value
-        if (timeoutSec <= 0) {
-            _clipboardCountdown.value = 0
-            return
-        }
-
-        clipboardJob = viewModelScope.launch {
-            _clipboardCountdown.value = timeoutSec
-            while (_clipboardCountdown.value > 0) {
-                kotlinx.coroutines.delay(1000L)
-                _clipboardCountdown.value = _clipboardCountdown.value - 1
-            }
-            clearClipboardNow()
-        }
+        com.example.util.ClipboardSecurityManager.copySensitive(
+            context = getApplication(),
+            label = item.title,
+            sensitiveText = item.secretContent,
+            autoClearDurationSec = duration
+        )
     }
 
     fun clearClipboardNow() {
-        clipboardJob?.cancel()
-        try {
-            val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("", ""))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
         _activeCopiedItemId.value = null
-        _clipboardCountdown.value = 0
+        com.example.util.ClipboardSecurityManager.clearClipboard(getApplication(), showNotification = false)
     }
 
     fun clearSensitiveState() {
@@ -267,6 +249,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     // Preference States from UserSettingsManager & Room
+    val duressPin: StateFlow<String> = userSettings.duressPin
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0000")
+
     val masterPin: StateFlow<String> = userSettings.masterPin
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1234")
 
@@ -296,6 +281,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     val stealthDecoy: StateFlow<Boolean> = userSettings.stealthDecoy
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val decoyType: StateFlow<String> = userSettings.decoyType
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "NONE")
+
+    val masterKnock: StateFlow<String> = userSettings.masterKnock
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1,2,4,3")
 
     val hidePatternPath: StateFlow<Boolean> = userSettings.hidePatternPath
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -449,18 +440,30 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             userSettings.setMasterPin(newPin)
         }
     }
+    fun setMasterPin(pin: String) = updateMasterPin(pin)
 
     fun updateMasterPattern(newPattern: String) {
         viewModelScope.launch {
             userSettings.setMasterPattern(newPattern)
         }
     }
+    fun setMasterPattern(pattern: String) = updateMasterPattern(pattern)
 
     fun updateSecurityType(type: String) {
         viewModelScope.launch {
             userSettings.setSecurityType(type)
         }
     }
+    fun setSecurityType(type: String) = updateSecurityType(type)
+
+    fun setDuressPin(pin: String) {
+        viewModelScope.launch {
+            userSettings.setDuressPin(pin)
+        }
+    }
+    fun updateDuressPin(pin: String) = setDuressPin(pin)
+
+    fun setInactivityTimeout(sec: Int) = setInactivityTimeoutSec(sec)
 
     fun updateGracePeriodMs(ms: Long) {
         viewModelScope.launch {
@@ -477,6 +480,20 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     fun setStealthDecoy(enabled: Boolean) {
         viewModelScope.launch {
             userSettings.setStealthDecoy(enabled)
+        }
+    }
+
+    fun setDecoyType(type: String) {
+        viewModelScope.launch {
+            userSettings.setDecoyType(type)
+            repository.logSecurityEvent("DECOY_MODE_CHANGED", "Camouflage decoy set to $type.")
+        }
+    }
+
+    fun setMasterKnock(knock: String) {
+        viewModelScope.launch {
+            userSettings.setMasterKnock(knock)
+            repository.logSecurityEvent("CREDENTIAL_CHANGED", "Directional Knock code updated.")
         }
     }
 
@@ -513,6 +530,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     fun logSecurityEvent(action: String, details: String) {
         viewModelScope.launch {
             repository.logSecurityEvent(action, details)
+        }
+    }
+
+    fun clearAllSecurityLogs() {
+        viewModelScope.launch {
+            repository.clearSecurityLogs()
         }
     }
 

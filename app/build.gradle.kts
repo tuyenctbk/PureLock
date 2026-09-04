@@ -19,8 +19,8 @@ android {
     applicationId = "com.soloprono.purelock"
     minSdk = 24
     targetSdk = 35
-    versionCode = 7
-    versionName = "1.6"
+    versionCode = 8
+    versionName = "1.7"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -113,6 +113,7 @@ dependencies {
   implementation(libs.androidx.navigation.compose)
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
+  implementation(libs.sqlcipher.android)
   implementation(libs.androidx.biometric)
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.analytics)

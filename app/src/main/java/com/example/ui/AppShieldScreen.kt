@@ -21,9 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +43,7 @@ fun AppShieldScreen(
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("ALL") }
+    var showInfoDialog by remember { mutableStateOf(false) }
 
     val categories = listOf("ALL", "FINANCIAL", "SOCIAL", "SYSTEM", "MEDIA", "GAMES")
 
@@ -56,240 +57,147 @@ fun AppShieldScreen(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Hero Header Status Banner - High Fidelity Cyber Security Design
-        Surface(
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp),
-            tonalElevation = 8.dp,
-            modifier = Modifier.border(
-                width = 1.dp,
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
-                        androidx.compose.ui.graphics.Color.Transparent
-                    )
-                ),
-                shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
-            )
-        ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                // Background subtle hero banner vector overlay
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = com.example.R.drawable.banner_security_hero),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
-                        .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    alpha = 0.45f
-                )
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(52.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                                    .border(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f), CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Shield,
-                                    contentDescription = "PureLock Active",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(30.dp)
-                                )
-                            }
-                            Column {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Text(
-                                        text = "PureLock",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Surface(
-                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                        shape = RoundedCornerShape(12.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(6.dp)
-                                                    .clip(CircleShape)
-                                                    .background(MaterialTheme.colorScheme.primary)
-                                            )
-                                            Text(
-                                                text = "Protected",
-                                                style = MaterialTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                                            )
-                                        }
-                                    }
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Zero Cloud",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(14.dp)
-                                    )
-                                    Text(
-                                        text = "100% Offline SQLCipher Protection Active",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
-                            }
-                        }
-
-                        // Quick Settings Gear Icon
-                        IconButton(
-                            onClick = onNavigateToSettings,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
-                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
-                                .dpadFocusable(shape = CircleShape)
-                                .testTag("btn_header_settings")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Invisible Suite Settings",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-
-                // Stats Banner Badge
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary
-                                )
-                            )
-                        )
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "$activeCount / ${allApps.size} Applications Protected",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text(
-                            text = "Instant 10ms Accessibility Detection Active",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
-                        )
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        IconButton(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                viewModel.setAllAppsLockState(true)
-                            },
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
-                                .testTag("btn_lock_all")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Shield All",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                viewModel.setAllAppsLockState(false)
-                            },
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
-                                .testTag("btn_unlock_all")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LockOpen,
-                                contentDescription = "Unshield All",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .widthIn(max = 640.dp)
+                .align(Alignment.TopCenter)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Search Input Field
+            // Minimal Header Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, bottom = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    PureLockLogoEmblem(
+                        size = 38.dp,
+                        showGlowRing = false,
+                        badgeBackground = MaterialTheme.colorScheme.primaryContainer
+                    )
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "App Shield",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = "$activeCount/${allApps.size} Locked",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Lock All quick action
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            viewModel.setAllAppsLockState(true)
+                        },
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .testTag("btn_lock_all")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Lock All",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    // Unlock All quick action
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            viewModel.setAllAppsLockState(false)
+                        },
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .testTag("btn_unlock_all")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LockOpen,
+                            contentDescription = "Unlock All",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    // Info / Hint button to hide complexity
+                    IconButton(
+                        onClick = { showInfoDialog = true },
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .testTag("btn_shield_info")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Protection Details",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
+            // Search Bar
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("input_app_search"),
-                placeholder = { Text(L10n.getString(LocalContext.current, "search_apps"), style = MaterialTheme.typography.bodyMedium) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                placeholder = { Text("Search apps...", style = MaterialTheme.typography.bodyMedium) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear search", tint = MaterialTheme.colorScheme.outline)
+                            Icon(Icons.Default.Clear, contentDescription = "Clear search", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
                         }
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                 )
@@ -297,14 +205,21 @@ fun AppShieldScreen(
 
             // Category Filter Chips
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 items(categories) { category ->
                     FilterChip(
                         selected = selectedCategory == category,
                         onClick = { selectedCategory = category },
-                        label = { Text(L10n.getString(LocalContext.current, category.lowercase()), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold) },
+                        label = {
+                            Text(
+                                text = if (category == "ALL") "All" else category.lowercase().replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        },
                         leadingIcon = {
                             val icon = when (category) {
                                 "FINANCIAL" -> Icons.Default.AccountBalance
@@ -314,20 +229,20 @@ fun AppShieldScreen(
                                 "GAMES" -> Icons.Default.SportsEsports
                                 else -> Icons.Default.Apps
                             }
-                            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(icon, contentDescription = null, modifier = Modifier.size(14.dp))
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
                             selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
                             labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             iconColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         border = FilterChipDefaults.filterChipBorder(
                             enabled = true,
                             selected = selectedCategory == category,
-                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                             selectedBorderColor = MaterialTheme.colorScheme.primary
                         ),
                         modifier = Modifier.testTag("chip_category_$category")
@@ -335,124 +250,7 @@ fun AppShieldScreen(
                 }
             }
 
-            // High Privacy Recommendations Section
-            val recommendedApps = remember(allApps) {
-                allApps.filter { app ->
-                    !app.isLocked && (
-                        app.category in listOf("FINANCIAL", "SOCIAL", "MEDIA") ||
-                        app.appName.contains("bank", ignoreCase = true) ||
-                        app.appName.contains("photo", ignoreCase = true) ||
-                        app.appName.contains("message", ignoreCase = true) ||
-                        app.appName.contains("chat", ignoreCase = true) ||
-                        app.appName.contains("pay", ignoreCase = true) ||
-                        app.packageName.contains("finance", ignoreCase = true)
-                    )
-                }
-            }
-
-            if (recommendedApps.isNotEmpty()) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)),
-                    shape = RoundedCornerShape(16.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lightbulb,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Text(
-                                text = "High-Privacy Recommendations",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        Text(
-                            text = "Protect sensitive Banking, Messaging, or Photo apps to keep personal data safe:",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(recommendedApps) { recApp ->
-                                Surface(
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(12.dp),
-                                    tonalElevation = 2.dp,
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = when (recApp.category) {
-                                                "FINANCIAL" -> Icons.Default.AccountBalance
-                                                "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
-                                                else -> Icons.Default.Photo
-                                            },
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Text(
-                                            text = recApp.appName,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                        Button(
-                                            onClick = { viewModel.toggleLockState(recApp.packageName, recApp.isLocked) },
-                                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
-                                            modifier = Modifier.height(28.dp).testTag("btn_protect_rec_${recApp.packageName}")
-                                        ) {
-                                            Text("Protect Now", fontSize = 11.sp)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.VerifiedUser,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            text = "All high-privacy apps (Banking, Messaging, Photos) are currently locked and protected.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            // App Items List
+            // App List
             if (filteredApps.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -462,35 +260,28 @@ fun AppShieldScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier.padding(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.SearchOff,
-                            contentDescription = "No apps found",
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            modifier = Modifier.size(54.dp)
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(40.dp)
                         )
                         Text(
-                            text = "No Applications Found",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "We couldn't find any applications matching \"$searchQuery\" in the $selectedCategory category. Try adjusting your filter or typing a different query.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = 24.dp)
+                            text = "No apps found",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 8.dp)
                 ) {
                     items(
                         items = filteredApps,
@@ -505,6 +296,67 @@ fun AppShieldScreen(
             }
         }
     }
+
+    // Protection Details Info Dialog (Hides complexity & details behind hint button)
+    if (showInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showInfoDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Shield,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "App Shield Protection",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Speed, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                        Text(
+                            text = "Real-time 10ms Accessibility foreground detection instantly overlays your lock screen when protected apps launch.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                        Text(
+                            text = "100% Offline with SQLCipher AES-256 local database encryption. Zero cloud telemetry.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(Icons.Default.VisibilityOff, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                        Text(
+                            text = "Enable Decoy Camouflage in Settings to disguise PureLock as a functional calculator or fake crash screen.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showInfoDialog = false }) {
+                    Text("Got It")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -513,22 +365,18 @@ private fun AppShieldItemCard(
     onToggle: () -> Unit
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
-    val secondaryColor = MaterialTheme.colorScheme.secondary
     val haptic = LocalHapticFeedback.current
 
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = if (app.isLocked) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f)
-            else MaterialTheme.colorScheme.surface
-        ),
-        shape = RoundedCornerShape(16.dp),
+    Surface(
+        color = if (app.isLocked) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+        else MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(14.dp),
         border = androidx.compose.foundation.BorderStroke(
-            width = if (app.isLocked) 1.5.dp else 1.dp,
-            color = if (app.isLocked) primaryColor.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            width = 1.dp,
+            color = if (app.isLocked) primaryColor.copy(alpha = 0.35f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .dpadFocusable(shape = RoundedCornerShape(16.dp))
             .clickable {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onToggle()
@@ -536,117 +384,79 @@ private fun AppShieldItemCard(
             .testTag("card_app_${app.packageName}")
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // High-fidelity left vertical accent strip indicating lock state
-            if (app.isLocked) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                // Category Icon
                 Box(
                     modifier = Modifier
-                        .width(6.dp)
-                        .height(84.dp)
+                        .size(38.dp)
+                        .clip(CircleShape)
                         .background(
-                            Brush.verticalGradient(
-                                colors = listOf(primaryColor, secondaryColor)
-                            ),
-                            RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
-                        )
-                )
-            } else {
-                Spacer(modifier = Modifier.width(6.dp))
+                            if (app.isLocked) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val categoryIcon = when (app.category) {
+                        "FINANCIAL" -> Icons.Default.AccountBalance
+                        "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
+                        "SYSTEM" -> Icons.Default.Build
+                        "MEDIA" -> Icons.Default.PlayCircle
+                        "GAMES" -> Icons.Default.SportsEsports
+                        else -> Icons.Default.Apps
+                    }
+                    Icon(
+                        imageVector = categoryIcon,
+                        contentDescription = null,
+                        tint = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = app.appName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = app.category.lowercase().replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                    )
+                }
             }
 
             Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    // Category Icon Badge
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (app.isLocked) MaterialTheme.colorScheme.primaryContainer
-                                else MaterialTheme.colorScheme.surfaceContainerHigh
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val categoryIcon = when (app.category) {
-                            "FINANCIAL" -> Icons.Default.AccountBalance
-                            "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
-                            "SYSTEM" -> Icons.Default.Build
-                            "MEDIA" -> Icons.Default.PlayCircle
-                            "GAMES" -> Icons.Default.SportsEsports
-                            else -> Icons.Default.Apps
-                        }
-                        Icon(
-                            imageVector = categoryIcon,
-                            contentDescription = app.category,
-                            tint = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                AnimatedLockToggleIcon(
+                    isLocked = app.isLocked,
+                    onToggle = onToggle
+                )
 
-                    Column {
-                        Text(
-                            text = app.appName,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(
-                                text = app.category,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = "•",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                            Text(
-                                text = app.packageName,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1
-                            )
-                        }
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    AnimatedLockToggleIcon(
-                        isLocked = app.isLocked,
-                        onToggle = onToggle
-                    )
-
-                    // Lock Switch Toggle
-                    Switch(
-                        checked = app.isLocked,
-                        onCheckedChange = { onToggle() },
-                        thumbContent = if (app.isLocked) {
-                            { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) }
-                        } else {
-                            { Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(12.dp)) }
-                        },
-                        modifier = Modifier.testTag("switch_lock_${app.packageName}")
-                    )
-                }
+                Switch(
+                    checked = app.isLocked,
+                    onCheckedChange = { onToggle() },
+                    thumbContent = if (app.isLocked) {
+                        { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) }
+                    } else {
+                        { Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(12.dp)) }
+                    },
+                    modifier = Modifier.testTag("switch_lock_${app.packageName}")
+                )
             }
         }
     }
@@ -663,70 +473,49 @@ fun AnimatedLockToggleIcon(
     val scale by transition.animateFloat(
         transitionSpec = { spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium) },
         label = "Scale"
-    ) { locked -> if (locked) 1.15f else 0.92f }
-
-    val rotation by transition.animateFloat(
-        transitionSpec = { tween(durationMillis = 350, easing = FastOutSlowInEasing) },
-        label = "Rotation"
-    ) { locked -> if (locked) 0f else -18f }
+    ) { locked -> if (locked) 1.05f else 0.95f }
 
     val containerColor by transition.animateColor(
-        transitionSpec = { tween(durationMillis = 300) },
+        transitionSpec = { tween(durationMillis = 250) },
         label = "ContainerColor"
     ) { locked ->
         if (locked) MaterialTheme.colorScheme.primaryContainer
-        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
     }
 
     val iconColor by transition.animateColor(
-        transitionSpec = { tween(durationMillis = 300) },
+        transitionSpec = { tween(durationMillis = 250) },
         label = "IconColor"
     ) { locked ->
         if (locked) MaterialTheme.colorScheme.primary
-        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
     }
 
     Box(
         modifier = modifier
-            .size(40.dp)
+            .size(34.dp)
             .clip(CircleShape)
             .background(containerColor)
-            .border(
-                width = if (isLocked) 1.5.dp else 1.dp,
-                color = if (isLocked) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                shape = CircleShape
-            )
             .clickable { onToggle() }
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-                rotationZ = rotation
             },
         contentAlignment = Alignment.Center
     ) {
         AnimatedContent(
             targetState = isLocked,
             transitionSpec = {
-                (fadeIn(animationSpec = tween(220)) + scaleIn(initialScale = 0.6f)) togetherWith
-                        (fadeOut(animationSpec = tween(180)) + scaleOut(targetScale = 0.6f))
+                fadeIn(animationSpec = tween(180)) togetherWith fadeOut(animationSpec = tween(150))
             },
             label = "LockIconContent"
         ) { locked ->
-            if (locked) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Locked",
-                    tint = iconColor,
-                    modifier = Modifier.size(20.dp)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.LockOpen,
-                    contentDescription = "Unlocked",
-                    tint = iconColor,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            Icon(
+                imageVector = if (locked) Icons.Default.Lock else Icons.Default.LockOpen,
+                contentDescription = if (locked) "Locked" else "Unlocked",
+                tint = iconColor,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }

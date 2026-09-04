@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Clean Vector Splash Logo (100% Pure XML) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="192dp"
@@ -7,71 +6,175 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <group
-        android:scaleX="0.88"
-        android:scaleY="0.88"
-        android:pivotX="54"
-        android:pivotY="54">
+    <!-- Midnight Obsidian Dark Gradient Canvas -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:type="linear">
+                <item android:color="#FF030712" android:offset="0.0" />
+                <item android:color="#FF0B1120" android:offset="0.45" />
+                <item android:color="#FF032B45" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
-        <!-- Drop Shadow -->
+    <!-- Ambient Cyan Radial Glow centered behind shield -->
+    <path android:pathData="M54,54 m-48,0 a48,48 0 1,0 96,0 a48,48 0 1,0 -96,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="54"
+                android:centerY="52"
+                android:gradientRadius="48"
+                android:type="radial">
+                <item android:color="#4D00F0FF" android:offset="0.0" />
+                <item android:color="#200284C7" android:offset="0.55" />
+                <item android:color="#00000000" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Geometric Hexagonal Micro-Matrix Grid -->
+    <path
+        android:strokeColor="#38BDF8"
+        android:strokeWidth="0.6"
+        android:strokeAlpha="0.18"
+        android:pathData="M54,12 L72,22 L72,42 L54,52 L36,42 L36,22 Z M54,52 L72,62 L72,82 L54,92 L36,82 L36,62 Z M18,32 L36,42 L36,62 L18,72 L0,62 L0,42 Z M90,32 L108,42 L108,62 L90,72 L72,62 L72,42 Z" />
+
+    <!-- Illuminated Circuit Traces -->
+    <path
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="1.0"
+        android:strokeAlpha="0.30"
+        android:strokeLineCap="round"
+        android:pathData="M0,28 L36,64 L108,64 M18,0 L54,36 L54,108 M0,88 L88,0 M70,108 L108,70" />
+
+    <!-- Glowing Cyber Nodes -->
+    <path
+        android:fillColor="#00F0FF"
+        android:fillAlpha="0.45"
+        android:pathData="M36,64 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M54,36 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M72,62 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+
+    <!-- FOREGROUND EMBLEM GROUP -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.88"
+        android:scaleY="0.88">
+
+        <!-- Outer Shield Drop Shadow -->
         <path
             android:fillColor="#000000"
-            android:fillAlpha="0.18"
-            android:pathData="M54,16 C38,23 22,25 18,33 C18,64 28,88 54,98 C80,88 90,64 90,33 C86,25 70,23 54,16 Z" />
+            android:fillAlpha="0.45"
+            android:pathData="M54,19 C37,26 21,28 17,36 C17,67 27,91 54,101 C81,91 91,67 91,36 C87,28 71,26 54,19 Z" />
 
-        <!-- Cyan/Blue Outer Glow Border -->
-        <path android:pathData="M54,14 C38,21 22,23 18,31 C18,62 28,86 54,96 C80,86 90,62 90,31 C86,23 70,21 54,14 Z">
+        <!-- Outer Glowing Cyber Shield Bevel (Electric Cyan to Cobalt Gradient) -->
+        <path android:pathData="M54,15 C37,22 21,24 17,32 C17,63 27,87 54,97 C81,87 91,63 91,32 C87,24 71,22 54,15 Z">
             <aapt:attr name="android:fillColor">
                 <gradient
                     android:startX="54"
-                    android:startY="14"
+                    android:startY="15"
                     android:endX="54"
-                    android:endY="96"
+                    android:endY="97"
                     android:type="linear">
                     <item android:color="#FF00F0FF" android:offset="0.0"/>
-                    <item android:color="#FF2EB5FF" android:offset="0.4"/>
-                    <item android:color="#FF0072FF" android:offset="1.0"/>
+                    <item android:color="#FF38BDF8" android:offset="0.30"/>
+                    <item android:color="#FF0284C7" android:offset="0.70"/>
+                    <item android:color="#FF0369A1" android:offset="1.0"/>
                 </gradient>
             </aapt:attr>
         </path>
 
-        <!-- Inner Shield Body -->
-        <path android:pathData="M54,17 C40,23 26,25 22,32 C22,59 30,82 54,92 C78,82 86,59 86,32 C82,25 68,23 54,17 Z">
+        <!-- Inner Armor Core (Obsidian High-Tech Base) -->
+        <path android:pathData="M54,18 C39,24 25,26 21,33 C21,60 29,83 54,93 C79,83 87,60 87,33 C83,26 69,24 54,18 Z">
             <aapt:attr name="android:fillColor">
                 <gradient
                     android:startX="54"
-                    android:startY="17"
+                    android:startY="18"
                     android:endX="54"
-                    android:endY="92"
+                    android:endY="93"
                     android:type="linear">
-                    <item android:color="#FF00C6FF" android:offset="0.0"/>
-                    <item android:color="#FF1E96FC" android:offset="0.45"/>
-                    <item android:color="#FF0052D4" android:offset="1.0"/>
+                    <item android:color="#FF0B132B" android:offset="0.0"/>
+                    <item android:color="#FF070C18" android:offset="0.60"/>
+                    <item android:color="#FF0F1D38" android:offset="1.0"/>
                 </gradient>
             </aapt:attr>
         </path>
 
-        <!-- Top Glossy Specular Highlight -->
+        <!-- Top Specular Gloss Highlight Wave -->
         <path
             android:fillColor="#FFFFFF"
-            android:fillAlpha="0.30"
-            android:pathData="M54,18 C41,23 28,25 24,31 C23.5,35 24,45 27,55 C33,42 43,30 54,26 C65,30 75,42 81,55 C84,45 84.5,35 84,31 C80,25 67,23 54,18 Z"/>
+            android:fillAlpha="0.26"
+            android:pathData="M54,19 C41,24 28,26 23,32 C22.5,36 23,46 26,56 C32,43 42,31 54,27 C66,31 76,43 82,56 C85,46 85.5,36 85,32 C80,26 67,24 54,19 Z"/>
 
-        <!-- Solid White Lock Shackle -->
+        <!-- Biometric / Circuit Arc Lines -->
+        <path
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="1.6"
+            android:strokeAlpha="0.75"
+            android:strokeLineCap="round"
+            android:pathData="M54,33 C46,33 39,40 39,48 M54,28 C43,28 34,37 34,48 C34,59 40,68 54,74 M54,38 C49,38 45,43 45,48 M54,33 C62,33 69,40 69,48 M54,28 C65,28 74,37 74,48 C74,59 68,68 54,74" />
+
+        <!-- Chrome Metallic Lock Shackle -->
+        <path android:pathData="M54,30 C46.2,30 40,36.2 40,44 V52 H46.5 V44 C46.5,39.8 49.8,36.5 54,36.5 C58.2,36.5 61.5,39.8 61.5,44 V52 H68 V44 C68,36.2 61.8,30 54,30 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="40"
+                    android:startY="30"
+                    android:endX="68"
+                    android:endY="52"
+                    android:type="linear">
+                    <item android:color="#FFFFFFFF" android:offset="0.0"/>
+                    <item android:color="#FFE2E8F0" android:offset="0.45"/>
+                    <item android:color="#FF94A3B8" android:offset="1.0"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Heavy Brushed Metallic Padlock Body -->
+        <path android:pathData="M34,51 H74 C76.5,51 78.5,53 78.5,55.5 V75.5 C78.5,78 76.5,80 74,80 H34 C31.5,80 29.5,78 29.5,75.5 V55.5 C29.5,53 31.5,51 34,51 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="29.5"
+                    android:startY="51"
+                    android:endX="78.5"
+                    android:endY="80"
+                    android:type="linear">
+                    <item android:color="#FFFFFFFF" android:offset="0.0"/>
+                    <item android:color="#FFF1F5F9" android:offset="0.30"/>
+                    <item android:color="#FFCBD5E1" android:offset="0.70"/>
+                    <item android:color="#FF64748B" android:offset="1.0"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Lock Body Top Bevel Line -->
         <path
             android:fillColor="#FFFFFF"
-            android:fillType="evenOdd"
-            android:pathData="M54,30 C47.37,30 42,35.37 42,42 V50 H46 V42 C46,37.58 49.58,34 54,34 C58.42,34 62,37.58 62,42 V50 H66 V42 C66,35.37 60.63,30 54,30 Z"/>
+            android:fillAlpha="0.7"
+            android:pathData="M34,51 H74 C76.5,51 78.5,53 78.5,54 H29.5 C29.5,53 31.5,51 34,51 Z" />
 
-        <!-- Solid White Lock Body -->
+        <!-- Deep Electric Keyhole Chamber -->
+        <path android:pathData="M54,59 C56.5,59 58.5,61 58.5,63.5 C58.5,65 57.8,66.3 56.7,67.2 L57.5,74 H50.5 L51.3,67.2 C50.2,66.3 49.5,65 49.5,63.5 C49.5,61 51.5,59 54,59 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="54"
+                    android:startY="59"
+                    android:endX="54"
+                    android:endY="74"
+                    android:type="linear">
+                    <item android:color="#FF0369A1" android:offset="0.0"/>
+                    <item android:color="#FF0B1120" android:offset="1.0"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Glowing Neon Cyan Center Dot & Pulse -->
         <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M38,50 H70 C72.21,50 74,51.79 74,54 V72 C74,74.21 72.21,76 70,76 H38 C35.79,76 34,74.21 34,72 V54 C34,51.79 35.79,50 38,50 Z"/>
-
-        <!-- Electric Keyhole -->
-        <path
-            android:fillColor="#FF0072FF"
-            android:pathData="M54,60 C56.21,60 58,61.79 58,64 C58,65.32 57.41,66.49 56.48,67.27 L57,72 H51 L51.52,67.27 C50.59,66.49 50,65.32 50,64 C50,61.79 51.79,60 54,60 Z"/>
-
+            android:fillColor="#00F0FF"
+            android:pathData="M54,63.5 m-2.2,0 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0" />
     </group>
 </vector>

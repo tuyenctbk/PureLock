@@ -217,4 +217,114 @@
     <string name="intruder_banner_info">Intruder photos are encrypted and stored exclusively inside app private memory. They never sync to clouds or gallery.</string>
     <string name="trash_banner_info">Trash Bin safeguards soft-deleted items. Items are automatically purged after %1$d days.</string>
     <string name="store_first_category_secret">Store Secret in %1$s</string>
+
+    <!-- Vault Dashboard UI Strings -->
+    <string name="vault_dashboard_title">Encrypted Vault</string>
+    <string name="vault_dashboard_subtitle">AES-256 SQLCipher • Zero-Knowledge</string>
+    <string name="vault_clipboard_protected">Clipboard Protected</string>
+    <string name="vault_clipboard_wiping_in">Wiping sensitive clip in %1$ds</string>
+    <string name="vault_clipboard_wiped_toast">Clipboard wiped immediately</string>
+    <string name="vault_search_placeholder">Search encrypted items…</string>
+    <string name="vault_empty_trash_button">Empty</string>
+    <string name="vault_trash_empty_title">Trash Bin is Empty</string>
+    <string name="vault_trash_empty_desc">Deleted secrets are permanently removed or automatically purged.</string>
+    <string name="vault_empty_no_match">No encrypted items match \"%1$s\"</string>
+    <string name="vault_empty_category_desc">Tap \'+\' to securely store passwords, secure notes, cards, or 2FA codes.</string>
+    <string name="vault_empty_in_category">No items in %1$s</string>
+    <string name="vault_item_moved_to_trash">\"%1$s\" moved to Trash</string>
+    <string name="vault_item_restored">\"%1$s\" restored</string>
+    <string name="vault_item_updated">Encrypted entry updated</string>
+    <string name="vault_item_saved_securely">Saved securely with AES-256 encryption</string>
+    <string name="vault_item_deleted_permanently">Secret permanently deleted</string>
+    <string name="vault_trash_emptied">Trash bin emptied</string>
+    <string name="vault_empty_trash_dialog_title">Empty Trash Bin?</string>
+    <string name="vault_empty_trash_dialog_message">All %1$d items in the trash bin will be permanently erased.</string>
+    <string name="vault_empty_trash_confirm">Empty Trash</string>
+    <string name="vault_delete_dialog_title">Permanently Delete Secret?</string>
+    <string name="vault_delete_dialog_message">Are you sure you want to delete \"%1$s\"? This encrypted entry cannot be recovered.</string>
+    <string name="vault_delete_dialog_confirm">Delete Permanently</string>
+    <string name="vault_add_new_title">New Encrypted Secret</string>
+    <string name="vault_edit_title">Edit Encrypted Item</string>
+    <string name="vault_field_category">Category</string>
+    <string name="vault_field_title_label">Title / Service Name *</string>
+    <string name="vault_field_title_placeholder">e.g., ProtonMail, GitHub, Safe Note</string>
+    <string name="vault_field_secret_label">Password / Secret *</string>
+    <string name="vault_field_note_content_label">Secret Content *</string>
+    <string name="vault_field_username_label">Username / Email</string>
+    <string name="vault_field_username_placeholder">user@example.com</string>
+    <string name="vault_field_website_label">Website or App</string>
+    <string name="vault_field_website_placeholder">https://example.com</string>
+    <string name="vault_field_notes_label">Encrypted Notes (Optional)</string>
+    <string name="vault_field_pin_top">Pin to Top</string>
+    <string name="vault_field_favorite">Favorite</string>
+    <string name="vault_btn_save">Save Encrypted</string>
+    <string name="vault_btn_generate">Generate</string>
+    <string name="vault_generator_helper">Auto-generate 20-char high entropy key</string>
+    <string name="vault_filter_all">All</string>
+    <string name="vault_filter_passwords">Passwords</string>
+    <string name="vault_filter_notes">Notes</string>
+    <string name="vault_filter_cards">Cards</string>
+    <string name="vault_filter_2fa">2FA / Codes</string>
+    <string name="vault_filter_pins">PINs</string>
+    <string name="vault_filter_favorites">Favorites</string>
+    <string name="vault_filter_trash">Trash</string>
+
+    <!-- Navigation Bar Strings -->
+    <string name="nav_vault">Vault</string>
+    <string name="nav_shield">App Shield</string>
+    <string name="nav_intruder">Intruder</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_audit">Audit</string>
+
+    <!-- Splash Screen Strings -->
+    <string name="splash_tagline">Zero-Knowledge Offline Security</string>
+    <string name="splash_status_initializing">Initializing AES-256 Vault…</string>
+    <string name="splash_status_keystore">Hardware Security Keystore Active</string>
+    <string name="splash_status_ready">Security Shield Ready</string>
+    <string name="splash_badge_offline">100% Offline • Zero Telemetry</string>
+
+    <!-- App Shield UI Strings -->
+    <string name="shield_locked_count">%1$d/%2$d Locked</string>
+    <string name="shield_lock_all">Lock All</string>
+    <string name="shield_unlock_all">Unlock All</string>
+    <string name="shield_details_title">Protection Details</string>
+    <string name="shield_no_apps_match">No apps match \"%1$s\"</string>
+
+    <!-- Onboarding UI Strings -->
+    <string name="onboarding_welcome_title">Welcome to PureLock</string>
+    <string name="onboarding_welcome_desc">Zero-Cloud Offline Security Engine.\nProtect your apps, photos, and secrets with Military-Grade Local Encryption.</string>
+    <string name="onboarding_setup_key_title">Set Up Master Security Key</string>
+    <string name="onboarding_setup_pattern_desc">Draw your master pattern (minimum 4 dots) and configure fallback PIN.</string>
+    <string name="onboarding_setup_pin_desc">Create your master PIN to unlock PureLock and protected apps.</string>
+    <string name="onboarding_btn_continue">Continue</string>
+    <string name="onboarding_btn_enter">Enter PureLock</string>
+    <string name="onboarding_btn_back">Back</string>
+    <string name="onboarding_pin_min_length_error">Master PIN must be at least 4 digits.</string>
+    <string name="onboarding_pin_mismatch_error">Master PIN confirmation does not match.</string>
+    <string name="onboarding_pattern_min_nodes_error">Pattern must connect at least 4 dots.</string>
+    <string name="onboarding_disclosure_title">Accessibility Service Disclosure</string>
+    <string name="onboarding_disclosure_why_title">Why PureLock Needs Accessibility Permission:</string>
+    <string name="onboarding_disclosure_why_desc">PureLock uses the AccessibilityService API strictly to detect when your protected apps are opened in the foreground and display the lock screen overlay immediately.</string>
+    <string name="onboarding_disclosure_privacy_title">Data Collection &amp; Privacy Guarantee:</string>
+    <string name="onboarding_disclosure_privacy_desc">PureLock does NOT track, store, or transmit any sensitive user data, typed text, passwords, or personal content. PureLock is 100% offline with zero internet permissions.</string>
+    <string name="onboarding_disclosure_agree">Agree &amp; Turn On</string>
+    <string name="onboarding_disclosure_decline">Decline</string>
+    <string name="onboarding_perm_title">Enable Privacy Shield</string>
+    <string name="onboarding_perm_desc">Grant permissions so PureLock can detect app launches instantly.</string>
+    <string name="onboarding_perm_acc_title">Accessibility Service</string>
+    <string name="onboarding_perm_acc_desc">Detect foreground apps instantly.</string>
+    <string name="onboarding_perm_acc_btn">Grant Accessibility Permission</string>
+    <string name="onboarding_perm_usage_title">Usage Access Permission</string>
+    <string name="onboarding_perm_usage_desc">Monitor system app state safely.</string>
+    <string name="onboarding_perm_usage_btn">Grant Usage Access</string>
+    <string name="onboarding_complete_title">Protection Active!</string>
+    <string name="onboarding_complete_desc">Your zero-knowledge privacy vault is ready.\nAll master keys and encrypted items are secured strictly on your device.</string>
+    <string name="onboarding_master_pin_label">Master PIN</string>
+    <string name="onboarding_fallback_pin_label">Fallback Master PIN</string>
+    <string name="onboarding_confirm_pin_label">Confirm Master PIN</string>
+    <string name="onboarding_biometrics_title">Biometrics Enabled</string>
+    <string name="onboarding_biometrics_desc">Fingerprint or Face authentication will unlock PureLock instantly. Enter a Master PIN below for system reboots.</string>
+    <string name="onboarding_draw_pattern_hint">Draw Master Pattern Below</string>
+    <string name="onboarding_selected_nodes_format">Selected Nodes: %1$s</string>
+    <string name="onboarding_reset_pattern">Reset Pattern</string>
 </resources>

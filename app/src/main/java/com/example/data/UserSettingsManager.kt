@@ -33,6 +33,8 @@ class UserSettingsManager(private val context: Context) {
         val KEY_SHAKE_TO_LOCK = booleanPreferencesKey("shake_to_lock")
         val KEY_INTRUDER_CAPTURE = booleanPreferencesKey("intruder_capture")
         val KEY_STEALTH_DECOY = booleanPreferencesKey("stealth_decoy")
+        val KEY_DECOY_TYPE = stringPreferencesKey("decoy_type") // "NONE", "CALCULATOR", "FAKE_CRASH"
+        val KEY_MASTER_KNOCK = stringPreferencesKey("master_knock") // e.g. "1,2,4,3"
         val KEY_STEALTH_MODE_ACTIVE = booleanPreferencesKey("stealth_mode_active")
         val KEY_BIOMETRIC_SETTINGS_SECURED = booleanPreferencesKey("biometric_settings_secured")
 
@@ -116,6 +118,21 @@ class UserSettingsManager(private val context: Context) {
 
     val stealthDecoy: Flow<Boolean> = safeData.map { prefs ->
         prefs[KEY_STEALTH_DECOY] ?: false
+    }
+
+    val decoyType: Flow<String> = safeData.map { prefs ->
+        val explicit = prefs[KEY_DECOY_TYPE]
+        if (explicit != null) {
+            explicit
+        } else if (prefs[KEY_STEALTH_DECOY] == true) {
+            "CALCULATOR"
+        } else {
+            "NONE"
+        }
+    }
+
+    val masterKnock: Flow<String> = safeData.map { prefs ->
+        prefs[KEY_MASTER_KNOCK] ?: "1,2,4,3"
     }
 
     val stealthModeActive: Flow<Boolean> = safeData.map { prefs ->
@@ -244,6 +261,24 @@ class UserSettingsManager(private val context: Context) {
     suspend fun setStealthDecoy(enabled: Boolean) {
         dataStore.edit { prefs ->
             prefs[KEY_STEALTH_DECOY] = enabled
+            if (enabled && prefs[KEY_DECOY_TYPE] == null) {
+                prefs[KEY_DECOY_TYPE] = "CALCULATOR"
+            } else if (!enabled) {
+                prefs[KEY_DECOY_TYPE] = "NONE"
+            }
+        }
+    }
+
+    suspend fun setDecoyType(type: String) {
+        dataStore.edit { prefs ->
+            prefs[KEY_DECOY_TYPE] = type
+            prefs[KEY_STEALTH_DECOY] = (type != "NONE")
+        }
+    }
+
+    suspend fun setMasterKnock(knock: String) {
+        dataStore.edit { prefs ->
+            prefs[KEY_MASTER_KNOCK] = knock
         }
     }
 

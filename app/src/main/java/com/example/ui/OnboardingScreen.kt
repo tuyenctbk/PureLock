@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -132,25 +133,29 @@ fun OnboardingScreen(
                         onClick = { currentStep-- },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                     ) {
-                        Text("Back")
+                        Text(stringResource(R.string.onboarding_btn_back))
                     }
                 } else {
                     Spacer(modifier = Modifier.width(1.dp))
                 }
 
+                val minPinError = stringResource(R.string.onboarding_pin_min_length_error)
+                val mismatchError = stringResource(R.string.onboarding_pin_mismatch_error)
+                val patternError = stringResource(R.string.onboarding_pattern_min_nodes_error)
+
                 Button(
                     onClick = {
                         if (currentStep == 1) {
                             if (inputPin.length < 4) {
-                                pinError = "Master PIN must be at least 4 digits."
+                                pinError = minPinError
                                 return@Button
                             }
                             if (inputPin != confirmPin) {
-                                pinError = "Master PIN confirmation does not match."
+                                pinError = mismatchError
                                 return@Button
                             }
                             if (selectedSecurityType == "PATTERN" && patternNodes.size < 4) {
-                                pinError = "Pattern must connect at least 4 dots."
+                                pinError = patternError
                                 return@Button
                             }
                             pinError = null
@@ -169,7 +174,7 @@ fun OnboardingScreen(
                     modifier = Modifier.height(48.dp)
                 ) {
                     Text(
-                        text = if (currentStep == 3) "Enter PureLock" else "Continue",
+                        text = if (currentStep == 3) stringResource(R.string.onboarding_btn_enter) else stringResource(R.string.onboarding_btn_continue),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -189,25 +194,17 @@ private fun OnboardingStepWelcome() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Surface(
-            modifier = Modifier.size(100.dp),
-            shape = CircleShape,
-            color = Color(0xFF1E293B)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    painter = painterResource(id = R.drawable.splash_logo),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(72.dp)
-                )
-            }
-        }
+        PureLockLogoEmblem(
+            size = 108.dp,
+            showGlowRing = true,
+            showRadarScan = true,
+            elevation = 16.dp
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Welcome to PureLock",
+            text = stringResource(R.string.onboarding_welcome_title),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -217,7 +214,7 @@ private fun OnboardingStepWelcome() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Zero-Cloud Offline Security Engine.\nProtect your apps, photos, and secrets with Military-Grade Local Encryption.",
+            text = stringResource(R.string.onboarding_welcome_desc),
             fontSize = 15.sp,
             color = Color(0xFF94A3B8),
             textAlign = TextAlign.Center,
@@ -246,7 +243,7 @@ private fun OnboardingStepSecuritySetup(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Set Up Master Security Key",
+            text = stringResource(R.string.onboarding_setup_key_title),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -257,9 +254,9 @@ private fun OnboardingStepSecuritySetup(
 
         Text(
             text = when (selectedSecurityType) {
-                "PATTERN" -> "Draw your master pattern (minimum 4 dots) and configure fallback PIN."
-                "BIOMETRIC" -> "Use system fingerprint/face unlock with fallback PIN."
-                else -> "Create a 4-8 digit master PIN key."
+                "PATTERN" -> stringResource(R.string.onboarding_setup_pattern_desc)
+                "BIOMETRIC" -> stringResource(R.string.onboarding_biometrics_desc)
+                else -> stringResource(R.string.onboarding_setup_pin_desc)
             },
             fontSize = 13.sp,
             color = Color(0xFF94A3B8),
@@ -297,7 +294,7 @@ private fun OnboardingStepSecuritySetup(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = if (patternNodes.isEmpty()) "Draw Master Pattern Below" else "Selected Nodes: ${patternNodes.joinToString("-")}",
+                        text = if (patternNodes.isEmpty()) stringResource(R.string.onboarding_draw_pattern_hint) else stringResource(R.string.onboarding_selected_nodes_format, patternNodes.joinToString("-")),
                         color = Color(0xFF38BDF8),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
@@ -316,7 +313,7 @@ private fun OnboardingStepSecuritySetup(
 
                     if (patternNodes.isNotEmpty()) {
                         TextButton(onClick = { onPatternNodesChanged(emptyList()) }) {
-                            Text("Reset Pattern", color = Color(0xFFF87171), fontSize = 12.sp)
+                            Text(stringResource(R.string.onboarding_reset_pattern), color = Color(0xFFF87171), fontSize = 12.sp)
                         }
                     }
                 }
@@ -342,13 +339,13 @@ private fun OnboardingStepSecuritySetup(
                         )
                         Column {
                             Text(
-                                text = "Biometrics Enabled",
+                                text = stringResource(R.string.onboarding_biometrics_title),
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = "Fingerprint or Face authentication will unlock PureLock instantly. Enter a Master PIN below for system reboots.",
+                                text = stringResource(R.string.onboarding_biometrics_desc),
                                 color = Color(0xFF94A3B8),
                                 fontSize = 12.sp
                             )
@@ -363,7 +360,7 @@ private fun OnboardingStepSecuritySetup(
         OutlinedTextField(
             value = pin,
             onValueChange = onPinChanged,
-            label = { Text(if (selectedSecurityType == "PIN") "Master PIN" else "Fallback Master PIN") },
+            label = { Text(if (selectedSecurityType == "PIN") stringResource(R.string.onboarding_master_pin_label) else stringResource(R.string.onboarding_fallback_pin_label)) },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -382,7 +379,7 @@ private fun OnboardingStepSecuritySetup(
         OutlinedTextField(
             value = confirmPin,
             onValueChange = onConfirmPinChanged,
-            label = { Text("Confirm Master PIN") },
+            label = { Text(stringResource(R.string.onboarding_confirm_pin_label)) },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -416,29 +413,29 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
         AlertDialog(
             onDismissRequest = { showAccessibilityDisclosure = false },
             icon = { Icon(Icons.Default.AccessibilityNew, contentDescription = null, tint = Color(0xFF38BDF8)) },
-            title = { Text("Accessibility Service Disclosure", fontWeight = FontWeight.Bold, color = Color.White) },
+            title = { Text(stringResource(R.string.onboarding_disclosure_title), fontWeight = FontWeight.Bold, color = Color.White) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Why PureLock Needs Accessibility Permission:",
+                        text = stringResource(R.string.onboarding_disclosure_why_title),
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "PureLock uses the AccessibilityService API strictly to detect when your protected apps are opened in the foreground and display the lock screen overlay immediately.",
+                        text = stringResource(R.string.onboarding_disclosure_why_desc),
                         color = Color(0xFF94A3B8),
                         fontSize = 13.sp
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Data Collection & Privacy Guarantee:",
+                        text = stringResource(R.string.onboarding_disclosure_privacy_title),
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "PureLock does NOT track, store, or transmit any sensitive user data, typed text, passwords, or personal content. PureLock is 100% offline with zero internet permissions.",
+                        text = stringResource(R.string.onboarding_disclosure_privacy_desc),
                         color = Color(0xFF94A3B8),
                         fontSize = 13.sp
                     )
@@ -456,7 +453,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
                 ) {
-                    Text("Agree & Turn On")
+                    Text(stringResource(R.string.onboarding_disclosure_agree))
                 }
             },
             dismissButton = {
@@ -464,7 +461,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     onClick = { showAccessibilityDisclosure = false },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                 ) {
-                    Text("Decline")
+                    Text(stringResource(R.string.onboarding_disclosure_decline))
                 }
             },
             containerColor = Color(0xFF1E293B)
@@ -479,7 +476,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Enable Privacy Shield",
+            text = stringResource(R.string.onboarding_perm_title),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -489,7 +486,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Grant permissions so PureLock can detect app launches instantly.",
+            text = stringResource(R.string.onboarding_perm_desc),
             fontSize = 14.sp,
             color = Color(0xFF94A3B8),
             textAlign = TextAlign.Center
@@ -507,8 +504,8 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     Icon(Icons.Default.AccessibilityNew, contentDescription = null, tint = Color(0xFF38BDF8))
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Accessibility Service", fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("Detect foreground apps instantly.", fontSize = 12.sp, color = Color(0xFF94A3B8))
+                        Text(stringResource(R.string.onboarding_perm_acc_title), fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(stringResource(R.string.onboarding_perm_acc_desc), fontSize = 12.sp, color = Color(0xFF94A3B8))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -517,7 +514,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF334155))
                 ) {
-                    Text("Grant Accessibility Permission")
+                    Text(stringResource(R.string.onboarding_perm_acc_btn))
                 }
             }
         }
@@ -534,8 +531,8 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     Icon(Icons.Default.Insights, contentDescription = null, tint = Color(0xFF38BDF8))
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Usage Access Permission", fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("Monitor system app state safely.", fontSize = 12.sp, color = Color(0xFF94A3B8))
+                        Text(stringResource(R.string.onboarding_perm_usage_title), fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(stringResource(R.string.onboarding_perm_usage_desc), fontSize = 12.sp, color = Color(0xFF94A3B8))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -550,7 +547,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF334155))
                 ) {
-                    Text("Grant Usage Access")
+                    Text(stringResource(R.string.onboarding_perm_usage_btn))
                 }
             }
         }
@@ -584,7 +581,7 @@ private fun OnboardingStepComplete() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Protection Active!",
+            text = stringResource(R.string.onboarding_complete_title),
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -594,7 +591,7 @@ private fun OnboardingStepComplete() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Your zero-knowledge privacy vault is ready.\nAll master keys and encrypted items are secured strictly on your device.",
+            text = stringResource(R.string.onboarding_complete_desc),
             fontSize = 15.sp,
             color = Color(0xFF94A3B8),
             textAlign = TextAlign.Center,

@@ -16,6 +16,7 @@ import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
 import com.example.data.model.UserSettingEntity
+import net.sqlcipher.database.SupportFactory
 
 @Database(
     entities = [
@@ -26,7 +27,7 @@ import com.example.data.model.UserSettingEntity
         EncryptedVaultEntity::class,
         UserSettingEntity::class
     ],
-    version = 5,
+    version = 7,
     exportSchema = false
 )
 abstract class PureLockDatabase : RoomDatabase() {
@@ -41,13 +42,30 @@ abstract class PureLockDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: PureLockDatabase? = null
 
+        private fun getOrCreatePassphrase(context: Context): ByteArray {
+            val prefs = context.getSharedPreferences("purelock_sec_vault", Context.MODE_PRIVATE)
+            val keyAlias = "purelock_db_enc_key"
+            val existing = prefs.getString(keyAlias, null)
+            if (existing != null) {
+                return android.util.Base64.decode(existing, android.util.Base64.NO_WRAP)
+            }
+            val randomBytes = ByteArray(32)
+            java.security.SecureRandom().nextBytes(randomBytes)
+            val encoded = android.util.Base64.encodeToString(randomBytes, android.util.Base64.NO_WRAP)
+            prefs.edit().putString(keyAlias, encoded).apply()
+            return randomBytes
+        }
+
         fun getDatabase(context: Context): PureLockDatabase {
             return INSTANCE ?: synchronized(this) {
+                val passphrase = getOrCreatePassphrase(context.applicationContext)
+                val factory = SupportFactory(passphrase)
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     PureLockDatabase::class.java,
-                    "purelock_privacy_db"
+                    "purelock_privacy_encrypted.db"
                 )
+                .openHelperFactory(factory)
                 .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()
                 INSTANCE = instance

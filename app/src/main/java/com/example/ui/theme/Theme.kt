@@ -94,25 +94,75 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = Color(0xFFCBD5E1)
 )
 
+private val EmeraldDarkColorScheme = darkColorScheme(
+    primary = EmeraldPrimary,
+    onPrimary = Color(0xFF042F2E),
+    primaryContainer = Color(0xFF064E3B),
+    onPrimaryContainer = Color(0xFFD1FAE5),
+    secondary = EmeraldAccent,
+    onSecondary = Color(0xFF042F2E),
+    secondaryContainer = Color(0xFF065F46),
+    onSecondaryContainer = Color(0xFFA7F3D0),
+    tertiary = Color(0xFFFBBF24),
+    onTertiary = Color(0xFF451A03),
+    background = EmeraldSurface,
+    onBackground = Color(0xFFECFDF5),
+    surface = EmeraldSurface,
+    surfaceVariant = EmeraldSurfaceVariant,
+    onSurface = Color(0xFFECFDF5),
+    onSurfaceVariant = Color(0xFF6EE7B7),
+    outline = Color(0xFF065F46),
+    outlineVariant = Color(0xFF042F2E)
+)
+
+private val SapphireDarkColorScheme = darkColorScheme(
+    primary = SapphirePrimary,
+    onPrimary = Color(0xFF082F49),
+    primaryContainer = Color(0xFF0C4A6E),
+    onPrimaryContainer = Color(0xFFE0F2FE),
+    secondary = SapphireAccent,
+    onSecondary = Color(0xFF082F49),
+    secondaryContainer = Color(0xFF0369A1),
+    onSecondaryContainer = Color(0xFFBAE6FD),
+    tertiary = SecurityCyan,
+    onTertiary = Color(0xFF082F49),
+    background = SapphireSurface,
+    onBackground = Color(0xFFF0F9FF),
+    surface = SapphireSurface,
+    surfaceVariant = SapphireSurfaceVariant,
+    onSurface = Color(0xFFF0F9FF),
+    onSurfaceVariant = Color(0xFF7DD3FC),
+    outline = Color(0xFF0369A1),
+    outlineVariant = Color(0xFF0C4A6E)
+)
+
 @Composable
 fun PureLockTheme(
     themeMode: String = "SYSTEM",
     darkTheme: Boolean = when (themeMode) {
         "LIGHT" -> false
-        "DARK", "AMOLED" -> true
+        "DARK", "AMOLED", "CYBER_MIDNIGHT", "OLED_BLACK", "EMERALD_VAULT", "SAPPHIRE_FROST" -> true
         else -> isSystemInDarkTheme()
     },
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        themeMode == "AMOLED" -> AmoledDarkColorScheme
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val colorScheme = when (themeMode) {
+        "AMOLED", "OLED_BLACK" -> AmoledDarkColorScheme
+        "EMERALD_VAULT" -> EmeraldDarkColorScheme
+        "SAPPHIRE_FROST" -> SapphireDarkColorScheme
+        "CYBER_MIDNIGHT" -> DarkColorScheme
+        "LIGHT" -> LightColorScheme
+        else -> {
+            if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val context = LocalContext.current
+                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            } else if (darkTheme) {
+                DarkColorScheme
+            } else {
+                LightColorScheme
+            }
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
     }
 
     MaterialTheme(
