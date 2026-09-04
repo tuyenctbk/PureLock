@@ -18,9 +18,9 @@ android {
   defaultConfig {
     applicationId = "com.soloprono.purelock"
     minSdk = 24
-    targetSdk = 35
-    versionCode = 8
-    versionName = "1.7"
+    targetSdk = 36
+    versionCode = 10
+    versionName = "2.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
