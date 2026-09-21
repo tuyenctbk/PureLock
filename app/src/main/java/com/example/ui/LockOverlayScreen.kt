@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Base64
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -68,6 +69,10 @@ fun LockOverlayScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
+
+    BackHandler {
+        onCancelled()
+    }
 
     var appName by remember { mutableStateOf(packageName) }
     var appIconBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -171,22 +176,38 @@ fun LockOverlayScreen(
     }
 
     fun handleDigitPressed(digit: Int) {
-        if (inputPin.length < masterPin.length) {
-            inputPin += digit
+        val maxTargetLen = maxOf(masterPin.length.coerceAtLeast(4), duressPin.length.coerceAtLeast(4))
+        if (inputPin.length < maxTargetLen) {
+            val updated = inputPin + digit
+            inputPin = updated
             errorMessage = null
-            if (inputPin.length >= masterPin.length) {
-                if (inputPin == masterPin) {
-                    handleSuccessUnlock()
-                } else if (inputPin == duressPin) {
-                    scope.launch {
-                        repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
-                        repository.emptyTrashVault()
-                    }
-                    onCancelled()
-                } else {
-                    inputPin = ""
-                    recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
+
+            // 1. Check if duress PIN triggered (emergency panic wipe)
+            if (duressPin.isNotBlank() && updated == duressPin) {
+                scope.launch {
+                    repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
+                    repository.emptyTrashVault()
                 }
+                onCancelled()
+                return
+            }
+
+            // 2. Check if master PIN matches
+            if (updated == masterPin) {
+                handleSuccessUnlock()
+                return
+            }
+
+            // 3. Check if input length reached the target expected length
+            val expectedLength = if (duressPin.isNotBlank() && updated.length < duressPin.length && duressPin.startsWith(updated)) {
+                duressPin.length
+            } else {
+                masterPin.length
+            }
+
+            if (updated.length >= expectedLength) {
+                inputPin = ""
+                recordFailedAttempt(context.getString(R.string.lock_incorrect_pin))
             }
         }
     }
@@ -424,7 +445,7 @@ fun LockOverlayScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
-                            contentDescription = "Intruder Alert",
+                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                         Text(
@@ -467,7 +488,7 @@ fun LockOverlayScreen(
                         securityType = "KNOCK"
                         secondaryAuthNotice = null
                     },
-                    label = { Text("Knock") },
+                    label = { Text(stringResource(R.string.lock_mode_knock)) },
                     leadingIcon = { Icon(Icons.Default.TouchApp, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("chip_knock_mode")
                 )
@@ -591,7 +612,7 @@ fun LockOverlayScreen(
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Unlock with Biometrics")
+                                        Text(stringResource(R.string.lock_unlock_biometrics))
                                     }
                                 }
                             }
@@ -624,7 +645,7 @@ fun LockOverlayScreen(
                                 },
                                 onPatternCompleted = {
                                     val userPatternStr = patternSelectedNodes.joinToString(",")
-                                    if (userPatternStr == masterPattern || userPatternStr == "1,2,5,8,9") {
+                                    if (userPatternStr == masterPattern) {
                                         handleSuccessUnlock()
                                     } else {
                                         recordFailedAttempt(context.getString(R.string.lock_incorrect_pattern))
@@ -664,7 +685,7 @@ fun LockOverlayScreen(
                                             modifier = Modifier.size(16.dp)
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Biometrics")
+                                        Text(stringResource(R.string.lock_mode_biometric))
                                     }
                                 }
                             }
@@ -1056,12 +1077,12 @@ fun CalculatorDisguiseView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Calculate,
-                        contentDescription = "Calculator",
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
-                        text = "Calculator",
+                        text = stringResource(R.string.suite_decoy_calculator),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -1073,7 +1094,7 @@ fun CalculatorDisguiseView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Lock,
-                        contentDescription = "Direct Lock",
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.size(18.dp)
                     )

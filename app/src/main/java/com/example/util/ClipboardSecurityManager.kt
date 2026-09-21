@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.R
 
 /**
  * ClipboardSecurityManager ensures passwords, 2FA tokens, and secret notes
@@ -112,7 +113,7 @@ object ClipboardSecurityManager {
                     clipboard.setPrimaryClip(emptyClip)
                 }
                 if (showNotification) {
-                    Toast.makeText(context, "Sensitive clipboard cleared automatically.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.clipboard_cleared_auto_toast), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 // Defensive catch for OEM clipboard service anomalies

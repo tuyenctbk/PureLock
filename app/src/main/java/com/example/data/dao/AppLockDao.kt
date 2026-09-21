@@ -36,6 +36,9 @@ interface AppLockDao {
     @Query("UPDATE locked_apps SET unlockCount = 0")
     suspend fun resetUnlockCounts()
 
+    @Query("UPDATE locked_apps SET lastUnlockedTimestamp = 0")
+    suspend fun resetAllUnlockedTimestamps()
+
     @Query("DELETE FROM locked_apps WHERE packageName = :packageName")
     suspend fun deleteApp(packageName: String)
 }

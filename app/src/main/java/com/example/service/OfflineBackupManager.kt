@@ -38,7 +38,7 @@ class OfflineBackupManager(private val context: Context) {
 
         val backupDataJson = JSONObject().apply {
             put("timestamp", System.currentTimeMillis())
-            put("app_version", "2.1.0")
+            put("app_version", com.example.BuildConfig.VERSION_NAME)
 
             val appsArray = JSONArray()
             lockedApps.forEach { app ->
@@ -133,7 +133,7 @@ class OfflineBackupManager(private val context: Context) {
         val dataJson = JSONObject().apply {
             put("timestamp", System.currentTimeMillis())
             put("type", "ENCRYPTED_NOTES_VAULT")
-            put("app_version", "2.1.0")
+            put("app_version", com.example.BuildConfig.VERSION_NAME)
 
             val vaultArray = JSONArray()
             vaultItems.forEach { item ->

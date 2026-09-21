@@ -8,7 +8,7 @@
         android:shortcutLongLabel="@string/shortcut_vault_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.example"
+            android:targetPackage="com.soloprono.purelock"
             android:targetClass="com.example.MainActivity">
             <extra android:name="shortcut_action" android:value="VIEW_VAULT" />
         </intent>
@@ -21,7 +21,7 @@
         android:shortcutLongLabel="@string/shortcut_generator_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.example"
+            android:targetPackage="com.soloprono.purelock"
             android:targetClass="com.example.MainActivity">
             <extra android:name="shortcut_action" android:value="GENERATE_PASSWORD" />
         </intent>

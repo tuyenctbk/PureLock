@@ -31,8 +31,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.data.model.SecurityLogEntity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -164,12 +166,12 @@ fun SecurityAnalyticsDashboard(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Filter audit logs...", style = MaterialTheme.typography.bodySmall) },
+                placeholder = { Text(stringResource(R.string.audit_search_placeholder), style = MaterialTheme.typography.bodySmall) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp)) },
                 trailingIcon = if (searchQuery.isNotEmpty()) {
                     {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear), modifier = Modifier.size(16.dp))
                         }
                     }
                 } else null,
@@ -261,16 +263,16 @@ fun SecurityAnalyticsDashboard(
         AlertDialog(
             onDismissRequest = { showChartInfoDialog = false },
             icon = { Icon(Icons.Default.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text("Protection Rating", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.audit_protection_rating_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("• Score is based on protected app coverage and active defense layers.", style = MaterialTheme.typography.bodySmall)
-                    Text("• 0s-30s auto-lock threshold minimizes vulnerability exposure.", style = MaterialTheme.typography.bodySmall)
-                    Text("• SQLCipher AES-256 secures all databases locally with zero telemetry.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.audit_protection_rating_bullet1), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.audit_protection_rating_bullet2), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.audit_protection_rating_bullet3), style = MaterialTheme.typography.bodySmall)
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showChartInfoDialog = false }) { Text("Got It") }
+                TextButton(onClick = { showChartInfoDialog = false }) { Text(stringResource(R.string.got_it)) }
             }
         )
     }
@@ -396,13 +398,14 @@ fun ThreatLevelGaugeCard(
                     ) {
                         Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("AES-256 SQLCipher", style = MaterialTheme.typography.labelSmall, fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(stringResource(R.string.badge_aes_sqlcipher), style = MaterialTheme.typography.labelSmall, fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
 
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                     shape = RoundedCornerShape(8.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                     modifier = Modifier.weight(1f)
                 ) {
                     Row(
@@ -412,7 +415,7 @@ fun ThreatLevelGaugeCard(
                     ) {
                         Icon(Icons.Default.Timer, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(12.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("${backgroundTimeoutSec}s Auto-Lock", style = MaterialTheme.typography.labelSmall, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.badge_autolock_format, backgroundTimeoutSec), style = MaterialTheme.typography.labelSmall, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -595,12 +598,12 @@ fun SecurityLogDetailDialog(
             ) {
                 Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Copy")
+                Text(stringResource(R.string.btn_copy))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close")
+                Text(stringResource(R.string.btn_close))
             }
         }
     )

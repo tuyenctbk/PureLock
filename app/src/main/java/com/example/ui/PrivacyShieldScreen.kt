@@ -26,8 +26,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.R
 import com.example.data.model.SecurityLogEntity
+import com.example.util.PermissionUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -45,6 +49,24 @@ fun PrivacyShieldScreen(
     var showExportDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
     var showAccessibilityDisclosure by remember { mutableStateOf(false) }
+    var showRestrictedSettingsHelp by remember { mutableStateOf(false) }
+
+    var isAccessibilityGranted by remember { mutableStateOf(PermissionUtils.isAccessibilityServiceEnabled(context)) }
+    var isOverlayGranted by remember { mutableStateOf(PermissionUtils.isOverlayPermissionGranted(context)) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isAccessibilityGranted = PermissionUtils.isAccessibilityServiceEnabled(context)
+                isOverlayGranted = PermissionUtils.isOverlayPermissionGranted(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     val lockedAppsCount = remember(allApps) { allApps.count { it.isLocked } }
     val protectionScore = if (allApps.isNotEmpty()) (lockedAppsCount * 100) / allApps.size else 100
@@ -117,38 +139,133 @@ fun PrivacyShieldScreen(
                 }
             }
 
-            // Quick Service Privileges Status Strip
+            // Service Privileges Status Strip
             Surface(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(14.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+                    // Accessibility Service Status
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Speed, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                        Column {
-                            Text(stringResource(R.string.onboarding_perm_acc_title), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                            Text(stringResource(R.string.onboarding_perm_acc_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = if (isAccessibilityGranted) Icons.Default.CheckCircle else Icons.Default.AccessibilityNew,
+                                contentDescription = null,
+                                tint = if (isAccessibilityGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Column {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Text(
+                                        stringResource(R.string.onboarding_perm_acc_title),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        text = if (isAccessibilityGranted) "(${stringResource(R.string.perm_status_active)})" else "(${stringResource(R.string.perm_status_inactive)})",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (isAccessibilityGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                                Text(
+                                    stringResource(R.string.onboarding_perm_acc_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            }
+                        }
+
+                        if (!isAccessibilityGranted) {
+                            OutlinedButton(
+                                onClick = { showAccessibilityDisclosure = true },
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                modifier = Modifier.height(34.dp).testTag("btn_grant_accessibility")
+                            ) {
+                                Text(stringResource(R.string.perm_action_grant), fontSize = 12.sp)
+                            }
                         }
                     }
 
-                    OutlinedButton(
-                        onClick = { showAccessibilityDisclosure = true },
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                        modifier = Modifier.height(34.dp).testTag("btn_grant_accessibility")
+                    if (!isAccessibilityGranted) {
+                        TextButton(
+                            onClick = { showRestrictedSettingsHelp = true },
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
+                            modifier = Modifier.height(28.dp).align(Alignment.Start)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.restricted_settings_help_btn),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+
+                    // Overlay Permission Status
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(stringResource(R.string.onboarding_perm_usage_btn), fontSize = 12.sp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = if (isOverlayGranted) Icons.Default.CheckCircle else Icons.Default.Layers,
+                                contentDescription = null,
+                                tint = if (isOverlayGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Column {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Text(
+                                        stringResource(R.string.onboarding_perm_overlay_title),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        text = if (isOverlayGranted) "(${stringResource(R.string.perm_status_granted)})" else "(${stringResource(R.string.perm_status_required)})",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (isOverlayGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                                Text(
+                                    stringResource(R.string.onboarding_perm_overlay_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            }
+                        }
+
+                        if (!isOverlayGranted) {
+                            OutlinedButton(
+                                onClick = { PermissionUtils.openOverlaySettings(context) },
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                modifier = Modifier.height(34.dp).testTag("btn_grant_overlay")
+                            ) {
+                                Text(stringResource(R.string.perm_action_grant), fontSize = 12.sp)
+                            }
+                        }
                     }
                 }
             }
@@ -173,9 +290,9 @@ fun PrivacyShieldScreen(
             title = { Text(stringResource(R.string.insights_zero_cloud_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("• PureLock contains ZERO internet permissions ('android.permission.INTERNET' is omitted).", style = MaterialTheme.typography.bodySmall)
-                    Text("• All security logs, snapshots, PINs, and patterns are encrypted at rest with SQLCipher AES-256.", style = MaterialTheme.typography.bodySmall)
-                    Text("• App lock statistics never leave your device.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.insights_zero_cloud_bullet1), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.insights_zero_cloud_bullet2), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.insights_zero_cloud_bullet3), style = MaterialTheme.typography.bodySmall)
                 }
             },
             confirmButton = {
@@ -193,8 +310,19 @@ fun PrivacyShieldScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
+                        text = stringResource(R.string.onboarding_disclosure_why_title),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
                         text = stringResource(R.string.onboarding_disclosure_why_desc),
                         style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.onboarding_disclosure_privacy_title),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = stringResource(R.string.onboarding_disclosure_privacy_desc),
@@ -207,12 +335,7 @@ fun PrivacyShieldScreen(
                 Button(
                     onClick = {
                         showAccessibilityDisclosure = false
-                        try {
-                            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            // Fallback
-                        }
+                        PermissionUtils.openAccessibilitySettings(context)
                     }
                 ) {
                     Text(stringResource(R.string.onboarding_disclosure_agree))
@@ -220,6 +343,43 @@ fun PrivacyShieldScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showAccessibilityDisclosure = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    // Restricted Settings Help Dialog
+    if (showRestrictedSettingsHelp) {
+        AlertDialog(
+            onDismissRequest = { showRestrictedSettingsHelp = false },
+            icon = { Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            title = { Text(stringResource(R.string.restricted_settings_dialog_title), fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = stringResource(R.string.restricted_settings_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(text = stringResource(R.string.restricted_settings_step_1), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                    Text(text = stringResource(R.string.restricted_settings_step_2), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                    Text(text = stringResource(R.string.restricted_settings_step_3), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                    Text(text = stringResource(R.string.restricted_settings_step_4), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showRestrictedSettingsHelp = false
+                        PermissionUtils.openAppInfoSettings(context)
+                    }
+                ) {
+                    Text(stringResource(R.string.restricted_settings_open_app_info))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestrictedSettingsHelp = false }) {
+                    Text(stringResource(R.string.ok))
+                }
             }
         )
     }
@@ -242,7 +402,7 @@ fun PrivacyShieldScreen(
             title = { Text(stringResource(R.string.suite_export_backup_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Copy CSV formatted audit log history (${securityLogs.size} records):", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.privacy_export_csv_header, securityLogs.size), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = exportText.take(300) + if (exportText.length > 300) "..." else "",
                         onValueChange = {},
@@ -256,7 +416,7 @@ fun PrivacyShieldScreen(
                 Button(
                     onClick = {
                         clipboardManager.setText(AnnotatedString(exportText))
-                        Toast.makeText(context, "Audit logs copied to clipboard (CSV format)", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.privacy_export_copied_toast), Toast.LENGTH_SHORT).show()
                         showExportDialog = false
                     }
                 ) {

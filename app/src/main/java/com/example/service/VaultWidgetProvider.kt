@@ -34,8 +34,23 @@ class VaultWidgetProvider : AppWidgetProvider() {
         if (intent.action == ACTION_LOCK_VAULT) {
             val pendingResult = goAsync()
             val db = PureLockDatabase.getDatabase(context)
+            val prefs = com.example.data.PureLockPreferences(context)
+            val repository = com.example.data.PureLockRepository(
+                context,
+                db.appLockDao(),
+                db.intruderDao(),
+                db.logDao(),
+                db.scheduleRuleDao(),
+                db.encryptedVaultDao(),
+                db.userSettingDao(),
+                prefs
+            )
             scope.launch {
                 try {
+                    // 1. Immediately revoke all active sessions and reset unlock timestamps
+                    repository.lockAllAndClearSessions()
+                    com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
+
                     val lockedApps = db.appLockDao().getAllLockedApps().first()
                     val lockedCount = lockedApps.count { it.isLocked }
                     val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
@@ -47,7 +62,7 @@ class VaultWidgetProvider : AppWidgetProvider() {
                     )
                     for (appWidgetId in appWidgetIds) {
                         val views = RemoteViews(context.packageName, R.layout.vault_widget)
-                        views.setTextViewText(R.id.tv_protected_count, "Vault Locked! Protected Items: $totalProtected")
+                        views.setTextViewText(R.id.tv_protected_count, "Vault Secured & Locked! ($totalProtected items)")
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
                 } catch (e: Exception) {

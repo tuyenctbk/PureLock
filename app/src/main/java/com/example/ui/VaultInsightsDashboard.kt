@@ -151,14 +151,14 @@ fun VaultInsightsDialog(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     MetricStatCard(
-                        title = "Total Notes",
+                        title = stringResource(R.string.insights_metric_total_notes),
                         value = totalCount.toString(),
-                        subtitle = "Encrypted at Rest",
+                        subtitle = stringResource(R.string.insights_metric_encrypted_at_rest),
                         icon = Icons.Default.Lock,
                         modifier = Modifier.weight(1f)
                     )
                     MetricStatCard(
-                        title = "Health Index",
+                        title = stringResource(R.string.insights_metric_health_index),
                         value = "$healthIndex%",
                         subtitle = avgStrengthLabel,
                         icon = Icons.Default.Shield,
@@ -402,7 +402,7 @@ fun VaultInsightsDialog(
                 onClick = onDismiss,
                 modifier = Modifier.testTag("btn_close_vault_insights")
             ) {
-                Text("Close")
+                Text(stringResource(R.string.btn_close))
             }
         }
     )

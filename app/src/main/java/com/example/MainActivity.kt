@@ -196,7 +196,7 @@ class MainActivity : FragmentActivity() {
                             )
                         } else if (!isAuthenticated) {
                             LockOverlayScreen(
-                                packageName = "com.example",
+                                packageName = context.packageName,
                                 repository = viewModel.repository,
                                 onUnlocked = {
                                     appAuthenticated = true

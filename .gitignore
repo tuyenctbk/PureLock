@@ -2,6 +2,7 @@
 *.apk
 *.ap_
 *.aab
+*.apks
 *.dex
 
 # Directory locks & build outputs
@@ -10,11 +11,25 @@ build/
 .gradle/
 .kotlin/
 captures/
+.ksp/
+.cxx/
+obj/
+libs/
+.externalNativeBuild/
+
+# Test reports & profiling
+*/reports/
+*/test-results/
+screenshots/
+roborazzi/
+*.hprof
+*.log
 
 # Local configuration & environment files
 local.properties
 .env
 .env.*
+.env*.local
 
 # Signing keystores & secrets
 *.jks
@@ -24,6 +39,11 @@ local.properties
 *.pem
 *.pk8
 
+# Firebase & Crashlytics
+google-services.json
+crashlytics.properties
+crashlytics-build.properties
+
 # IDE & Editor specific files
 .idea/
 *.iml
@@ -31,12 +51,6 @@ local.properties
 .project
 .settings/
 .classpath
-
-# NDK & Native Build artifacts
-.externalNativeBuild/
-.cxx/
-obj/
-libs/
 
 # OS generated files
 .DS_Store
@@ -47,5 +61,6 @@ Thumbs.db
 
 # Python helper script caches
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+.pytest_cache/

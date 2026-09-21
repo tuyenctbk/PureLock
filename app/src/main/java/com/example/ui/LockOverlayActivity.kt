@@ -44,6 +44,7 @@ class LockOverlayActivity : FragmentActivity() {
                         packageName = lockedPackage,
                         repository = repository,
                         onUnlocked = {
+                            com.example.service.PureLockAccessibilityService.onPackageUnlocked(lockedPackage)
                             lifecycleScope.launch {
                                 repository.updateLastUnlocked(lockedPackage)
                                 finish()

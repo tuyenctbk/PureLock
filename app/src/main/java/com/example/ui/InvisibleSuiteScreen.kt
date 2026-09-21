@@ -42,6 +42,7 @@ fun InvisibleSuiteScreen(
     val themeMode by viewModel.themeMode.collectAsState()
     val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
     val inactivityTimeoutSec by viewModel.inactivityTimeoutSec.collectAsState()
+    val gracePeriodMs by viewModel.gracePeriodMs.collectAsState()
     val duressPin by viewModel.duressPin.collectAsState()
     val randomKeyboard by viewModel.randomKeyboard.collectAsState()
     val hidePatternPath by viewModel.hidePatternPath.collectAsState()
@@ -122,28 +123,28 @@ fun InvisibleSuiteScreen(
                         FilterChip(
                             selected = securityType == "PIN",
                             onClick = { viewModel.setSecurityType("PIN") },
-                            label = { Text("PIN", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.lock_mode_pin), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Pin, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_security_pin")
                         )
                         FilterChip(
                             selected = securityType == "PATTERN",
                             onClick = { viewModel.setSecurityType("PATTERN") },
-                            label = { Text("Pattern", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.lock_mode_pattern), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Pattern, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_security_pattern")
                         )
                         FilterChip(
                             selected = securityType == "KNOCK",
                             onClick = { viewModel.setSecurityType("KNOCK") },
-                            label = { Text("Knock", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.lock_mode_knock), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.TouchApp, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_security_knock")
                         )
                         FilterChip(
                             selected = securityType == "BIOMETRIC",
                             onClick = { viewModel.setSecurityType("BIOMETRIC") },
-                            label = { Text("Bio", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.lock_mode_biometric), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Fingerprint, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_security_biometric")
                         )
@@ -153,6 +154,8 @@ fun InvisibleSuiteScreen(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
 
                 // Change Master Credential action button
+                val dotsCount = masterPattern.split(',').filter { it.isNotEmpty() }.size
+                val tapsCount = masterKnock.split(',').filter { it.isNotEmpty() }.size
                 SettingsActionRow(
                     icon = when (securityType) {
                         "PATTERN" -> Icons.Default.Pattern
@@ -160,14 +163,14 @@ fun InvisibleSuiteScreen(
                         else -> Icons.Default.Pin
                     },
                     title = when (securityType) {
-                        "PATTERN" -> "Change Master Pattern"
-                        "KNOCK" -> "Configure Knock Code (4-Quadrant)"
-                        else -> "Change Master PIN"
+                        "PATTERN" -> stringResource(R.string.suite_change_pattern_title)
+                        "KNOCK" -> stringResource(R.string.suite_change_knock_title)
+                        else -> stringResource(R.string.suite_change_pin_title)
                     },
                     subtitle = when (securityType) {
-                        "PATTERN" -> "Pattern set (${masterPattern.split(',').filter { it.isNotEmpty() }.size} dots)"
-                        "KNOCK" -> "Knock rhythm (${masterKnock.split(',').filter { it.isNotEmpty() }.size} taps)"
-                        else -> "Current: ••••"
+                        "PATTERN" -> stringResource(R.string.suite_pattern_dots_subtitle, dotsCount)
+                        "KNOCK" -> stringResource(R.string.suite_knock_taps_subtitle, tapsCount)
+                        else -> stringResource(R.string.suite_pin_current_subtitle)
                     },
                     onClick = {
                         when (securityType) {
@@ -190,26 +193,30 @@ fun InvisibleSuiteScreen(
 
                 // Scramble Keypad / Hide Pattern Path
                 if (securityType == "PIN") {
+                    val rndTitle = stringResource(R.string.suite_random_keypad_title)
+                    val rndDesc = stringResource(R.string.suite_random_keypad_dialog_desc)
                     SettingsSwitchRow(
                         icon = Icons.Default.Shuffle,
-                        title = "Randomize Keypad",
+                        title = rndTitle,
                         checked = randomKeyboard,
                         onCheckedChange = { viewModel.setRandomKeyboard(it) },
                         onInfoClick = {
-                            infoDialogTitle = "Randomize Keypad"
-                            infoDialogMessage = "Shuffles number positions on every unlock attempt to prevent shoulder surfing and smudged screen footprint analysis."
+                            infoDialogTitle = rndTitle
+                            infoDialogMessage = rndDesc
                         },
                         testTag = "switch_random_keyboard"
                     )
                 } else if (securityType == "PATTERN") {
+                    val invTitle = stringResource(R.string.suite_invisible_pattern_title)
+                    val invDesc = stringResource(R.string.suite_invisible_pattern_dialog_desc)
                     SettingsSwitchRow(
                         icon = Icons.Default.VisibilityOff,
-                        title = "Invisible Pattern Trail",
+                        title = invTitle,
                         checked = hidePatternPath,
                         onCheckedChange = { viewModel.setHidePatternPath(it) },
                         onInfoClick = {
-                            infoDialogTitle = "Invisible Pattern Trail"
-                            infoDialogMessage = "Hides the connecting line while drawing your unlock pattern, preventing onlookers from seeing your unlock gesture."
+                            infoDialogTitle = invTitle
+                            infoDialogMessage = invDesc
                         },
                         testTag = "switch_hide_pattern"
                     )
@@ -261,30 +268,34 @@ fun InvisibleSuiteScreen(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
 
                 // Duress PIN
+                val duressTitle = stringResource(R.string.suite_duress_title)
+                val duressDesc = stringResource(R.string.suite_duress_dialog_desc)
                 SettingsActionRow(
                     icon = Icons.Default.GppBad,
-                    title = stringResource(R.string.suite_duress_title),
-                    subtitle = if (duressPin.isNotBlank()) "Configured (••••)" else "Not configured",
+                    title = duressTitle,
+                    subtitle = if (duressPin.isNotBlank()) stringResource(R.string.suite_pin_current_subtitle) else stringResource(R.string.perm_status_inactive),
                     onClick = {
                         newDuressPinInput = duressPin
                         showDuressPinDialog = true
                     },
                     onInfoClick = {
-                        infoDialogTitle = "Duress PIN"
-                        infoDialogMessage = "If forced to unlock under pressure, entering your Duress PIN will appear to unlock normally while secretly locking down sensitive items and alerting security logs."
+                        infoDialogTitle = duressTitle
+                        infoDialogMessage = duressDesc
                     },
                     testTag = "btn_duress_pin"
                 )
 
                 // Intruder Capture
+                val intruderTitle = stringResource(R.string.suite_intruder_selfie_title)
+                val intruderDesc = stringResource(R.string.suite_intruder_selfie_dialog_desc)
                 SettingsSwitchRow(
                     icon = Icons.Default.CameraAlt,
-                    title = stringResource(R.string.suite_intruder_selfie_title),
+                    title = intruderTitle,
                     checked = intruderCapture,
                     onCheckedChange = { viewModel.setIntruderCapture(it) },
                     onInfoClick = {
-                        infoDialogTitle = "Intruder Selfie"
-                        infoDialogMessage = "Silently takes a front-facing camera photo when someone enters an incorrect PIN or pattern, stored in your encrypted Vault."
+                        infoDialogTitle = intruderTitle
+                        infoDialogMessage = intruderDesc
                     },
                     testTag = "switch_intruder_capture"
                 )
@@ -337,14 +348,16 @@ fun InvisibleSuiteScreen(
             // Section 4: Relock & Emergency Triggers
             SettingsSectionCard(title = stringResource(R.string.suite_section_triggers)) {
                 // Shake to Lock
+                val shakeTitle = stringResource(R.string.suite_shake_title)
+                val shakeDesc = stringResource(R.string.suite_shake_dialog_desc)
                 SettingsSwitchRow(
                     icon = Icons.Default.Vibration,
-                    title = stringResource(R.string.suite_shake_title),
+                    title = shakeTitle,
                     checked = shakeToLockEnabled,
                     onCheckedChange = { viewModel.setShakeToLock(it) },
                     onInfoClick = {
-                        infoDialogTitle = "Shake to Lock"
-                        infoDialogMessage = "Instantly locks PureLock and clears active sessions when a physical shake gesture is detected."
+                        infoDialogTitle = shakeTitle
+                        infoDialogMessage = shakeDesc
                     },
                     testTag = "switch_shake_lock"
                 )
@@ -384,6 +397,81 @@ fun InvisibleSuiteScreen(
                         )
                     }
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                // App Relock Grace Period
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.suite_grace_period_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = stringResource(R.string.suite_grace_period_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                        val graceTitle = stringResource(R.string.suite_grace_period_title)
+                        val graceDesc = stringResource(R.string.suite_grace_period_dialog_desc)
+                        IconButton(
+                            onClick = {
+                                infoDialogTitle = graceTitle
+                                infoDialogMessage = graceDesc
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        FilterChip(
+                            selected = gracePeriodMs <= 0L && gracePeriodMs != -1L,
+                            onClick = { viewModel.updateGracePeriodMs(0L) },
+                            label = { Text("0s", fontSize = 11.sp) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = gracePeriodMs == 30_000L,
+                            onClick = { viewModel.updateGracePeriodMs(30_000L) },
+                            label = { Text("30s", fontSize = 11.sp) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = gracePeriodMs == 60_000L,
+                            onClick = { viewModel.updateGracePeriodMs(60_000L) },
+                            label = { Text("1m", fontSize = 11.sp) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = gracePeriodMs == 300_000L,
+                            onClick = { viewModel.updateGracePeriodMs(300_000L) },
+                            label = { Text("5m", fontSize = 11.sp) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = gracePeriodMs == -1L,
+                            onClick = { viewModel.updateGracePeriodMs(-1L) },
+                            label = { Text(stringResource(R.string.grace_period_screen_off), fontSize = 10.sp) },
+                            modifier = Modifier.weight(1.4f)
+                        )
+                    }
+                }
             }
 
             // PureLock Security Architecture & Brand Card
@@ -414,7 +502,7 @@ fun InvisibleSuiteScreen(
                     )
 
                     Text(
-                        text = "Version 2.1 • Hardware Keystore & SQLCipher AES-256",
+                        text = "Version ${com.example.BuildConfig.VERSION_NAME} • Hardware Keystore & SQLCipher AES-256",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
@@ -456,10 +544,10 @@ fun InvisibleSuiteScreen(
     if (showChangePinDialog) {
         AlertDialog(
             onDismissRequest = { showChangePinDialog = false },
-            title = { Text("Set Master PIN", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.suite_set_master_pin_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Enter 4-8 digit master security PIN:", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.suite_set_master_pin_desc), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newPinInput,
                         onValueChange = { if (it.length <= 8 && it.all { char -> char.isDigit() }) newPinInput = it },
@@ -474,11 +562,11 @@ fun InvisibleSuiteScreen(
                         if (newPinInput.length >= 4) {
                             viewModel.setMasterPin(newPinInput)
                             showChangePinDialog = false
-                            Toast.makeText(context, "Master PIN updated", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.suite_master_pin_updated_toast), Toast.LENGTH_SHORT).show()
                         }
                     }
                 ) {
-                    Text("Save PIN")
+                    Text(stringResource(R.string.suite_save_pin_btn))
                 }
             },
             dismissButton = {
@@ -491,10 +579,10 @@ fun InvisibleSuiteScreen(
     if (showChangePatternDialog) {
         AlertDialog(
             onDismissRequest = { showChangePatternDialog = false },
-            title = { Text("Set Master Pattern", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.suite_set_master_pattern_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Connect dots (comma-separated 0-8, e.g. 0,1,2,5,8):", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.suite_set_master_pattern_desc), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newPatternInput,
                         onValueChange = { newPatternInput = it },
@@ -509,11 +597,11 @@ fun InvisibleSuiteScreen(
                         if (newPatternInput.isNotBlank()) {
                             viewModel.setMasterPattern(newPatternInput)
                             showChangePatternDialog = false
-                            Toast.makeText(context, "Master pattern updated", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.suite_master_pattern_updated_toast), Toast.LENGTH_SHORT).show()
                         }
                     }
                 ) {
-                    Text("Save Pattern")
+                    Text(stringResource(R.string.suite_save_pattern_btn))
                 }
             },
             dismissButton = {
@@ -526,7 +614,7 @@ fun InvisibleSuiteScreen(
     if (showChangeKnockDialog) {
         AlertDialog(
             onDismissRequest = { showChangeKnockDialog = false },
-            title = { Text("Configure Knock Code", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.suite_configure_knock_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -534,7 +622,7 @@ fun InvisibleSuiteScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Tap 4-quadrant area to record a rhythm (minimum 3 taps). Recorded: ${newKnockList.size} knocks",
+                        text = stringResource(R.string.suite_configure_knock_desc, newKnockList.size),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center
                     )
@@ -598,7 +686,7 @@ fun InvisibleSuiteScreen(
 
                     if (newKnockList.isNotEmpty()) {
                         TextButton(onClick = { newKnockList = emptyList() }) {
-                            Text("Clear (${newKnockList.joinToString("→")})", fontSize = 12.sp)
+                            Text("${stringResource(R.string.clear)} (${newKnockList.joinToString("→")})", fontSize = 12.sp)
                         }
                     }
                 }
@@ -610,13 +698,13 @@ fun InvisibleSuiteScreen(
                             val codeStr = newKnockList.joinToString(",")
                             viewModel.setMasterKnock(codeStr)
                             showChangeKnockDialog = false
-                            Toast.makeText(context, "Knock Code configured", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.suite_knock_configured_toast), Toast.LENGTH_SHORT).show()
                         } else {
-                            Toast.makeText(context, "Tap at least 3 quadrants to form a pattern", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.suite_knock_min_error_toast), Toast.LENGTH_SHORT).show()
                         }
                     }
                 ) {
-                    Text("Save Knock Code")
+                    Text(stringResource(R.string.suite_save_knock_btn))
                 }
             },
             dismissButton = {
@@ -629,10 +717,10 @@ fun InvisibleSuiteScreen(
     if (showDuressPinDialog) {
         AlertDialog(
             onDismissRequest = { showDuressPinDialog = false },
-            title = { Text("Set Duress PIN", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.suite_set_duress_pin_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Enter a decoy PIN different from your master PIN:", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.suite_set_duress_pin_desc), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newDuressPinInput,
                         onValueChange = { if (it.length <= 8 && it.all { char -> char.isDigit() }) newDuressPinInput = it },
@@ -646,7 +734,7 @@ fun InvisibleSuiteScreen(
                     onClick = {
                         viewModel.setDuressPin(newDuressPinInput)
                         showDuressPinDialog = false
-                        Toast.makeText(context, "Duress PIN configured", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.suite_duress_pin_configured_toast), Toast.LENGTH_SHORT).show()
                     }
                 ) {
                     Text(stringResource(R.string.save))

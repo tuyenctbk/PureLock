@@ -180,14 +180,14 @@ fun IntruderVaultScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Intruder Photos (${intruderSelfies.size})", fontWeight = FontWeight.SemiBold, fontSize = 13.sp) },
+                    text = { Text(stringResource(R.string.tab_intruder_photos, intruderSelfies.size), fontWeight = FontWeight.SemiBold, fontSize = 13.sp) },
                     icon = { Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("tab_intruder_photos")
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Secret Vault (${encryptedVaultItems.size})", fontWeight = FontWeight.SemiBold, fontSize = 13.sp) },
+                    text = { Text(stringResource(R.string.tab_secret_vault, encryptedVaultItems.size), fontWeight = FontWeight.SemiBold, fontSize = 13.sp) },
                     icon = { Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("tab_secret_notes")
                 )
@@ -306,7 +306,7 @@ fun IntruderVaultScreen(
                     value = vaultSearchQuery,
                     onValueChange = { vaultSearchQuery = it },
                     modifier = Modifier.fillMaxWidth().testTag("input_vault_search"),
-                    placeholder = { Text("Search secrets...", style = MaterialTheme.typography.bodyMedium) },
+                    placeholder = { Text(stringResource(R.string.search_vault_placeholder), style = MaterialTheme.typography.bodyMedium) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
                     trailingIcon = {
                         if (vaultSearchQuery.isNotEmpty()) {
@@ -418,7 +418,7 @@ fun IntruderVaultScreen(
                                         IconButton(
                                             onClick = {
                                                 viewModel.copyVaultItemToClipboard(item)
-                                                Toast.makeText(context, "Copied! Auto-clears from clipboard in 30s.", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, context.getString(R.string.clipboard_copied_toast), Toast.LENGTH_SHORT).show()
                                             },
                                             modifier = Modifier.size(36.dp)
                                         ) {
@@ -456,12 +456,12 @@ fun IntruderVaultScreen(
         AlertDialog(
             onDismissRequest = { showVaultInfoDialog = false },
             icon = { Icon(Icons.Default.Security, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text("Vault Security Details", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.vault_security_details_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("• Intruder Capture uses the front camera to automatically snap photos after 1-3 failed attempts.", style = MaterialTheme.typography.bodySmall)
-                    Text("• Secret notes and passwords are encrypted with AES-256 SQLCipher at rest.", style = MaterialTheme.typography.bodySmall)
-                    Text("• Copied passwords automatically purge from the system clipboard after 30 seconds.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.vault_security_details_bullet1), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.vault_security_details_bullet2), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.vault_security_details_bullet3), style = MaterialTheme.typography.bodySmall)
                 }
             },
             confirmButton = {
@@ -525,7 +525,7 @@ fun IntruderVaultScreen(
                         selectedSelfie = null
                     }
                 ) {
-                    Text("Delete Snapshot", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.btn_delete_snapshot), color = MaterialTheme.colorScheme.error)
                 }
             }
         )
@@ -536,8 +536,8 @@ fun IntruderVaultScreen(
         AlertDialog(
             onDismissRequest = { showClearAllSelfiesConfirm = false },
             icon = { Icon(Icons.Default.DeleteForever, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-            title = { Text("Clear All Snapshots?") },
-            text = { Text("This will permanently delete all intruder capture photos.") },
+            title = { Text(stringResource(R.string.clear_all_snapshots_title)) },
+            text = { Text(stringResource(R.string.clear_all_snapshots_desc)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -567,13 +567,13 @@ fun IntruderVaultScreen(
                 showAddVaultDialog = false
                 editingVaultItem = null
             },
-            title = { Text(if (isEditing) "Edit Secret" else "New Secret", fontWeight = FontWeight.Bold) },
+            title = { Text(if (isEditing) stringResource(R.string.dialog_edit_secret) else stringResource(R.string.dialog_new_secret), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
-                        label = { Text("Title") },
+                        label = { Text(stringResource(R.string.field_title)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -581,7 +581,7 @@ fun IntruderVaultScreen(
                     OutlinedTextField(
                         value = secretContent,
                         onValueChange = { secretContent = it },
-                        label = { Text("Secret Content") },
+                        label = { Text(stringResource(R.string.field_secret_content)) },
                         trailingIcon = {
                             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                                 Icon(
@@ -639,8 +639,8 @@ fun IntruderVaultScreen(
         AlertDialog(
             onDismissRequest = { itemToDelete = null },
             icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-            title = { Text("Delete Secret?") },
-            text = { Text("Permanently delete \"${item.title}\"?") },
+            title = { Text(stringResource(R.string.delete_secret_dialog_title)) },
+            text = { Text(stringResource(R.string.delete_secret_dialog_message, item.title)) },
             confirmButton = {
                 Button(
                     onClick = {

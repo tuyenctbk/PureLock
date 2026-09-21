@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.util.FirebaseManager
+import com.example.util.PermissionUtils
 
 @Composable
 fun OnboardingScreen(
@@ -408,6 +409,24 @@ private fun OnboardingStepSecuritySetup(
 @Composable
 private fun OnboardingStepPermissions(context: android.content.Context) {
     var showAccessibilityDisclosure by remember { mutableStateOf(false) }
+    var showRestrictedSettingsHelp by remember { mutableStateOf(false) }
+
+    var isAccessibilityGranted by remember { mutableStateOf(PermissionUtils.isAccessibilityServiceEnabled(context)) }
+    var isOverlayGranted by remember { mutableStateOf(PermissionUtils.isOverlayPermissionGranted(context)) }
+
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                isAccessibilityGranted = PermissionUtils.isAccessibilityServiceEnabled(context)
+                isOverlayGranted = PermissionUtils.isOverlayPermissionGranted(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     if (showAccessibilityDisclosure) {
         AlertDialog(
@@ -445,11 +464,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                 Button(
                     onClick = {
                         showAccessibilityDisclosure = false
-                        try {
-                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                        PermissionUtils.openAccessibilitySettings(context)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
                 ) {
@@ -462,6 +477,48 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                 ) {
                     Text(stringResource(R.string.onboarding_disclosure_decline))
+                }
+            },
+            containerColor = Color(0xFF1E293B)
+        )
+    }
+
+    if (showRestrictedSettingsHelp) {
+        AlertDialog(
+            onDismissRequest = { showRestrictedSettingsHelp = false },
+            icon = { Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF38BDF8)) },
+            title = { Text(stringResource(R.string.restricted_settings_dialog_title), fontWeight = FontWeight.Bold, color = Color.White) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = stringResource(R.string.restricted_settings_desc),
+                        color = Color(0xFFE2E8F0),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(text = stringResource(R.string.restricted_settings_step_1), color = Color(0xFF94A3B8), fontSize = 12.sp)
+                    Text(text = stringResource(R.string.restricted_settings_step_2), color = Color(0xFF94A3B8), fontSize = 12.sp)
+                    Text(text = stringResource(R.string.restricted_settings_step_3), color = Color(0xFF94A3B8), fontSize = 12.sp)
+                    Text(text = stringResource(R.string.restricted_settings_step_4), color = Color(0xFF94A3B8), fontSize = 12.sp)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showRestrictedSettingsHelp = false
+                        PermissionUtils.openAppInfoSettings(context)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+                ) {
+                    Text(stringResource(R.string.restricted_settings_open_app_info))
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showRestrictedSettingsHelp = false },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                ) {
+                    Text(stringResource(R.string.ok))
                 }
             },
             containerColor = Color(0xFF1E293B)
@@ -492,62 +549,104 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // 1. Accessibility Service Card
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isAccessibilityGranted) Color(0xFF132E22) else Color(0xFF1E293B)
+            ),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AccessibilityNew, contentDescription = null, tint = Color(0xFF38BDF8))
+                    Icon(
+                        imageVector = if (isAccessibilityGranted) Icons.Default.CheckCircle else Icons.Default.AccessibilityNew,
+                        contentDescription = null,
+                        tint = if (isAccessibilityGranted) Color(0xFF4ADE80) else Color(0xFF38BDF8)
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.onboarding_perm_acc_title), fontWeight = FontWeight.Bold, color = Color.White)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(stringResource(R.string.onboarding_perm_acc_title), fontWeight = FontWeight.Bold, color = Color.White)
+                            if (isAccessibilityGranted) {
+                                Text(
+                                    text = "(${stringResource(R.string.perm_status_active)})",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF4ADE80),
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
                         Text(stringResource(R.string.onboarding_perm_acc_desc), fontSize = 12.sp, color = Color(0xFF94A3B8))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { showAccessibilityDisclosure = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF334155))
-                ) {
-                    Text(stringResource(R.string.onboarding_perm_acc_btn))
+                if (!isAccessibilityGranted) {
+                    Button(
+                        onClick = { showAccessibilityDisclosure = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+                    ) {
+                        Text(stringResource(R.string.onboarding_perm_acc_btn))
+                    }
+                    TextButton(
+                        onClick = { showRestrictedSettingsHelp = true },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.restricted_settings_help_btn),
+                            color = Color(0xFF38BDF8),
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // 2. Display Over Other Apps (Overlay) Card
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isOverlayGranted) Color(0xFF132E22) else Color(0xFF1E293B)
+            ),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Insights, contentDescription = null, tint = Color(0xFF38BDF8))
+                    Icon(
+                        imageVector = if (isOverlayGranted) Icons.Default.CheckCircle else Icons.Default.Layers,
+                        contentDescription = null,
+                        tint = if (isOverlayGranted) Color(0xFF4ADE80) else Color(0xFF38BDF8)
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.onboarding_perm_usage_title), fontWeight = FontWeight.Bold, color = Color.White)
-                        Text(stringResource(R.string.onboarding_perm_usage_desc), fontSize = 12.sp, color = Color(0xFF94A3B8))
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(stringResource(R.string.onboarding_perm_overlay_title), fontWeight = FontWeight.Bold, color = Color.White)
+                            if (isOverlayGranted) {
+                                Text(
+                                    text = "(${stringResource(R.string.perm_status_granted)})",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF4ADE80),
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                        Text(stringResource(R.string.onboarding_perm_overlay_desc), fontSize = 12.sp, color = Color(0xFF94A3B8))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {
-                        try {
-                            context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF334155))
-                ) {
-                    Text(stringResource(R.string.onboarding_perm_usage_btn))
+                if (!isOverlayGranted) {
+                    Button(
+                        onClick = { PermissionUtils.openOverlaySettings(context) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF334155))
+                    ) {
+                        Text(stringResource(R.string.onboarding_perm_overlay_btn))
+                    }
                 }
             }
         }

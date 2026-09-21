@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="active_protections">Protecciones Activas</string>
-    <string name="all">TODO</string>
     <string name="app_name">PureLock</string>
+    <string name="accessibility_service_description">PureLock utiliza este servicio ligero estrictamente para detectar cuándo se inician las aplicaciones protegidas y mostrar la pantalla de bloqueo seguro. PureLock no contiene permisos de Internet y nunca envía ni comparte sus datos.</string>
     <string name="shortcut_vault_short">Ver Bóveda</string>
     <string name="shortcut_vault_long">Abrir Bóveda de Secretos Cifrados</string>
     <string name="shortcut_generator_short">Generador</string>
     <string name="shortcut_generator_long">Generar Contraseña Segura</string>
-    <string name="accessibility_service_description">PureLock utiliza este servicio ligero estrictamente para detectar cuándo se inician las aplicaciones protegidas y mostrar la pantalla de bloqueo seguro. PureLock no contiene permisos de Internet y nunca envía ni comparte sus datos.</string>
+    <string name="active_protections">Protecciones Activas</string>
+    <string name="all">TODO</string>
     <string name="app_shield">Protección</string>
     <string name="autofill_btn">Habilitar Autocompletado</string>
     <string name="autofill_desc">Autocompleta credenciales de forma segura directamente desde la bóveda.</string>
@@ -34,7 +34,6 @@
     <string name="trash_purge">Período de Auto-Purga</string>
     <string name="trash_purge_desc">Los secretos se borrarán permanentemente después de la duración elegida.</string>
     <string name="unlocked">Desbloqueado</string>
-
     <string name="delete_note_title">¿Eliminar nota cifrada?</string>
     <string name="delete_note_message">¿Seguro que deseas eliminar \"%1$s\"? Este elemento se moverá a la Papelera durante %2$d días antes de ser eliminado permanentemente.</string>
     <string name="delete_note_permanent_title">¿Eliminar secreto permanentemente?</string>
@@ -59,7 +58,6 @@
     <string name="category_password">Contraseña</string>
     <string name="category_note">Nota Secreta</string>
     <string name="category_pin">PIN Bancario</string>
-
     <string name="password_strength_weak">Débil</string>
     <string name="password_strength_fair">Aceptable</string>
     <string name="password_strength_strong">Fuerte</string>
@@ -70,7 +68,6 @@
     <string name="strength_rule_digits">0-9</string>
     <string name="strength_rule_symbols">!@#</string>
     <string name="strength_rule_length">12+ Caracteres</string>
-
     <string name="auto_lock_settings_title">Tiempo de Bloqueo Automático</string>
     <string name="auto_lock_settings_desc">Elige qué tan rápido PureLock bloquea la aplicación por inactividad.</string>
     <string name="auto_lock_immediately">Inmediatamente</string>
@@ -81,7 +78,6 @@
     <string name="auto_lock_10m">10 Minutos</string>
     <string name="auto_lock_never">Nunca (Bloqueo de sesión)</string>
     <string name="auto_lock_dialog_title">Seleccionar Intervalo de Bloqueo</string>
-
     <string name="export_notes_title">Exportación Segura de Notas Cifradas</string>
     <string name="export_notes_desc">Exporta tus notas cifradas a un archivo local protegido con AES-256-GCM.</string>
     <string name="import_notes_title">Importar Archivo de Notas Cifradas</string>
@@ -97,8 +93,6 @@
     <string name="import_file_error">Error de descifrado. Contraseña incorrecta o archivo dañado.</string>
     <string name="copied_clipboard_countdown">¡Copiado! El portapapeles se limpia en %1$ds</string>
     <string name="clear_clipboard_now">Limpiar Ahora</string>
-
-    <!-- Clipboard Delay Configuration -->
     <string name="clipboard_clear_delay_title">Retraso de Limpieza del Portapapeles</string>
     <string name="clipboard_clear_delay_desc">Borra automáticamente los secretos copiados del portapapeles para evitar espionaje.</string>
     <string name="clipboard_delay_10s">10 Segundos</string>
@@ -106,8 +100,6 @@
     <string name="clipboard_delay_60s">60 Segundos (1 Min)</string>
     <string name="clipboard_delay_120s">120 Segundos (2 Min)</string>
     <string name="clipboard_delay_disabled">Nunca (Limpieza Manual)</string>
-
-    <!-- Sorting Options -->
     <string name="sort_notes_title">Ordenar Notas</string>
     <string name="sort_date_desc">Fecha de Creación (Más recientes)</string>
     <string name="sort_date_asc">Fecha de Creación (Más antiguas)</string>
@@ -115,8 +107,6 @@
     <string name="sort_alphabetical_desc">Alfabético (Z → A)</string>
     <string name="sort_strength_desc">Seguridad de Contraseña (Mayor)</string>
     <string name="sort_strength_asc">Seguridad de Contraseña (Menor)</string>
-
-    <!-- Category System -->
     <string name="category_all_notes">Todas las Notas</string>
     <string name="category_work">Trabajo</string>
     <string name="category_personal">Personal</string>
@@ -126,8 +116,6 @@
     <string name="category_secure_notes">Notas Seguras</string>
     <string name="category_label">Categoría</string>
     <string name="select_category">Seleccionar Categoría</string>
-
-    <!-- Lock Screen & Secondary Authentication Strings -->
     <string name="lock_access_granted">Acceso Concedido</string>
     <string name="lock_security_shield">Escudo de Seguridad PureLock</string>
     <string name="lock_auth_success_opening">Autenticación exitosa. Abriendo %1$s…</string>
@@ -150,8 +138,6 @@
     <string name="lock_panic_triggered">¡PIN de coacción ingresado! Modo de pánico activado.</string>
     <string name="secondary_auth_title">Autenticación Secundaria</string>
     <string name="secondary_auth_desc">El respaldo de PIN o Patrón protege la app si la autenticación biométrica no está disponible.</string>
-
-    <!-- Password Generator Utility Strings -->
     <string name="generator_title">Generador de Contraseñas Seguras</string>
     <string name="generator_toggle_expand">Generador de Contraseñas Personalizado</string>
     <string name="generator_length_label">Longitud: %1$d caracteres</string>
@@ -173,8 +159,6 @@
     <string name="generator_copied_toast">Contraseña generada copiada al portapapeles</string>
     <string name="generator_applied_toast">Contraseña generada aplicada al secreto</string>
     <string name="generator_strength_entropy">Seguridad: %1$s (%2$.1f bits de entropía)</string>
-
-    <!-- Settings Fallback & Auth Strings -->
     <string name="settings_lock_active">Bloqueo de Configuración Activo</string>
     <string name="settings_lock_desc">La Suite Invisible está protegida por biometría y PIN secundario. Autentícate para modificar ajustes.</string>
     <string name="settings_scan_biometrics">Escanear Biometría</string>
@@ -183,8 +167,6 @@
     <string name="settings_enter_master_pin_desc">Ingresa tu código PIN maestro para desbloquear los ajustes.</string>
     <string name="settings_incorrect_pin">PIN Maestro Incorrecto</string>
     <string name="settings_unlock_btn">Desbloquear</string>
-
-    <!-- Vault Insights Dashboard -->
     <string name="vault_insights_title">Estadísticas de la Bóveda</string>
     <string name="vault_insights_subtitle">Estadísticas criptográficas y telemetría de seguridad</string>
     <string name="insights_total_records">Total de Registros</string>
@@ -194,13 +176,10 @@
     <string name="insights_category_distribution">Distribución por Categoría</string>
     <string name="insights_usage_frequency">Frecuencia de Uso y Guardado</string>
     <string name="insights_security_audit">Auditoría de Seguridad de la Bóveda</string>
-    <!-- Additional Navigation & Quick Actions -->
     <string name="export_btn_label">Exportar</string>
     <string name="import_btn_label">Importar</string>
     <string name="insights_btn_label">Estadísticas</string>
     <string name="generator_quick_presets">Ajustes Rápidos:</string>
-
-    <!-- Empty State Illustrations & View Strings -->
     <string name="empty_notes_main_title">Tu Bóveda está Vacía</string>
     <string name="empty_notes_main_desc">Protege tus contraseñas, notas privadas, PINs bancarios y datos confidenciales localmente con cifrado de hardware AES-256-GCM.</string>
     <string name="empty_category_title">No se encontraron %1$s</string>
@@ -212,8 +191,6 @@
     <string name="intruder_banner_info">Las fotos de intrusos se cifran y guardan exclusivamente en la memoria privada. Nunca se sincronizan con la nube o galería.</string>
     <string name="trash_banner_info">La papelera protege los elementos eliminados temporalmente. Se purgan automáticamente tras %1$d días.</string>
     <string name="store_first_category_secret">Guardar Secreto en %1$s</string>
-
-    <!-- Vault Dashboard UI Strings -->
     <string name="vault_dashboard_title">Bóveda Cifrada</string>
     <string name="vault_dashboard_subtitle">AES-256 SQLCipher • Cero Conocimiento</string>
     <string name="vault_clipboard_protected">Portapapeles Protegido</string>
@@ -263,29 +240,21 @@
     <string name="vault_filter_pins">PINs</string>
     <string name="vault_filter_favorites">Favoritos</string>
     <string name="vault_filter_trash">Papelera</string>
-
-    <!-- Navigation Bar Strings -->
     <string name="nav_vault">Bóveda</string>
     <string name="nav_shield">Bloqueo de Apps</string>
     <string name="nav_intruder">Intruso</string>
     <string name="nav_settings">Ajustes</string>
     <string name="nav_audit">Auditoría</string>
-
-    <!-- Splash Screen Strings -->
     <string name="splash_tagline">Seguridad Fuera de Línea Zero-Knowledge</string>
     <string name="splash_status_initializing">Inicializando bóveda AES-256…</string>
     <string name="splash_status_keystore">Keystore de hardware activo</string>
     <string name="splash_status_ready">Escudo de seguridad listo</string>
     <string name="splash_badge_offline">100% Fuera de Línea • Cero Telemetría</string>
-
-    <!-- App Shield UI Strings -->
     <string name="shield_locked_count">%1$d/%2$d Bloqueadas</string>
     <string name="shield_lock_all">Bloquear Todo</string>
     <string name="shield_unlock_all">Desbloquear Todo</string>
     <string name="shield_details_title">Detalles de Protección</string>
     <string name="shield_no_apps_match">No hay aplicaciones que coincidan con \"%1$s\"</string>
-
-    <!-- Onboarding UI Strings -->
     <string name="onboarding_welcome_title">Bienvenido a PureLock</string>
     <string name="onboarding_welcome_desc">Motor de seguridad sin conexión.\nProteja sus aplicaciones, fotos y secretos con cifrado local de grado militar.</string>
     <string name="onboarding_setup_key_title">Configurar Clave de Seguridad Maestra</string>
@@ -312,6 +281,29 @@
     <string name="onboarding_perm_usage_title">Permiso de Acceso de Uso</string>
     <string name="onboarding_perm_usage_desc">Monitorea el estado de las aplicaciones de forma segura.</string>
     <string name="onboarding_perm_usage_btn">Conceder Acceso de Uso</string>
+    <string name="onboarding_perm_overlay_title">Mostrar sobre otras aplicaciones</string>
+    <string name="onboarding_perm_overlay_desc">Permite que PureLock muestre de forma segura la pantalla de bloqueo cuando se abre una app protegida.</string>
+    <string name="onboarding_perm_overlay_btn">Conceder permiso de superposición</string>
+    <string name="perm_status_active">Activo</string>
+    <string name="perm_status_inactive">Inactivo</string>
+    <string name="perm_status_granted">Concedido</string>
+    <string name="perm_status_required">Requerido</string>
+    <string name="perm_action_grant">Activar</string>
+    <string name="restricted_settings_help_btn">Ayuda sobre ajustes restringidos en Android 13+</string>
+    <string name="restricted_settings_dialog_title">Ajustes restringidos en Android 13+</string>
+    <string name="restricted_settings_desc">Si Android desactivó la accesibilidad con una advertencia de \'Ajuste restringido\', sigue estos pasos:</string>
+    <string name="restricted_settings_step_1">1. Toca abajo para abrir la información de la app PureLock en ajustes.</string>
+    <string name="restricted_settings_step_2">2. En la esquina superior derecha, toca los tres puntos verticales (⋮).</string>
+    <string name="restricted_settings_step_3">3. Toca \'Permitir ajustes restringidos\' y confirma tu PIN o huella.</string>
+    <string name="restricted_settings_step_4">4. Vuelve aquí y toca \'Conceder accesibilidad\' para completar la configuración.</string>
+    <string name="restricted_settings_open_app_info">Abrir información de PureLock</string>
+    <string name="suite_grace_period_title">Período de gracia de rebloqueo</string>
+    <string name="suite_grace_period_desc">Configura cuánto tiempo permanece accesible una app desbloqueada tras salir de ella.</string>
+    <string name="grace_period_immediate">Inmediato (0s)</string>
+    <string name="grace_period_30s">30 Segundos</string>
+    <string name="grace_period_1m">1 Minuto</string>
+    <string name="grace_period_5m">5 Minutos</string>
+    <string name="grace_period_screen_off">Al apagar pantalla</string>
     <string name="onboarding_complete_title">¡Protección Activa!</string>
     <string name="onboarding_complete_desc">Su bóveda de privacidad zero-knowledge está lista.\nTodas las claves maestras y elementos cifrados se guardan únicamente en su dispositivo.</string>
     <string name="onboarding_master_pin_label">PIN Maestro</string>
@@ -322,8 +314,6 @@
     <string name="onboarding_draw_pattern_hint">Dibuje el patrón maestro abajo</string>
     <string name="onboarding_selected_nodes_format">Nodos seleccionados: %1$s</string>
     <string name="onboarding_reset_pattern">Reiniciar Patrón</string>
-
-    <!-- Smart Prompts & Suite Localization -->
     <string name="smart_share_title">Comparte Privacidad Sin Nube</string>
     <string name="smart_share_desc">¿Te gusta PureLock? ¡Comparte la máxima protección de privacidad con tus amigos y familiares!</string>
     <string name="smart_share_later">Más tarde</string>
@@ -332,7 +322,150 @@
     <string name="smart_rate_desc">¡Tu calificación de 5 estrellas nos ayuda a mantener PureLock 100% gratuito y sin nube para todos!</string>
     <string name="smart_rate_not_now">Ahora no</string>
     <string name="smart_rate_btn">Calificarnos</string>
-
+    <string name="shield_search_apps_placeholder">Search installed apps…</string>
+    <string name="shield_no_apps_found">No apps installed or found</string>
+    <string name="shield_system_apps_toggle">System Apps</string>
+    <string name="shield_clear_all_locks">Clear All Locks</string>
+    <string name="shield_lock_all_apps">Lock All Apps</string>
+    <string name="shield_active_locks_count">%1$d active locks</string>
+    <string name="shield_unlocked_state">Unlocked</string>
+    <string name="shield_locked_state">Locked</string>
+    <string name="shield_custom_schedule_title">Custom Lock Schedules</string>
+    <string name="shield_schedule_desc">Enforce app lock rules only during specific time intervals</string>
+    <string name="shield_add_schedule">Add Schedule Rule</string>
+    <string name="shield_rule_name">Rule Name</string>
+    <string name="shield_start_time">Start Time</string>
+    <string name="shield_end_time">End Time</string>
+    <string name="shield_rule_days">Active Days</string>
+    <string name="shield_delete_schedule">Delete Schedule</string>
+    <string name="shield_all_apps_locked_toast">All %1$d apps locked</string>
+    <string name="shield_all_apps_unlocked_toast">All apps unlocked</string>
+    <string name="suite_stealth_title">Camouflage &amp; Stealth Decoys</string>
+    <string name="suite_stealth_subtitle">Disguise PureLock icon and decoy fake crash or calculator overlays</string>
+    <string name="suite_decoy_calc_title">Calculator Decoy Lock</string>
+    <string name="suite_decoy_calc_desc">Disguises lock screen as a working scientific calculator. Type Master PIN then \'=\' to unlock.</string>
+    <string name="suite_decoy_crash_title">Fake Crash Dialog Decoy</string>
+    <string name="suite_decoy_crash_desc">Shows \'App has stopped\' fake system crash dialog. Long-press \'Close app\' to reveal real lock.</string>
+    <string name="suite_invisible_pattern_title">Invisible Pattern Trail</string>
+    <string name="suite_invisible_pattern_desc">Hides line drawing animations on pattern unlock to prevent shoulder surfing.</string>
+    <string name="suite_random_keypad_title">Randomized Keypad Scramble</string>
+    <string name="suite_random_keypad_desc">Shuffles 0-9 digits on lock screen every time to prevent fingerprint smudge deduction.</string>
+    <string name="suite_intruder_selfie_title">Selfie de Intruso</string>
+    <string name="suite_intruder_selfie_desc">Silently captures front camera photo after failed unlock attempts.</string>
+    <string name="suite_intruder_threshold_title">Failed Attempts Before Snapshot</string>
+    <string name="suite_intruder_threshold_format">%1$d failed attempts</string>
+    <string name="suite_panic_switch_title">Panic Duress PIN</string>
+    <string name="suite_panic_switch_desc">Entering this PIN on the lock screen immediately triggers stealth fake data decoy mode.</string>
+    <string name="suite_panic_pin_label">Panic PIN</string>
+    <string name="suite_panic_pin_dialog_title">Configure Panic Duress PIN</string>
+    <string name="suite_panic_pin_dialog_desc">If coerced, enter this emergency PIN to show an empty fake vault instead of your real encrypted data.</string>
+    <string name="suite_re_lock_policy_title">Re-lock Delay Policy</string>
+    <string name="suite_re_lock_immediate">Immediately upon exit</string>
+    <string name="suite_re_lock_1min">1 minute after exit</string>
+    <string name="suite_re_lock_3min">3 minutes after exit</string>
+    <string name="suite_re_lock_screen_off">When screen turns off</string>
+    <string name="suite_trash_retention_title">Trash Bin Retention</string>
+    <string name="suite_trash_retention_format">%1$d days retention</string>
+    <string name="suite_clipboard_autoclear_title">Clipboard Auto-Wipe Timeout</string>
+    <string name="suite_clipboard_autoclear_format">%1$d seconds</string>
+    <string name="suite_security_logs_title">Hardware Security Logs</string>
+    <string name="suite_security_logs_desc">View local security events, unlock logs, and sensor alerts</string>
+    <string name="suite_clear_logs">Clear Logs</string>
+    <string name="suite_export_backup_title">Exportar Registros de Auditoría</string>
+    <string name="suite_export_backup_desc">Export all encrypted notes and locked app configurations to a password-protected JSON backup.</string>
+    <string name="suite_import_backup_title">Restore Encrypted Backup</string>
+    <string name="suite_import_backup_desc">Restore notes and configurations from an AES-256 backup file.</string>
+    <string name="suite_language_title">Application Language</string>
+    <string name="suite_language_desc">Choose user interface language</string>
+    <string name="suite_about_title">About PureLock</string>
+    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.1</string>
+    <string name="suite_hardware_keystore">Android Keystore Backed (AES-GCM-256)</string>
+    <string name="intruder_title">Intruder Snapshot Vault</string>
+    <string name="intruder_subtitle">Hardware-isolated frontal photos of unauthorized unlock attempts</string>
+    <string name="intruder_delete_all">Delete All</string>
+    <string name="intruder_delete_all_dialog_title">Delete All Intruder Photos?</string>
+    <string name="intruder_delete_all_dialog_message">Are you sure you want to permanently erase all %1$d intruder snapshots?</string>
+    <string name="intruder_delete_single_dialog_title">Delete Snapshot?</string>
+    <string name="intruder_delete_single_dialog_message">Are you sure you want to delete this intruder snapshot?</string>
+    <string name="intruder_attempt_at">Attempt: %1$s</string>
+    <string name="intruder_attempt_app">Target: %1$s</string>
+    <string name="intruder_attempt_reason">Trigger: %1$s</string>
+    <string name="intruder_failed_pin">Wrong PIN entered</string>
+    <string name="intruder_failed_pattern">Wrong Pattern drawn</string>
+    <string name="intruder_failed_biometric">Biometric mismatch</string>
+    <string name="intruder_all_deleted_toast">All intruder snapshots deleted</string>
+    <string name="intruder_deleted_toast">Snapshot deleted</string>
+    <string name="privacy_audit_title">Privacy Shield &amp; Permission Audit</string>
+    <string name="privacy_audit_subtitle">Inspect risky permissions across installed apps with zero cloud tracking</string>
+    <string name="privacy_score_title">Device Privacy Score</string>
+    <string name="privacy_score_excellent">Excellent Protection</string>
+    <string name="privacy_score_good">Good Protection</string>
+    <string name="privacy_score_warning">Attention Needed</string>
+    <string name="privacy_risk_high">High Risk</string>
+    <string name="privacy_risk_medium">Medium Risk</string>
+    <string name="privacy_risk_low">Safe</string>
+    <string name="privacy_perm_camera">Camera Access</string>
+    <string name="privacy_perm_location">Precise Location</string>
+    <string name="privacy_perm_microphone">Microphone / Audio</string>
+    <string name="privacy_perm_contacts">Contacts List</string>
+    <string name="privacy_perm_sms">SMS / Messages</string>
+    <string name="privacy_perm_storage">Storage Access</string>
+    <string name="privacy_apps_inspected">%1$d Apps Audited</string>
+    <string name="privacy_no_risky_apps">No high risk permission vulnerabilities detected.</string>
+    <string name="privacy_recommendation_title">Privacy Recommendations</string>
+    <string name="privacy_recommendation_lock_sensitive">Consider locking apps that have access to Camera or Location.</string>
+    <string name="analytics_title">Security Analytics</string>
+    <string name="analytics_subtitle">Local device telemetry &amp; security posture</string>
+    <string name="analytics_total_events">Total Events</string>
+    <string name="analytics_failed_unlocks">Failed Unlocks</string>
+    <string name="analytics_successful_unlocks">Successful Unlocks</string>
+    <string name="analytics_vault_access">Vault Accesses</string>
+    <string name="analytics_threat_level">Threat Level: %1$s</string>
+    <string name="analytics_threat_low">Low (Safe)</string>
+    <string name="analytics_threat_medium">Moderate</string>
+    <string name="analytics_threat_high">Elevated</string>
+    <string name="analytics_recent_events">Recent Security Audit Logs</string>
+    <string name="analytics_clear_all_logs">Clear Security Logs</string>
+    <string name="analytics_logs_cleared_toast">Security logs cleared</string>
+    <string name="analytics_no_logs">No security logs recorded yet</string>
+    <string name="insights_total_notes">Total Notes</string>
+    <string name="insights_encrypted_at_rest">Encrypted at Rest</string>
+    <string name="insights_health_index">Health Index</string>
+    <string name="insights_avg_strength_entropy">Average Password Strength &amp; Entropy</string>
+    <string name="insights_avg_entropy_format">Average entropy is %1$.1f bits per secret. %2$s</string>
+    <string name="insights_high_resistance">Your credentials have high cryptographic resistance to brute-force attacks.</string>
+    <string name="insights_mix_special">Consider using longer passwords with mixed special characters.</string>
+    <string name="insights_entropy_empty">Add your encrypted notes and credentials to see real-time security entropy metrics.</string>
+    <string name="insights_no_category_data">No category data available yet.</string>
+    <string name="insights_zero_cloud_title">Zero-Cloud Hardware Protection</string>
+    <string name="insights_zero_cloud_desc">All vault insights are computed on-device with zero network telemetry or tracking.</string>
+    <string name="insights_bits_avg">bits avg</string>
+    <string name="insights_strength_very_strong">Very Strong</string>
+    <string name="insights_strength_strong">Strong</string>
+    <string name="insights_strength_fair">Fair</string>
+    <string name="insights_strength_weak">Weak</string>
+    <string name="insights_tier_strong">Strong (75+ bits)</string>
+    <string name="insights_tier_good">Good (55-74 bits)</string>
+    <string name="insights_tier_fair">Fair (35-54 bits)</string>
+    <string name="insights_tier_weak">Weak (&lt;35 bits)</string>
+    <string name="insights_period_24h">Past 24h</string>
+    <string name="insights_period_7d">Past 7d</string>
+    <string name="insights_period_30d">Past 30d</string>
+    <string name="insights_period_older">Older (&gt;30d)</string>
+    <string name="lock_calc_exit">Salir</string>
+    <string name="lock_fake_crash_system_alert">Alerta del sistema</string>
+    <string name="lock_fake_crash_stopped">Desafortunadamente, %1$s se ha detenido.</string>
+    <string name="lock_fake_crash_exception_detail">La aplicación encontró una excepción no controlada y fue terminada por el sistema.</string>
+    <string name="lock_fake_crash_log_sent">Informe de error enviado al desarrollador.</string>
+    <string name="lock_fake_crash_send_feedback">Enviar comentarios</string>
+    <string name="lock_fake_crash_close_app">Cerrar aplicación</string>
+    <string name="lock_knock_stealth_rhythm">Toca el ritmo en los 4 cuadrantes (%1$d toques)</string>
+    <string name="lock_knock_incorrect">Patrón de toques incorrecto. Inténtalo de nuevo.</string>
+    <string name="lock_knock_clear">Borrar Toques</string>
+    <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="category_all">ALL</string>
     <string name="suite_header_subtitle">Sigilo, Señuelos y Autenticación</string>
     <string name="suite_section_credentials">Credenciales y Tipo de Bloqueo</string>
     <string name="suite_lock_method">Método de Bloqueo</string>
@@ -343,22 +476,80 @@
     <string name="suite_decoy_calculator">Calculadora</string>
     <string name="suite_decoy_fake_crash">Falso Cierre</string>
     <string name="suite_duress_title">PIN de Coacción</string>
-    <string name="suite_intruder_selfie_title">Selfie de Intruso</string>
     <string name="suite_section_theme">Tema Visual y Paleta de Seguridad</string>
     <string name="suite_palette_label">Paleta de Colores</string>
     <string name="suite_section_triggers">Disparadores y Tiempo de Espera</string>
     <string name="suite_shake_title">Agitar para Bloquear</string>
     <string name="suite_autolock_label">Tiempo de Bloqueo Automático</string>
-    <string name="suite_export_backup_title">Exportar Registros de Auditoría</string>
-
-    <string name="lock_calc_exit">Salir</string>
-    <string name="lock_fake_crash_system_alert">Alerta del sistema</string>
-    <string name="lock_fake_crash_stopped">Desafortunadamente, %1$s se ha detenido.</string>
-    <string name="lock_fake_crash_exception_detail">La aplicación encontró una excepción no controlada y fue terminada por el sistema.</string>
-    <string name="lock_fake_crash_log_sent">Informe de error enviado al desarrollador.</string>
-    <string name="lock_fake_crash_send_feedback">Enviar comentarios</string>
-    <string name="lock_fake_crash_close_app">Cerrar aplicación</string>
-    <string name="lock_knock_incorrect">Patrón de toques incorrecto. Inténtalo de nuevo.</string>
-    <string name="lock_knock_stealth_rhythm">Toca el ritmo en los 4 cuadrantes (%1$d toques)</string>
-    <string name="lock_knock_clear">Borrar Toques</string>
+    <string name="lock_biometric_unrecognized">Biometrics not recognized. Please retry or enter PIN.</string>
+    <string name="tab_intruder_photos">Fotos de Intrusos (%1$d)</string>
+    <string name="tab_secret_vault">Bóveda Secreta (%1$d)</string>
+    <string name="clipboard_copied_toast">¡Copiado! Se borrará del portapapeles en 30s.</string>
+    <string name="vault_security_details_title">Detalles de seguridad de la bóveda</string>
+    <string name="vault_security_details_bullet1">• La captura de intrusos usa la cámara frontal tras 1-3 intentos fallidos.</string>
+    <string name="vault_security_details_bullet2">• Las notas y claves se cifran con AES-256 SQLCipher en almacenamiento local.</string>
+    <string name="vault_security_details_bullet3">• Las claves copiadas se eliminan del portapapeles tras 30 segundos.</string>
+    <string name="btn_delete_snapshot">Eliminar captura</string>
+    <string name="clear_all_snapshots_title">¿Borrar todas las capturas?</string>
+    <string name="clear_all_snapshots_desc">Esto eliminará permanentemente todas las fotos de intrusos.</string>
+    <string name="dialog_edit_secret">Editar secreto</string>
+    <string name="dialog_new_secret">Nuevo secreto</string>
+    <string name="field_title">Título</string>
+    <string name="field_secret_content">Contenido secreto</string>
+    <string name="delete_secret_dialog_title">¿Eliminar secreto?</string>
+    <string name="delete_secret_dialog_message">¿Eliminar permanentemente \"%1$s\"?</string>
+    <string name="lock_mode_knock">Toque rítmico (Knock)</string>
+    <string name="suite_change_pattern_title">Cambiar patrón maestro</string>
+    <string name="suite_change_knock_title">Configurar código de toques (4 cuadrantes)</string>
+    <string name="suite_change_pin_title">Cambiar PIN maestro</string>
+    <string name="suite_pattern_dots_subtitle">Patrón configurado (%1$d puntos)</string>
+    <string name="suite_knock_taps_subtitle">Ritmo de toques (%1$d toques)</string>
+    <string name="suite_pin_current_subtitle">Actual: ••••</string>
+    <string name="suite_random_keypad_dialog_desc">Desordena los números en cada intento para evitar deducción por huellas.</string>
+    <string name="suite_invisible_pattern_dialog_desc">Oculta el trazo mientras dibujas tu patrón para evitar miradas indiscretas.</string>
+    <string name="suite_duress_dialog_desc">Si te fuerzan a desbloquear, introduce el PIN de coacción para mostrar una bóveda falsa.</string>
+    <string name="suite_intruder_selfie_dialog_desc">Toma fotos silenciosas con la cámara frontal tras intentos fallidos de desbloqueo.</string>
+    <string name="suite_shake_dialog_desc">Bloquea PureLock al instante al detectar un movimiento de sacudida.</string>
+    <string name="suite_grace_period_dialog_desc">Tiempo que una app desbloqueada permanece abierta. \'0s\' bloquea de inmediato.</string>
+    <string name="suite_set_master_pin_title">Establecer PIN maestro</string>
+    <string name="suite_set_master_pin_desc">Introduce un PIN maestro de 4 a 8 dígitos:</string>
+    <string name="suite_master_pin_updated_toast">PIN maestro actualizado</string>
+    <string name="suite_save_pin_btn">Guardar PIN</string>
+    <string name="suite_set_master_pattern_title">Establecer patrón maestro</string>
+    <string name="suite_set_master_pattern_desc">Conecta los puntos (0-8 separados por comas, ej. 0,1,2,5,8):</string>
+    <string name="suite_master_pattern_updated_toast">Patrón maestro actualizado</string>
+    <string name="suite_save_pattern_btn">Guardar patrón</string>
+    <string name="suite_configure_knock_title">Configurar código de toques</string>
+    <string name="suite_configure_knock_desc">Toca los 4 cuadrantes para grabar un ritmo (mínimo 3 toques). Grabados: %1$d toques</string>
+    <string name="suite_knock_min_error_toast">Toca al menos 3 cuadrantes para formar un patrón</string>
+    <string name="suite_knock_configured_toast">Código de toques configurado</string>
+    <string name="suite_save_knock_btn">Guardar código</string>
+    <string name="suite_set_duress_pin_title">Establecer PIN de coacción</string>
+    <string name="suite_set_duress_pin_desc">Introduce un PIN señuelo diferente a tu PIN maestro:</string>
+    <string name="suite_duress_pin_configured_toast">PIN de coacción configurado</string>
+    <string name="lock_unlock_biometrics">Desbloquear con biometría</string>
+    <string name="insights_zero_cloud_bullet1">• PureLock tiene CERO permisos de internet (\'android.permission.INTERNET\' omitido).</string>
+    <string name="insights_zero_cloud_bullet2">• Todos los registros, fotos y claves están cifrados con SQLCipher AES-256.</string>
+    <string name="insights_zero_cloud_bullet3">• Las estadísticas de bloqueo nunca salen de tu dispositivo.</string>
+    <string name="privacy_export_csv_header">Copiar historial de registros en formato CSV (%1$d registros):</string>
+    <string name="privacy_export_copied_toast">Registros copiados al portapapeles (formato CSV)</string>
+    <string name="audit_search_placeholder">Filtrar registros de auditoría…</string>
+    <string name="audit_protection_rating_title">Nivel de protección</string>
+    <string name="audit_protection_rating_bullet1">• La puntuación se basa en la cobertura de apps protegidas y defensas activas.</string>
+    <string name="audit_protection_rating_bullet2">• El umbral de bloqueo de 0s a 30s minimiza la exposición ante descuidos.</string>
+    <string name="audit_protection_rating_bullet3">• SQLCipher AES-256 asegura las bases de datos locales sin telemetría.</string>
+    <string name="got_it">Entendido</string>
+    <string name="btn_copy">Copiar</string>
+    <string name="btn_close">Cerrar</string>
+    <string name="insights_metric_total_notes">Notas Totales</string>
+    <string name="insights_metric_encrypted_at_rest">Cifrado en Reposo</string>
+    <string name="insights_metric_health_index">Índice de Salud</string>
+    <string name="details">Detalles</string>
+    <string name="badge_aes_sqlcipher">AES-256 SQLCipher</string>
+    <string name="badge_autolock_format">%1$ds Auto-Bloqueo</string>
+    <string name="clipboard_cleared_auto_toast">Portapapeles confidencial vaciado automáticamente.</string>
+    <string name="backup_overdue_notif_text">¡No se ha realizado copia cifrada en más de 30 días! Toca para respaldar.</string>
+    <string name="backup_health_notif_title">Alerta de estado de copia</string>
+    <string name="backup_health_channel_name">Alertas de copia de seguridad</string>
+    <string name="backup_health_channel_desc">Avisa cuando no se ha realizado ninguna copia de seguridad en más de 30 días.</string>
 </resources>

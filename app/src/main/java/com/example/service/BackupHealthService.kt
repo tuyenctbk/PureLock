@@ -47,10 +47,10 @@ class BackupHealthService(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Backup Health Warnings",
+                context.getString(R.string.backup_health_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Alerts when no encrypted backup has been performed in over 30 days."
+                description = context.getString(R.string.backup_health_channel_desc)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -65,8 +65,8 @@ class BackupHealthService(private val context: Context) {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(com.example.R.drawable.splash_logo)
-            .setContentTitle("Backup Health Warning")
-            .setContentText("No encrypted backup performed in over 30 days! Tap to backup now.")
+            .setContentTitle(context.getString(R.string.backup_health_notif_title))
+            .setContentText(context.getString(R.string.backup_overdue_notif_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

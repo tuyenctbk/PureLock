@@ -179,19 +179,31 @@ class PureLockRepository(
         }
     }
 
-    private fun getInstalledUserApps(): List<LockedAppEntity> {
+    fun getInstalledUserApps(): List<LockedAppEntity> {
         val pm = context.packageManager
+        val resolveInfos = mutableListOf<android.content.pm.ResolveInfo>()
+
+        // 1. Standard mobile launcher apps
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        val resolveInfos = pm.queryIntentActivities(intent, 0)
+        resolveInfos.addAll(pm.queryIntentActivities(intent, 0))
+
+        // 2. Android TV Leanback launcher apps
+        val tvIntent = Intent(Intent.ACTION_MAIN, null).apply {
+            addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+        }
+        resolveInfos.addAll(pm.queryIntentActivities(tvIntent, 0))
+
         val result = mutableListOf<LockedAppEntity>()
+        val seenPackages = mutableSetOf<String>()
 
         for (info in resolveInfos) {
             val packageName = info.activityInfo.packageName
-            val appName = info.loadLabel(pm).toString()
             if (packageName == context.packageName) continue // Skip PureLock itself
+            if (!seenPackages.add(packageName)) continue
 
+            val appName = info.loadLabel(pm).toString()
             val category = categorizeApp(packageName, appName)
             // Lock sensitive categories by default
             val defaultLocked = category in listOf("FINANCIAL", "SOCIAL", "SYSTEM")
@@ -206,6 +218,28 @@ class PureLockRepository(
             )
         }
         return result
+    }
+
+    suspend fun refreshInstalledApps(): Int {
+        val installedApps = getInstalledUserApps()
+        val existingApps = appLockDao.getAllLockedApps().first()
+        val existingMap = existingApps.associateBy { it.packageName }
+
+        val toInsert = mutableListOf<LockedAppEntity>()
+        for (installed in installedApps) {
+            if (!existingMap.containsKey(installed.packageName)) {
+                toInsert.add(installed)
+            }
+        }
+
+        if (toInsert.isNotEmpty()) {
+            appLockDao.upsertApps(toInsert)
+            logSecurityEvent(
+                "APPS_CATALOG_REFRESHED",
+                "Discovered and indexed ${toInsert.size} new apps in App Shield catalog."
+            )
+        }
+        return toInsert.size
     }
 
     private fun categorizeApp(packageName: String, appName: String): String {
@@ -358,7 +392,17 @@ class PureLockRepository(
     suspend fun isAppLockRequired(packageName: String): Boolean {
         val app = appLockDao.getLockedAppByPackage(packageName) ?: return false
 
-        // Check if there are active schedule rules for this package
+        // 1. If user disabled lock for this app in App Shield, never lock it
+        if (!app.isLocked) return false
+
+        // 2. Safety threshold: If unlocked within last 1500ms, do not relock
+        // (prevents overlay finish race condition)
+        val now = System.currentTimeMillis()
+        if (now - app.lastUnlockedTimestamp < 1500L) {
+            return false
+        }
+
+        // 3. Check active schedule rules if any exist for this package
         val rules = scheduleRuleDao.getActiveRulesForPackage(packageName)
         if (rules.isNotEmpty()) {
             val cal = Calendar.getInstance()
@@ -401,17 +445,28 @@ class PureLockRepository(
                 // Outside active schedule range -> Do not lock right now
                 return false
             }
-        } else {
-            // Standard toggle check
-            if (!app.isLocked) return false
         }
 
         val gracePeriod = preferences.gracePeriodMs.first()
-        if (gracePeriod <= 0L) return true
+        if (gracePeriod == 0L) {
+            return true
+        }
+        if (gracePeriod == -1L) {
+            return app.lastUnlockedTimestamp == 0L
+        }
 
-        val now = System.currentTimeMillis()
         val elapsed = now - app.lastUnlockedTimestamp
         return elapsed > gracePeriod
+    }
+
+    suspend fun resetAllUnlockedSessions() {
+        appLockDao.resetAllUnlockedTimestamps()
+        com.example.service.PureLockAccessibilityService.clearAllSessions()
+    }
+
+    suspend fun lockAllAndClearSessions() {
+        resetAllUnlockedSessions()
+        logSecurityEvent("VAULT_LOCKDOWN", "Emergency lockdown triggered. All session tokens cleared.")
     }
 
     suspend fun clearSecurityLogs() {
