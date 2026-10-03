@@ -39,23 +39,32 @@ fun AppShieldScreen(
     viewModel: PureLockViewModel,
     onNavigateToSettings: () -> Unit
 ) {
+    val context = LocalContext.current
     val allApps by viewModel.allApps.collectAsState()
     val activeCount by viewModel.activeLockedAppsCount.collectAsState()
+    val isSyncingApps by viewModel.isSyncingApps.collectAsState()
     val haptic = LocalHapticFeedback.current
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("ALL") }
+    var selectedStatusFilter by remember { mutableStateOf("ALL") } // "ALL", "LOCKED", "UNLOCKED"
     var showInfoDialog by remember { mutableStateOf(false) }
+    var showPermGuideDialog by remember { mutableStateOf(false) }
 
     val categories = listOf("ALL", "FINANCIAL", "SOCIAL", "SYSTEM", "MEDIA", "GAMES")
 
-    val filteredApps = remember(allApps, searchQuery, selectedCategory) {
+    val filteredApps = remember(allApps, searchQuery, selectedCategory, selectedStatusFilter) {
         allApps.filter { app ->
             val matchesSearch = searchQuery.isEmpty() ||
                     app.appName.contains(searchQuery, ignoreCase = true) ||
                     app.packageName.contains(searchQuery, ignoreCase = true)
             val matchesCategory = selectedCategory == "ALL" || app.category.equals(selectedCategory, ignoreCase = true)
-            matchesSearch && matchesCategory
+            val matchesStatus = when (selectedStatusFilter) {
+                "LOCKED" -> app.isLocked
+                "UNLOCKED" -> !app.isLocked
+                else -> true
+            }
+            matchesSearch && matchesCategory && matchesStatus
         }
     }
 
@@ -120,6 +129,34 @@ fun AppShieldScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Sync / Refresh Apps with device (clears uninstalled and detects newly installed)
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            viewModel.syncInstalledApps { removed ->
+                                val msg = if (removed > 0) context.getString(R.string.shield_synced_removed_toast, removed) else context.getString(R.string.shield_synced_toast)
+                                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        enabled = !isSyncingApps,
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .testTag("btn_sync_apps")
+                    ) {
+                        if (isSyncingApps) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Sync,
+                                contentDescription = stringResource(R.string.shield_sync_apps),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+
                     // Lock All quick action
                     IconButton(
                         onClick = {
@@ -160,6 +197,23 @@ fun AppShieldScreen(
                         )
                     }
 
+                    // Permission Approval Guide quick action
+                    IconButton(
+                        onClick = { showPermGuideDialog = true },
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .testTag("btn_shield_perm_guide")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Security,
+                            contentDescription = stringResource(R.string.perm_guide_title),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
                     // Info / Hint button to hide complexity
                     IconButton(
                         onClick = { showInfoDialog = true },
@@ -178,6 +232,11 @@ fun AppShieldScreen(
                     }
                 }
             }
+
+            // Core Privileges Inactive Warning Banner
+            ShieldInactiveWarningBanner(
+                onClickOpenGuide = { showPermGuideDialog = true }
+            )
 
             // Search Bar
             OutlinedTextField(
@@ -204,6 +263,33 @@ fun AppShieldScreen(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                 )
             )
+
+            // Status Filter Row (ALL, LOCKED, UNLOCKED)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                FilterChip(
+                    selected = selectedStatusFilter == "ALL",
+                    onClick = { selectedStatusFilter = "ALL" },
+                    label = { Text(stringResource(R.string.shield_filter_all), fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.weight(1f).testTag("chip_status_all")
+                )
+                FilterChip(
+                    selected = selectedStatusFilter == "LOCKED",
+                    onClick = { selectedStatusFilter = "LOCKED" },
+                    label = { Text("${stringResource(R.string.shield_filter_locked)} ($activeCount)", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) },
+                    modifier = Modifier.weight(1.15f).testTag("chip_status_locked")
+                )
+                FilterChip(
+                    selected = selectedStatusFilter == "UNLOCKED",
+                    onClick = { selectedStatusFilter = "UNLOCKED" },
+                    label = { Text("${stringResource(R.string.shield_filter_unlocked)} (${allApps.size - activeCount})", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                    leadingIcon = { Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(12.dp)) },
+                    modifier = Modifier.weight(1.25f).testTag("chip_status_unlocked")
+                )
+            }
 
             // Category Filter Chips
             LazyRow(
@@ -326,7 +412,7 @@ fun AppShieldScreen(
                     ) {
                         Icon(Icons.Default.Speed, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                         Text(
-                            text = "Real-time 10ms Accessibility foreground detection instantly overlays your lock screen when protected apps launch.",
+                            text = stringResource(R.string.shield_realtime_desc),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -336,7 +422,7 @@ fun AppShieldScreen(
                     ) {
                         Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                         Text(
-                            text = "100% Offline with SQLCipher AES-256 local database encryption. Zero cloud telemetry.",
+                            text = stringResource(R.string.shield_offline_desc),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -346,7 +432,7 @@ fun AppShieldScreen(
                     ) {
                         Icon(Icons.Default.VisibilityOff, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                         Text(
-                            text = "Enable Decoy Camouflage in Settings to disguise PureLock as a functional calculator or fake crash screen.",
+                            text = stringResource(R.string.shield_decoy_desc),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -357,6 +443,12 @@ fun AppShieldScreen(
                     Text(stringResource(R.string.ok))
                 }
             }
+        )
+    }
+
+    if (showPermGuideDialog) {
+        PermissionApproveGuideDialog(
+            onDismissRequest = { showPermGuideDialog = false }
         )
     }
 }

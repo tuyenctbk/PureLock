@@ -71,6 +71,7 @@ fun EncryptedVaultDashboardScreen(
     var editingItem by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
     var itemToDelete by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
     var showEmptyTrashDialog by remember { mutableStateOf(false) }
+    var showInsightsDialog by remember { mutableStateOf(false) }
 
     // Filter items based on category and search query
     val displayedItems = remember(
@@ -166,7 +167,10 @@ fun EncryptedVaultDashboardScreen(
                             }
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             if (selectedCategory == VaultFilterCategory.TRASH && trashVaultItems.isNotEmpty()) {
                                 TextButton(
                                     onClick = { showEmptyTrashDialog = true },
@@ -175,6 +179,22 @@ fun EncryptedVaultDashboardScreen(
                                     Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(stringResource(R.string.vault_empty_trash_button), fontSize = 12.sp)
+                                }
+                            } else if (selectedCategory != VaultFilterCategory.TRASH) {
+                                IconButton(
+                                    onClick = { showInsightsDialog = true },
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .testTag("btn_vault_insights")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Analytics,
+                                        contentDescription = stringResource(R.string.vault_insights_title),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                 }
                             }
                         }
@@ -412,12 +432,14 @@ fun EncryptedVaultDashboardScreen(
                                 showAddEditDialog = true
                             },
                             onMoveToTrash = {
+                                revealedItemIds = revealedItemIds - item.id
+                                if (editingItem?.id == item.id) editingItem = null
                                 viewModel.moveVaultItemToTrash(item.id)
-                                Toast.makeText(context, "\"${item.title}\" moved to Trash", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.vault_moved_to_trash, item.title), Toast.LENGTH_SHORT).show()
                             },
                             onRestore = {
                                 viewModel.restoreVaultItemFromTrash(item.id)
-                                Toast.makeText(context, "\"${item.title}\" restored", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.vault_restored_from_trash, item.title), Toast.LENGTH_SHORT).show()
                             },
                             onPermanentDelete = {
                                 itemToDelete = item
@@ -489,7 +511,11 @@ fun EncryptedVaultDashboardScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        itemToDelete?.let { viewModel.deleteEncryptedVaultItem(it.id) }
+                        itemToDelete?.let {
+                            revealedItemIds = revealedItemIds - it.id
+                            if (editingItem?.id == it.id) editingItem = null
+                            viewModel.deleteEncryptedVaultItem(it.id)
+                        }
                         itemToDelete = null
                         Toast.makeText(context, deleteToast, Toast.LENGTH_SHORT).show()
                     },
@@ -522,6 +548,8 @@ fun EncryptedVaultDashboardScreen(
             confirmButton = {
                 Button(
                     onClick = {
+                        revealedItemIds = emptySet()
+                        editingItem = null
                         viewModel.emptyTrashVault()
                         showEmptyTrashDialog = false
                         Toast.makeText(context, trashEmptiedToast, Toast.LENGTH_SHORT).show()
@@ -536,6 +564,14 @@ fun EncryptedVaultDashboardScreen(
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    // Vault Cryptographic Insights Dialog
+    if (showInsightsDialog) {
+        VaultInsightsDialog(
+            vaultItems = encryptedVaultItems,
+            onDismiss = { showInsightsDialog = false }
         )
     }
 }

@@ -307,12 +307,12 @@ fun InvisibleSuiteScreen(
                     Text(stringResource(R.string.suite_palette_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
 
                     val themes = listOf(
-                        "CYBER_MIDNIGHT" to "Midnight",
-                        "DARK" to "OLED Black",
-                        "EMERALD" to "Emerald",
-                        "SAPPHIRE" to "Sapphire",
-                        "MONET" to "Monet",
-                        "LIGHT" to "Minimal"
+                        "CYBER_MIDNIGHT" to stringResource(R.string.theme_midnight),
+                        "DARK" to stringResource(R.string.theme_oled_black),
+                        "EMERALD" to stringResource(R.string.theme_emerald),
+                        "SAPPHIRE" to stringResource(R.string.theme_sapphire),
+                        "MONET" to stringResource(R.string.theme_monet),
+                        "LIGHT" to stringResource(R.string.theme_minimal)
                     )
 
                     Row(
@@ -373,7 +373,7 @@ fun InvisibleSuiteScreen(
                     Column {
                         Text(stringResource(R.string.suite_autolock_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                         Text(
-                            text = if (inactivityTimeoutSec <= 0) "Immediate (Always)" else "${inactivityTimeoutSec}s Inactivity",
+                            text = if (inactivityTimeoutSec <= 0) stringResource(R.string.suite_timeout_immediate) else stringResource(R.string.suite_timeout_seconds_format, inactivityTimeoutSec),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -495,21 +495,21 @@ fun InvisibleSuiteScreen(
                     )
 
                     Text(
-                        text = "PureLock Security Architecture",
+                        text = stringResource(R.string.suite_architecture_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Text(
-                        text = "Version ${com.example.BuildConfig.VERSION_NAME} • Hardware Keystore & SQLCipher AES-256",
+                        text = stringResource(R.string.suite_architecture_version_format, com.example.BuildConfig.VERSION_NAME),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )
 
                     Text(
-                        text = "100% Offline • Zero Telemetry • Air-Gapped Privacy Engine",
+                        text = stringResource(R.string.suite_architecture_footer),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline,
                         textAlign = TextAlign.Center
@@ -798,7 +798,7 @@ private fun SettingsSwitchRow(
             Text(text = title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
             if (onInfoClick != null) {
                 IconButton(onClick = onInfoClick, modifier = Modifier.size(22.dp)) {
-                    Icon(Icons.Default.Info, contentDescription = "Details", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(15.dp))
+                    Icon(Icons.Default.Info, contentDescription = stringResource(R.string.details), tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(15.dp))
                 }
             }
         }
@@ -842,7 +842,7 @@ private fun SettingsActionRow(
             }
             if (onInfoClick != null) {
                 IconButton(onClick = onInfoClick, modifier = Modifier.size(22.dp)) {
-                    Icon(Icons.Default.Info, contentDescription = "Details", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(15.dp))
+                    Icon(Icons.Default.Info, contentDescription = stringResource(R.string.details), tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(15.dp))
                 }
             }
         }

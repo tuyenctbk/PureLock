@@ -170,9 +170,9 @@ fun SecuritySplashScreen(
                     }
                     val statusText = when (stage) {
                         0 -> stringResource(R.string.splash_status_initializing)
-                        1 -> stringResource(R.string.splash_status_keystore)
-                        2 -> stringResource(R.string.splash_status_ready)
-                        else -> stringResource(R.string.splash_status_ready)
+                        1 -> stringResource(R.string.splash_keystore_verified)
+                        2 -> stringResource(R.string.splash_database_mounted)
+                        else -> stringResource(R.string.splash_defense_armed)
                     }
 
                     Icon(
@@ -213,6 +213,23 @@ fun SecuritySplashScreen(
                     .clip(RoundedCornerShape(2.dp)),
                 color = Color(0xFF00F0FF),
                 trackColor = Color(0xFF1E293B)
+            )
+        }
+
+        // Top Right Skip Button for fast UX
+        TextButton(
+            onClick = onSplashFinished,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(top = 8.dp, end = 12.dp)
+                .testTag("btn_skip_splash")
+        ) {
+            Text(
+                text = stringResource(R.string.splash_skip),
+                color = Color(0xFF94A3B8),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
 

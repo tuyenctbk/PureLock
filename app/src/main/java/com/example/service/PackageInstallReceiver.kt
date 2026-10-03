@@ -19,12 +19,38 @@ import kotlinx.coroutines.launch
 class PackageInstallReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
-            val packageName = intent.data?.schemeSpecificPart ?: return
-            if (packageName == context.packageName) return
+        val packageName = intent.data?.schemeSpecificPart ?: return
+        if (packageName == context.packageName) return
 
-            val pendingResult = goAsync()
-            val scope = CoroutineScope(Dispatchers.IO)
+        val pendingResult = goAsync()
+        val scope = CoroutineScope(Dispatchers.IO)
+
+        if (intent.action == Intent.ACTION_PACKAGE_REMOVED || intent.action == Intent.ACTION_PACKAGE_FULLY_REMOVED) {
+            scope.launch {
+                try {
+                    val db = PureLockDatabase.getDatabase(context)
+                    val prefs = PureLockPreferences(context)
+                    val repository = PureLockRepository(
+                        context,
+                        db.appLockDao(),
+                        db.intruderDao(),
+                        db.logDao(),
+                        db.scheduleRuleDao(),
+                        db.encryptedVaultDao(),
+                        db.userSettingDao(),
+                        prefs
+                    )
+                    repository.removeUninstalledApp(packageName)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    pendingResult.finish()
+                }
+            }
+            return
+        }
+
+        if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
             scope.launch {
                 try {
                     val pm = context.packageManager
@@ -65,6 +91,8 @@ class PackageInstallReceiver : BroadcastReceiver() {
                     pendingResult.finish()
                 }
             }
+        } else {
+            pendingResult.finish()
         }
     }
 

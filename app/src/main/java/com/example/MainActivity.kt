@@ -133,13 +133,18 @@ class MainActivity : FragmentActivity() {
                             }
                             androidx.lifecycle.Lifecycle.Event.ON_START -> {
                                 if (appBackgroundTimestamp > 0L) {
-                                    // Auto-lock whenever app returns from background
-                                    appAuthenticated = false
-                                    viewModel.clearSensitiveState()
-                                    viewModel.logSecurityEvent(
-                                        "BACKGROUND_AUTO_LOCK",
-                                        "PureLock secured on background return. Biometric authentication required."
-                                    )
+                                    val elapsed = System.currentTimeMillis() - appBackgroundTimestamp
+                                    val timeoutMillis = if (inactivityTimeoutSec > 0) inactivityTimeoutSec * 1000L else 5000L
+                                    val returningFromSettings = com.example.util.PermissionManager.isReturningFromSettings()
+
+                                    if (!returningFromSettings && elapsed >= timeoutMillis) {
+                                        appAuthenticated = false
+                                        viewModel.clearSensitiveState()
+                                        viewModel.logSecurityEvent(
+                                            "BACKGROUND_AUTO_LOCK",
+                                            "PureLock secured on background return. Master authentication required."
+                                        )
+                                    }
                                     appBackgroundTimestamp = 0L
                                 }
                             }

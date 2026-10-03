@@ -192,7 +192,7 @@ fun SecurityAnalyticsDashboard(
             ) {
                 Icon(
                     imageVector = Icons.Default.FileDownload,
-                    contentDescription = "Export CSV",
+                    contentDescription = stringResource(R.string.export),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(18.dp)
                 )
@@ -209,7 +209,7 @@ fun SecurityAnalyticsDashboard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Clear",
+                        contentDescription = stringResource(R.string.clear),
                         tint = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.size(18.dp)
                     )
@@ -237,7 +237,7 @@ fun SecurityAnalyticsDashboard(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "No Events Recorded",
+                        text = stringResource(R.string.audit_no_events_recorded),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -344,13 +344,13 @@ fun ThreatLevelGaugeCard(
                     }
                     Column {
                         Text(
-                            text = if (isThreatActive) "$threatCount Alerts Detected" else "Protection Status",
+                            text = if (isThreatActive) stringResource(R.string.audit_alerts_detected_format, threatCount) else stringResource(R.string.audit_protection_status),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = if (isThreatActive) "Threats Logged" else "Active Defense",
+                            text = if (isThreatActive) stringResource(R.string.audit_threats_logged) else stringResource(R.string.audit_active_defense),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -373,7 +373,7 @@ fun ThreatLevelGaugeCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Details",
+                            contentDescription = stringResource(R.string.details),
                             tint = MaterialTheme.colorScheme.outline,
                             modifier = Modifier.size(16.dp)
                         )
@@ -557,7 +557,7 @@ fun SecurityLogDetailDialog(
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text(
-                            text = "Timestamp",
+                            text = stringResource(R.string.audit_timestamp_label),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -576,7 +576,7 @@ fun SecurityLogDetailDialog(
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text(
-                            text = "Details",
+                            text = stringResource(R.string.audit_details_label),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

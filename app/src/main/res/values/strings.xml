@@ -617,4 +617,109 @@
     <string name="backup_health_notif_title">Backup Health Warning</string>
     <string name="backup_health_channel_name">Backup Health Warnings</string>
     <string name="backup_health_channel_desc">Alerts when no encrypted backup has been performed in over 30 days.</string>
+
+    <!-- App Shield & Sync Strings -->
+    <string name="shield_synced_removed_toast">Synchronized: %1$d uninstalled apps removed from shield.</string>
+    <string name="shield_synced_toast">Installed apps synchronized successfully.</string>
+    <string name="shield_sync_apps">Sync Installed Apps</string>
+    <string name="shield_filter_all">All</string>
+    <string name="shield_filter_locked">Locked</string>
+    <string name="shield_filter_unlocked">Unlocked</string>
+    <string name="shield_realtime_desc">Instant lock verification via Accessibility Service</string>
+    <string name="shield_offline_desc">Zero network permissions and no telemetry</string>
+    <string name="shield_decoy_desc">Stealth calculator or fake crash disguises</string>
+
+    <!-- Vault Dashboard Strings -->
+    <string name="vault_moved_to_trash">Moved to Trash Bin</string>
+    <string name="vault_restored_from_trash">Restored from Trash Bin</string>
+    <string name="vault_close">Close</string>
+    <string name="export">Export</string>
+
+    <!-- Splash Screen Strings -->
+    <string name="splash_keystore_verified">Android Keystore Verified</string>
+    <string name="splash_database_mounted">SQLCipher AES-256 DB Mounted</string>
+    <string name="splash_defense_armed">Active Defense Armed</string>
+    <string name="splash_skip">Skip</string>
+
+    <!-- Permission Guide & Diagnostic Strings -->
+    <string name="perm_guide_title">Permissions &amp; Setup Guide</string>
+    <string name="perm_guide_subtitle">Grant required device privileges to enable app shielding</string>
+    <string name="perm_guide_diagnostics">Diagnostic &amp; Permissions Guide</string>
+    <string name="perm_guide_core_active">Core Privileges Active</string>
+    <string name="perm_guide_core_missing">Core Privileges Required</string>
+    <string name="perm_guide_all_granted_congrats">All security privileges are enabled. Your apps and data are safely shielded!</string>
+    <string name="perm_guide_instructions_title">Setup Instructions</string>
+    <string name="perm_guide_device_tips">Device Tips</string>
+    <string name="perm_guide_device_tips_title">Device Setup Tips</string>
+    <string name="perm_guide_tip_samsung">On Samsung devices, go to Settings &gt; Apps &gt; PureLock &gt; Battery &gt; Unrestricted to prevent background kills.</string>
+    <string name="perm_guide_tip_xiaomi">On MIUI/HyperOS, enable Autostart for PureLock and set Battery Saver to No Restrictions.</string>
+    <string name="perm_guide_tip_pixel">On Google Pixel devices, ensure Accessibility &gt; Downloaded Apps &gt; PureLock is switched ON.</string>
+    <string name="perm_guide_badge_core">REQUIRED</string>
+    <string name="perm_guide_badge_recommended">RECOMMENDED</string>
+    <string name="perm_guide_badge_optional">OPTIONAL</string>
+    <string name="perm_guide_status_granted">ACTIVE</string>
+    <string name="perm_guide_status_pending">SETUP</string>
+    <string name="perm_guide_open_settings">Open Settings</string>
+    <string name="perm_guide_test_button">Test Lock Screen Overlay</string>
+    <string name="perm_guide_test_toast">Launching test lock screen...</string>
+    <string name="perm_banner_title">App Shield Inactive</string>
+    <string name="perm_banner_desc">Accessibility and Overlay permissions are required to detect and lock apps.</string>
+    <string name="perm_banner_action">Enable Now</string>
+
+    <string name="perm_guide_acc_name">Accessibility Service</string>
+    <string name="perm_guide_acc_desc">Real-time detection when protected applications are launched.</string>
+    <string name="perm_guide_acc_step_1">1. Tap \'Open Settings\' below to navigate to Accessibility.</string>
+    <string name="perm_guide_acc_step_2">2. Find \'PureLock\' under Downloaded Apps or Installed Services.</string>
+    <string name="perm_guide_acc_step_3">3. Switch the toggle to ON and confirm system security prompt.</string>
+    <string name="perm_guide_acc_step_4">4. Return to PureLock to verify live active status.</string>
+
+    <string name="perm_guide_overlay_name">Display Over Other Apps</string>
+    <string name="perm_guide_overlay_desc">Allows displaying the security PIN/pattern lock overlay immediately on top of protected apps.</string>
+    <string name="perm_guide_overlay_step_1">1. Tap \'Open Settings\' to access Overlay permission.</string>
+    <string name="perm_guide_overlay_step_2">2. Locate \'PureLock\' in the list.</string>
+    <string name="perm_guide_overlay_step_3">3. Enable \'Allow display over other apps\'.</string>
+
+    <string name="perm_guide_usage_name">Usage Access (Recommended)</string>
+    <string name="perm_guide_usage_desc">Secondary fallback detection for Android TV and aggressive power management OSs.</string>
+    <string name="perm_guide_usage_step_1">1. Tap \'Open Settings\' to navigate to Usage Access.</string>
+    <string name="perm_guide_usage_step_2">2. Find and select \'PureLock\'.</string>
+    <string name="perm_guide_usage_step_3">3. Toggle \'Permit usage access\' to ON.</string>
+
+    <string name="perm_guide_camera_name">Camera Permission (Optional)</string>
+    <string name="perm_guide_camera_desc">Enables silent front-camera intruder selfie capture upon failed unlock attempts.</string>
+
+    <string name="perm_guide_notif_name">Notification Privileges (Optional)</string>
+    <string name="perm_guide_notif_desc">Allows posting security notifications and persistent shield status.</string>
+
+    <!-- Security Analytics Dashboard -->
+    <string name="audit_no_events_recorded">No Events Recorded</string>
+    <string name="audit_alerts_detected_format">%1$d Alerts Detected</string>
+    <string name="audit_protection_status">Protection Status</string>
+    <string name="audit_threats_logged">Threats Logged</string>
+    <string name="audit_active_defense">Active Defense</string>
+    <string name="audit_timestamp_label">Timestamp</string>
+    <string name="audit_details_label">Details</string>
+
+    <!-- Vault Insights Dashboard -->
+    <string name="insights_avg_entropy_title">Average Password Strength &amp; Entropy</string>
+    <string name="insights_entropy_summary_high">Average entropy is %1$.1f bits per secret. Your credentials have high cryptographic resistance to brute-force attacks.</string>
+    <string name="insights_entropy_summary_low">Average entropy is %1$.1f bits per secret. Consider using longer passwords with mixed special characters.</string>
+    <string name="insights_entropy_summary_empty">Add your encrypted notes and credentials to see real-time security entropy metrics.</string>
+    <string name="insights_items_count">Items</string>
+    <string name="insights_period_past_24h">Past 24h</string>
+    <string name="insights_period_past_7d">Past 7d</string>
+    <string name="insights_period_past_30d">Past 30d</string>
+
+    <!-- Invisible Suite & Theme Settings -->
+    <string name="theme_midnight">Midnight</string>
+    <string name="theme_oled_black">OLED Black</string>
+    <string name="theme_emerald">Emerald</string>
+    <string name="theme_sapphire">Sapphire</string>
+    <string name="theme_monet">Monet</string>
+    <string name="theme_minimal">Minimal</string>
+    <string name="suite_timeout_immediate">Immediate (Always)</string>
+    <string name="suite_timeout_seconds_format">%1$ds Inactivity</string>
+    <string name="suite_architecture_title">PureLock Security Architecture</string>
+    <string name="suite_architecture_version_format">Version %1$s • Hardware Keystore &amp; SQLCipher AES-256</string>
+    <string name="suite_architecture_footer">100% Offline • Zero Telemetry • Air-Gapped Privacy Engine</string>
 </resources>

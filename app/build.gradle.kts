@@ -19,8 +19,8 @@ android {
     applicationId = "com.soloprono.purelock"
     minSdk = 24
     targetSdk = 36
-    versionCode = 12
-    versionName = "2.2"
+    versionCode = 13
+    versionName = "2.3"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

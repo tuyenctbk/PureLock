@@ -389,6 +389,49 @@ class PureLockRepository(
         logSecurityEvent("NEW_PACKAGE_DETECTED", "Discovered new installation: $appName ($packageName). Protection status: $isLocked")
     }
 
+    suspend fun removeUninstalledApp(packageName: String) {
+        val app = appLockDao.getLockedAppByPackage(packageName)
+        val appName = app?.appName ?: packageName
+        appLockDao.deleteApp(packageName)
+        logSecurityEvent("PACKAGE_UNINSTALLED", "Application uninstalled and removed from security shield: $appName ($packageName)")
+    }
+
+    suspend fun syncInstalledAppsWithDevice(): Int {
+        val installed = getInstalledUserApps()
+        val installedPackages = installed.map { it.packageName }.toSet()
+        val existing = appLockDao.getAllLockedApps().first()
+
+        var removedCount = 0
+        for (app in existing) {
+            if (app.packageName !in installedPackages) {
+                appLockDao.deleteApp(app.packageName)
+                removedCount++
+            }
+        }
+
+        val existingMap = existing.associateBy { it.packageName }
+        val toUpsert = installed.map { installedApp ->
+            val prev = existingMap[installedApp.packageName]
+            if (prev != null) {
+                installedApp.copy(
+                    isLocked = prev.isLocked,
+                    unlockCount = prev.unlockCount,
+                    lastUnlockedTimestamp = prev.lastUnlockedTimestamp
+                )
+            } else {
+                installedApp
+            }
+        }
+        if (toUpsert.isNotEmpty()) {
+            appLockDao.upsertApps(toUpsert)
+        }
+
+        if (removedCount > 0) {
+            logSecurityEvent("APPS_SYNCED", "Synchronized installed apps: purged $removedCount uninstalled applications from database.")
+        }
+        return removedCount
+    }
+
     suspend fun isAppLockRequired(packageName: String): Boolean {
         val app = appLockDao.getLockedAppByPackage(packageName) ?: return false
 

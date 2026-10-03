@@ -100,6 +100,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun moveVaultItemToTrash(id: Long) {
+        if (_activeCopiedItemId.value == id) {
+            clearClipboardNow()
+        }
         viewModelScope.launch {
             repository.moveVaultItemToTrash(id)
         }
@@ -112,14 +115,33 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun emptyTrashVault() {
+        clearClipboardNow()
         viewModelScope.launch {
             repository.emptyTrashVault()
         }
     }
 
     fun deleteEncryptedVaultItem(id: Long) {
+        if (_activeCopiedItemId.value == id) {
+            clearClipboardNow()
+        }
         viewModelScope.launch {
             repository.deleteEncryptedVaultItem(id)
+        }
+    }
+
+    private val _isSyncingApps = MutableStateFlow(false)
+    val isSyncingApps: StateFlow<Boolean> = _isSyncingApps.asStateFlow()
+
+    fun syncInstalledApps(onComplete: (Int) -> Unit = {}) {
+        viewModelScope.launch {
+            _isSyncingApps.value = true
+            try {
+                val removed = repository.syncInstalledAppsWithDevice()
+                onComplete(removed)
+            } finally {
+                _isSyncingApps.value = false
+            }
         }
     }
 

@@ -436,22 +436,22 @@
     <string name="insights_high_resistance">Your credentials have high cryptographic resistance to brute-force attacks.</string>
     <string name="insights_mix_special">Consider using longer passwords with mixed special characters.</string>
     <string name="insights_entropy_empty">Add your encrypted notes and credentials to see real-time security entropy metrics.</string>
-    <string name="insights_no_category_data">No category data available yet.</string>
-    <string name="insights_zero_cloud_title">Zero-Cloud Hardware Protection</string>
-    <string name="insights_zero_cloud_desc">All vault insights are computed on-device with zero network telemetry or tracking.</string>
-    <string name="insights_bits_avg">bits avg</string>
-    <string name="insights_strength_very_strong">Very Strong</string>
-    <string name="insights_strength_strong">Strong</string>
-    <string name="insights_strength_fair">Fair</string>
-    <string name="insights_strength_weak">Weak</string>
-    <string name="insights_tier_strong">Strong (75+ bits)</string>
-    <string name="insights_tier_good">Good (55-74 bits)</string>
-    <string name="insights_tier_fair">Fair (35-54 bits)</string>
-    <string name="insights_tier_weak">Weak (&lt;35 bits)</string>
-    <string name="insights_period_24h">Past 24h</string>
-    <string name="insights_period_7d">Past 7d</string>
-    <string name="insights_period_30d">Past 30d</string>
-    <string name="insights_period_older">Older (&gt;30d)</string>
+    <string name="insights_no_category_data">Chưa có dữ liệu danh mục.</string>
+    <string name="insights_zero_cloud_title">Bảo Vệ Phần Cứng Không Đám Mây</string>
+    <string name="insights_zero_cloud_desc">Tất cả thông tin chi tiết về két được tính toán trên thiết bị mà không có bất kỳ dữ liệu từ xa nào.</string>
+    <string name="insights_bits_avg">bits tb</string>
+    <string name="insights_strength_very_strong">Rất Mạnh</string>
+    <string name="insights_strength_strong">Mạnh</string>
+    <string name="insights_strength_fair">Tương Đối</string>
+    <string name="insights_strength_weak">Yếu</string>
+    <string name="insights_tier_strong">Rất Mạnh (75+ bits)</string>
+    <string name="insights_tier_good">Tốt (55-74 bits)</string>
+    <string name="insights_tier_fair">Tương Đối (35-54 bits)</string>
+    <string name="insights_tier_weak">Yếu (&lt;35 bits)</string>
+    <string name="insights_period_24h">24 Giờ Qua</string>
+    <string name="insights_period_7d">7 Ngày Qua</string>
+    <string name="insights_period_30d">30 Ngày Qua</string>
+    <string name="insights_period_older">Cũ Hơn (&gt;30 ngày)</string>
     <string name="lock_calc_exit">Exit</string>
     <string name="lock_fake_crash_system_alert">System alert</string>
     <string name="lock_fake_crash_stopped">Unfortunately, %1$s has stopped.</string>
@@ -552,4 +552,109 @@
     <string name="backup_health_notif_title">Cảnh Báo Tình Trạng Sao Lưu</string>
     <string name="backup_health_channel_name">Cảnh Báo Tình Trạng Sao Lưu</string>
     <string name="backup_health_channel_desc">Cảnh báo khi chưa có bản sao lưu mã hóa nào được thực hiện trong hơn 30 ngày.</string>
+
+    <!-- App Shield & Sync Strings -->
+    <string name="shield_synced_removed_toast">Đã đồng bộ: xóa %1$d ứng dụng đã gỡ cài đặt khỏi khiên bảo vệ.</string>
+    <string name="shield_synced_toast">Đã đồng bộ danh sách ứng dụng thành công.</string>
+    <string name="shield_sync_apps">Đồng Bộ Ứng Dụng</string>
+    <string name="shield_filter_all">Tất Cả</string>
+    <string name="shield_filter_locked">Đã Khóa</string>
+    <string name="shield_filter_unlocked">Chưa Khóa</string>
+    <string name="shield_realtime_desc">Xác minh khóa tức thì qua Dịch vụ Trợ năng</string>
+    <string name="shield_offline_desc">Hoàn toàn không dùng Internet và không thu thập dữ liệu</string>
+    <string name="shield_decoy_desc">Màn hình ngụy trang máy tính hoặc báo lỗi giả</string>
+
+    <!-- Vault Dashboard Strings -->
+    <string name="vault_moved_to_trash">Đã chuyển vào Thùng Rác</string>
+    <string name="vault_restored_from_trash">Đã khôi phục từ Thùng Rác</string>
+    <string name="vault_close">Đóng</string>
+    <string name="export">Xuất</string>
+
+    <!-- Splash Screen Strings -->
+    <string name="splash_keystore_verified">Đã Xác Minh Android Keystore</string>
+    <string name="splash_database_mounted">Đã Nạp Cơ Sở Dữ Liệu SQLCipher AES-256</string>
+    <string name="splash_defense_armed">Hệ Thống Phòng Thủ Đã Sẵn Sàng</string>
+    <string name="splash_skip">Bỏ Qua</string>
+
+    <!-- Permission Guide & Diagnostic Strings -->
+    <string name="perm_guide_title">Hướng Dẫn Cấp Quyền &amp; Thiết Lập</string>
+    <string name="perm_guide_subtitle">Cấp các đặc quyền hệ thống để kích hoạt khiên bảo vệ ứng dụng</string>
+    <string name="perm_guide_diagnostics">Chẩn Đoán &amp; Hướng Dẫn Cấp Quyền</string>
+    <string name="perm_guide_core_active">Quyền Cốt Lõi Đang Hoạt Động</string>
+    <string name="perm_guide_core_missing">Yêu Cầu Quyền Cốt Lõi</string>
+    <string name="perm_guide_all_granted_congrats">Tất cả các quyền bảo mật đã được bật. Ứng dụng và dữ liệu của bạn đã được bảo vệ an toàn!</string>
+    <string name="perm_guide_instructions_title">Hướng Dẫn Cài Đặt</string>
+    <string name="perm_guide_device_tips">Mẹo Theo Thiết Bị</string>
+    <string name="perm_guide_device_tips_title">Mẹo Cài Đặt Theo Hãng Thiết Bị</string>
+    <string name="perm_guide_tip_samsung">Trên thiết bị Samsung, vào Cài đặt &gt; Ứng dụng &gt; PureLock &gt; Pin &gt; Không hạn chế để tránh bị tắt ngầm.</string>
+    <string name="perm_guide_tip_xiaomi">Trên MIUI/HyperOS, bật Tự khởi chạy cho PureLock và đặt Tiết kiệm pin thành Không hạn chế.</string>
+    <string name="perm_guide_tip_pixel">Trên thiết bị Google Pixel, đảm bảo Trợ năng &gt; Ứng dụng đã tải xuống &gt; PureLock được BẬT.</string>
+    <string name="perm_guide_badge_core">BẮT BUỘC</string>
+    <string name="perm_guide_badge_recommended">KHUYÊN DÙNG</string>
+    <string name="perm_guide_badge_optional">TÙY CHỌN</string>
+    <string name="perm_guide_status_granted">HOẠT ĐỘNG</string>
+    <string name="perm_guide_status_pending">CÀI ĐẶT</string>
+    <string name="perm_guide_open_settings">Mở Cài Đặt</string>
+    <string name="perm_guide_test_button">Thử Nghiệm Lớp Phủ Màn Hình Khóa</string>
+    <string name="perm_guide_test_toast">Đang mở màn hình khóa thử nghiệm...</string>
+    <string name="perm_banner_title">Khiên Ứng Dụng Chưa Hoạt Động</string>
+    <string name="perm_banner_desc">Cần có quyền Trợ năng và Hiển thị trên ứng dụng khác để phát hiện và khóa ứng dụng.</string>
+    <string name="perm_banner_action">Bật Ngay</string>
+
+    <string name="perm_guide_acc_name">Dịch Vụ Trợ Năng</string>
+    <string name="perm_guide_acc_desc">Phát hiện thời gian thực khi ứng dụng được bảo vệ được mở.</string>
+    <string name="perm_guide_acc_step_1">1. Nhấn \'Mở Cài Đặt\' bên dưới để chuyển đến mục Trợ Năng.</string>
+    <string name="perm_guide_acc_step_2">2. Tìm \'PureLock\' trong Ứng Dụng Đã Tải Xuống hoặc Dịch Vụ Đã Cài Đặt.</string>
+    <string name="perm_guide_acc_step_3">3. Bật công tắc sang ON và xác nhận cảnh báo bảo mật hệ thống.</string>
+    <string name="perm_guide_acc_step_4">4. Quay lại PureLock để kiểm tra trạng thái hoạt động trực tiếp.</string>
+
+    <string name="perm_guide_overlay_name">Hiển Thị Trên Ứng Dụng Khác</string>
+    <string name="perm_guide_overlay_desc">Cho phép hiển thị lớp phủ mã PIN/hình vẽ bảo mật ngay trên ứng dụng được bảo vệ.</string>
+    <string name="perm_guide_overlay_step_1">1. Nhấn \'Mở Cài Đặt\' để truy cập quyền Hiển Thị Lớp Phủ.</string>
+    <string name="perm_guide_overlay_step_2">2. Tìm \'PureLock\' trong danh sách.</string>
+    <string name="perm_guide_overlay_step_3">3. Bật \'Cho phép hiển thị trên các ứng dụng khác\'.</string>
+
+    <string name="perm_guide_usage_name">Truy Cập Dữ Liệu Sử Dụng (Khuyên dùng)</string>
+    <string name="perm_guide_usage_desc">Phương pháp dự phòng cho Android TV và các hệ điều hành quản lý pin nghiêm ngặt.</string>
+    <string name="perm_guide_usage_step_1">1. Nhấn \'Mở Cài Đặt\' để chuyển đến Quyền Truy Cập Sử Dụng.</string>
+    <string name="perm_guide_usage_step_2">2. Tìm và chọn \'PureLock\'.</string>
+    <string name="perm_guide_usage_step_3">3. Bật \'Cho phép theo dõi sử dụng\'.</string>
+
+    <string name="perm_guide_camera_name">Quyền Máy Ảnh (Tùy chọn)</string>
+    <string name="perm_guide_camera_desc">Cho phép âm thầm chụp ảnh kẻ xâm nhập bằng camera trước khi nhập sai mật khẩu.</string>
+
+    <string name="perm_guide_notif_name">Quyền Thông Báo (Tùy chọn)</string>
+    <string name="perm_guide_notif_desc">Cho phép gửi thông báo bảo mật và trạng thái khiên bảo vệ liên tục.</string>
+
+    <!-- Security Analytics Dashboard -->
+    <string name="audit_no_events_recorded">Chưa Ghi Nhận Sự Kiện Nào</string>
+    <string name="audit_alerts_detected_format">Phát Hiện %1$d Cảnh Báo</string>
+    <string name="audit_protection_status">Trạng Thái Bảo Vệ</string>
+    <string name="audit_threats_logged">Mối Đe Dọa Đã Ghi</string>
+    <string name="audit_active_defense">Phòng Thủ Đang Bật</string>
+    <string name="audit_timestamp_label">Thời Gian</string>
+    <string name="audit_details_label">Chi Tiết</string>
+
+    <!-- Vault Insights Dashboard -->
+    <string name="insights_avg_entropy_title">Độ Mạnh Mật Khẩu &amp; Entropy Trung Bình</string>
+    <string name="insights_entropy_summary_high">Entropy trung bình là %1$.1f bits mỗi bí mật. Thông tin xác thực của bạn có khả năng chống tấn công brute-force rất cao.</string>
+    <string name="insights_entropy_summary_low">Entropy trung bình là %1$.1f bits mỗi bí mật. Hãy cân nhắc sử dụng mật khẩu dài hơn với ký tự đặc biệt hỗn hợp.</string>
+    <string name="insights_entropy_summary_empty">Thêm ghi chú và thông tin xác thực đã mã hóa của bạn để xem số liệu entropy bảo mật thời gian thực.</string>
+    <string name="insights_items_count">Mục</string>
+    <string name="insights_period_past_24h">24 Giờ Qua</string>
+    <string name="insights_period_past_7d">7 Ngày Qua</string>
+    <string name="insights_period_past_30d">30 Ngày Qua</string>
+
+    <!-- Invisible Suite & Theme Settings -->
+    <string name="theme_midnight">Nửa Đêm</string>
+    <string name="theme_oled_black">Đen OLED</string>
+    <string name="theme_emerald">Ngọc Lục Bảo</string>
+    <string name="theme_sapphire">Lam Ngọc</string>
+    <string name="theme_monet">Monet</string>
+    <string name="theme_minimal">Tối Giản</string>
+    <string name="suite_timeout_immediate">Ngay Lập Tức (Luôn luôn)</string>
+    <string name="suite_timeout_seconds_format">Sau %1$ds Không Hoạt Động</string>
+    <string name="suite_architecture_title">Kiến Trúc Bảo Mật PureLock</string>
+    <string name="suite_architecture_version_format">Phiên Bản %1$s • Phần Cứng Keystore &amp; SQLCipher AES-256</string>
+    <string name="suite_architecture_footer">100% Ngoại Tuyến • Không Thu Thập Dữ Liệu • Động Cơ Riêng Tư Cách Ly</string>
 </resources>

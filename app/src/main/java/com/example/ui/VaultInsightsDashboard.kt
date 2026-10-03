@@ -178,7 +178,7 @@ fun VaultInsightsDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Average Password Strength & Entropy",
+                            text = stringResource(R.string.insights_avg_entropy_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -195,12 +195,9 @@ fun VaultInsightsDialog(
 
                         Text(
                             text = if (totalCount > 0) {
-                                "Average entropy is %.1f bits per secret. %s".format(
-                                    avgEntropy,
-                                    if (avgEntropy >= 60.0) "Your credentials have high cryptographic resistance to brute-force attacks."
-                                    else "Consider using longer passwords with mixed special characters."
-                                )
-                            } else "Add your encrypted notes and credentials to see real-time security entropy metrics.",
+                                if (avgEntropy >= 60.0) stringResource(R.string.insights_entropy_summary_high, avgEntropy)
+                                else stringResource(R.string.insights_entropy_summary_low, avgEntropy)
+                            } else stringResource(R.string.insights_entropy_summary_empty),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -320,7 +317,7 @@ fun VaultInsightsDialog(
                             }
                         } else {
                             Text(
-                                text = "No category data available yet.",
+                                text = stringResource(R.string.insights_no_category_data),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -382,13 +379,13 @@ fun VaultInsightsDialog(
                         )
                         Column {
                             Text(
-                                text = "Zero-Cloud Hardware Protection",
+                                text = stringResource(R.string.insights_zero_cloud_title),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Text(
-                                text = "All vault insights are computed on-device with zero network telemetry or tracking.",
+                                text = stringResource(R.string.insights_zero_cloud_desc),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -526,7 +523,7 @@ private fun D3StrengthGaugeChart(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "bits avg",
+                text = stringResource(R.string.insights_bits_avg),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -558,25 +555,25 @@ private fun D3StrengthHistogram(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         StrengthTierRow(
-            label = "Strong (75+ bits)",
+            label = stringResource(R.string.insights_tier_strong),
             count = strong,
             total = total,
             barColor = Color(0xFF43A047)
         )
         StrengthTierRow(
-            label = "Good (55-74 bits)",
+            label = stringResource(R.string.insights_tier_good),
             count = good,
             total = total,
             barColor = Color(0xFF00ACC1)
         )
         StrengthTierRow(
-            label = "Fair (35-54 bits)",
+            label = stringResource(R.string.insights_tier_fair),
             count = fair,
             total = total,
             barColor = Color(0xFFFB8C00)
         )
         StrengthTierRow(
-            label = "Weak (<35 bits)",
+            label = stringResource(R.string.insights_tier_weak),
             count = weak,
             total = total,
             barColor = Color(0xFFE53935)
@@ -676,7 +673,7 @@ private fun D3CategoryDonutChart(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Items",
+                text = stringResource(R.string.insights_items_count),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -696,10 +693,10 @@ private fun D3TimelineFrequencyChart(
     older: Int
 ) {
     val periods = listOf(
-        "Past 24h" to past24h,
-        "Past 7d" to past7d,
-        "Past 30d" to past30d,
-        "Older (>30d)" to older
+        stringResource(R.string.insights_period_past_24h) to past24h,
+        stringResource(R.string.insights_period_past_7d) to past7d,
+        stringResource(R.string.insights_period_past_30d) to past30d,
+        stringResource(R.string.insights_period_older) to older
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
