@@ -24,25 +24,38 @@ class PureLockAccessibilityService : AccessibilityService() {
     companion object {
         private const val TAG = "PureLockService"
 
+        // Tracks package -> unlock timestamp
+        private val unlockedPackages = java.util.concurrent.ConcurrentHashMap<String, Long>()
+        // Tracks package -> leave timestamp
+        private val packageLeaveTimestamps = java.util.concurrent.ConcurrentHashMap<String, Long>()
+
         @Volatile
-        private var activeUnlockedPackage: String? = null
-        @Volatile
-        private var lastUnlockedTimestamp: Long = 0L
-        @Volatile
-        private var lastLeaveTimestamp: Long = 0L
+        private var currentForegroundPackage: String? = null
 
         fun onPackageUnlocked(packageName: String) {
             val now = System.currentTimeMillis()
-            activeUnlockedPackage = packageName
-            lastUnlockedTimestamp = now
-            lastLeaveTimestamp = 0L
+            unlockedPackages[packageName] = now
+            packageLeaveTimestamps.remove(packageName)
+            currentForegroundPackage = packageName
             Log.d(TAG, "Active session initiated for: $packageName at $now")
         }
 
+        fun isPackageSessionValid(packageName: String, gracePeriodMs: Long): Boolean {
+            if (!unlockedPackages.containsKey(packageName)) return false
+            val leaveTime = packageLeaveTimestamps[packageName] ?: return true
+            val now = System.currentTimeMillis()
+            return when {
+                gracePeriodMs == -1L -> true
+                gracePeriodMs == 0L -> false
+                gracePeriodMs > 0L -> (now - leaveTime) <= gracePeriodMs
+                else -> false
+            }
+        }
+
         fun clearAllSessions() {
-            activeUnlockedPackage = null
-            lastUnlockedTimestamp = 0L
-            lastLeaveTimestamp = 0L
+            unlockedPackages.clear()
+            packageLeaveTimestamps.clear()
+            currentForegroundPackage = null
             Log.d(TAG, "All active sessions cleared.")
         }
     }
@@ -51,6 +64,8 @@ class PureLockAccessibilityService : AccessibilityService() {
     private lateinit var repository: PureLockRepository
     private var lastCheckedPackage: String? = null
     private var lastCheckTimestamp = 0L
+    @Volatile
+    private var cachedGracePeriodMs: Long = 30000L
 
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -83,6 +98,16 @@ class PureLockAccessibilityService : AccessibilityService() {
             prefs
         )
 
+        serviceScope.launch {
+            try {
+                repository.preferences.gracePeriodMs.collect {
+                    cachedGracePeriodMs = it
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error collecting grace period preference", e)
+            }
+        }
+
         try {
             val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
             ContextCompat.registerReceiver(this, screenOffReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
@@ -97,34 +122,27 @@ class PureLockAccessibilityService : AccessibilityService() {
         val packageName = event.packageName?.toString() ?: return
         if (packageName == applicationContext.packageName) return
         if (packageName == "com.android.systemui") return
+        if (packageName == "android") return
 
         val currentTime = System.currentTimeMillis()
 
-        // 1. If currently inside the active unlocked app session, do not lock
-        if (packageName == activeUnlockedPackage) {
-            lastLeaveTimestamp = 0L
-            return
-        }
-
-        // 2. User has switched to a different package
-        if (activeUnlockedPackage != null) {
-            serviceScope.launch {
-                val gracePeriod = repository.preferences.gracePeriodMs.first()
-                if (gracePeriod == 0L) {
-                    // Lock immediately upon leaving the app
-                    activeUnlockedPackage = null
-                    lastLeaveTimestamp = 0L
-                } else if (gracePeriod == -1L) {
-                    // Stays unlocked until Screen Off
-                } else if (gracePeriod > 0L) {
-                    if (lastLeaveTimestamp == 0L) {
-                        lastLeaveTimestamp = currentTime
-                    } else if (currentTime - lastLeaveTimestamp > gracePeriod) {
-                        activeUnlockedPackage = null
-                        lastLeaveTimestamp = 0L
-                    }
-                }
+        // Track foreground transitions and leave timestamps
+        val prevForeground = currentForegroundPackage
+        if (prevForeground != null && prevForeground != packageName) {
+            if (unlockedPackages.containsKey(prevForeground)) {
+                packageLeaveTimestamps[prevForeground] = currentTime
             }
+        }
+        currentForegroundPackage = packageName
+
+        // Check if package has an active, unexpired unlock session
+        if (isPackageSessionValid(packageName, cachedGracePeriodMs)) {
+            packageLeaveTimestamps.remove(packageName)
+            return
+        } else {
+            // Expired or never unlocked
+            unlockedPackages.remove(packageName)
+            packageLeaveTimestamps.remove(packageName)
         }
 
         // Prevent rapid duplicate evaluations for the same package within 500ms

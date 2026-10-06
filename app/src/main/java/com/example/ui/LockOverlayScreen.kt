@@ -213,6 +213,12 @@ fun LockOverlayScreen(
     }
 
     LaunchedEffect(packageName) {
+        inputPin = ""
+        failedAttempts = 0
+        errorMessage = null
+        isUnlockingSuccess = false
+        intruderCapturedBanner = false
+
         // Load app name and genuine target application icon
         try {
             val pm = context.packageManager
@@ -335,6 +341,7 @@ fun LockOverlayScreen(
                     ),
                 contentAlignment = Alignment.Center
             ) {
+                val iconBitmap = appIconBitmap
                 if (isUnlockingSuccess) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
@@ -342,9 +349,9 @@ fun LockOverlayScreen(
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(44.dp)
                     )
-                } else if (appIconBitmap != null) {
+                } else if (iconBitmap != null) {
                     androidx.compose.foundation.Image(
-                        bitmap = appIconBitmap!!.asImageBitmap(),
+                        bitmap = iconBitmap.asImageBitmap(),
                         contentDescription = appName,
                         modifier = Modifier
                             .size(48.dp)
@@ -600,7 +607,8 @@ fun LockOverlayScreen(
                                             launchBiometricPrompt(
                                                 context = context,
                                                 onSuccess = { handleSuccessUnlock() },
-                                                onError = { err -> recordFailedAttempt(err) }
+                                                onError = { err -> recordFailedAttempt(err) },
+                                                onDismiss = { /* User dismissed prompt */ }
                                             )
                                         },
                                         modifier = Modifier.testTag("btn_quick_biometric_pin")
@@ -674,7 +682,8 @@ fun LockOverlayScreen(
                                             launchBiometricPrompt(
                                                 context = context,
                                                 onSuccess = { handleSuccessUnlock() },
-                                                onError = { err -> recordFailedAttempt(err) }
+                                                onError = { err -> recordFailedAttempt(err) },
+                                                onDismiss = { /* User dismissed prompt */ }
                                             )
                                         },
                                         modifier = Modifier.testTag("btn_quick_biometric_pattern")
@@ -697,7 +706,8 @@ fun LockOverlayScreen(
                             launchBiometricPrompt(
                                 context = context,
                                 onSuccess = { handleSuccessUnlock() },
-                                onError = { err -> recordFailedAttempt(err) }
+                                onError = { err -> recordFailedAttempt(err) },
+                                onDismiss = { securityType = "PIN" }
                             )
                         }
 
@@ -711,7 +721,8 @@ fun LockOverlayScreen(
                                     launchBiometricPrompt(
                                         context = context,
                                         onSuccess = { handleSuccessUnlock() },
-                                        onError = { err -> recordFailedAttempt(err) }
+                                        onError = { err -> recordFailedAttempt(err) },
+                                        onDismiss = { securityType = "PIN" }
                                     )
                                 },
                                 modifier = Modifier
@@ -980,7 +991,8 @@ fun launchBiometricPrompt(
     title: String = "PureLock Biometric Security",
     subtitle: String = "Scan Fingerprint or Face ID to Unlock",
     onSuccess: () -> Unit,
-    onError: (String) -> Unit
+    onError: (String) -> Unit,
+    onDismiss: () -> Unit = {}
 ) {
     val manager = com.example.service.BiometricPromptManager(context)
     manager.authenticate(
@@ -989,7 +1001,8 @@ fun launchBiometricPrompt(
         subtitle = subtitle,
         negativeButtonText = "Use PIN / Pattern",
         onSuccess = onSuccess,
-        onError = onError
+        onError = onError,
+        onDismiss = onDismiss
     )
 }
 

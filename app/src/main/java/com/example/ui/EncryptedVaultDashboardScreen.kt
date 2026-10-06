@@ -463,9 +463,10 @@ fun EncryptedVaultDashboardScreen(
             initialItem = editingItem,
             onDismiss = { showAddEditDialog = false },
             onSave = { title, secret, category, username, website, notes, isPinned, isFavorite ->
-                if (editingItem != null) {
+                val currentItem = editingItem
+                if (currentItem != null) {
                     viewModel.updateEncryptedVaultItem(
-                        editingItem!!.copy(
+                        currentItem.copy(
                             title = title,
                             secretContent = secret,
                             category = category,

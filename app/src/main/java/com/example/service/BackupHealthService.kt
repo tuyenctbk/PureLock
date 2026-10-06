@@ -64,7 +64,7 @@ class BackupHealthService(private val context: Context) {
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(com.example.R.drawable.splash_logo)
+            .setSmallIcon(com.example.R.drawable.ic_launcher_monochrome)
             .setContentTitle(context.getString(R.string.backup_health_notif_title))
             .setContentText(context.getString(R.string.backup_overdue_notif_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -72,6 +72,18 @@ class BackupHealthService(private val context: Context) {
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        val hasPermission = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            try {
+                notificationManager.notify(NOTIFICATION_ID, notification)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }

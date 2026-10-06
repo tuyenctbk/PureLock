@@ -8,6 +8,7 @@
 # Directory locks & build outputs
 build/
 */build/
+**/build/
 .gradle/
 .kotlin/
 captures/
@@ -16,20 +17,23 @@ captures/
 obj/
 libs/
 .externalNativeBuild/
+.navigation/
 
-# Test reports & profiling
+# Test reports & profiling (preserve source test screenshots)
 */reports/
 */test-results/
-screenshots/
-roborazzi/
+build/outputs/roborazzi/
+**/build/**/roborazzi/
 *.hprof
 *.log
+!**/src/test/screenshots/**
 
 # Local configuration & environment files
 local.properties
 .env
 .env.*
 .env*.local
+!.env.example
 
 # Signing keystores & secrets
 *.jks
@@ -52,12 +56,15 @@ crashlytics-build.properties
 .settings/
 .classpath
 
-# OS generated files
+# OS generated files & temporary swap files
 .DS_Store
 .DS_Store?
 ehthumbs.db
 Thumbs.db
 *_System*
+*~
+*.swp
+*.swo
 
 # Python helper script caches
 __pycache__/

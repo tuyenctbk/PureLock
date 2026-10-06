@@ -86,8 +86,7 @@ class PureLockAutofillService : AutofillService() {
                 vaultItems.take(5).forEach { item ->
                     val presentation = RemoteViews(packageName, android.R.layout.activity_list_item).apply {
                         setImageViewResource(android.R.id.icon, com.example.R.drawable.splash_logo)
-                        setTextViewText(android.R.id.text1, "PureLock: ${item.title}")
-                        setTextViewText(android.R.id.text2, "Category: ${item.category} (Encrypted)")
+                        setTextViewText(android.R.id.text1, "PureLock: ${item.title} (${item.category})")
                     }
 
                     @Suppress("DEPRECATION")

@@ -68,11 +68,12 @@ object ClipboardSecurityManager {
         _lastCopiedLabel.value = label
         _isSensitiveClipActive.value = true
 
-        Toast.makeText(
-            context,
-            "\"$label\" copied. Clipboard will auto-clear in ${autoClearDurationSec}s.",
-            Toast.LENGTH_SHORT
-        ).show()
+        val toastMsg = if (label.isNotBlank()) {
+            "\"$label\" - " + context.getString(R.string.copied_clipboard_countdown, autoClearDurationSec)
+        } else {
+            context.getString(R.string.copied_clipboard_countdown, autoClearDurationSec)
+        }
+        Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT).show()
 
         startAutoClearTimer(context, autoClearDurationSec)
     }

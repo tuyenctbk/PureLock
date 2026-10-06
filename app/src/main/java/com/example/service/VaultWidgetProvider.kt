@@ -24,8 +24,17 @@ class VaultWidgetProvider : AppWidgetProvider() {
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+        val pendingResult = goAsync()
+        scope.launch {
+            try {
+                for (appWidgetId in appWidgetIds) {
+                    updateAppWidget(context, appWidgetManager, appWidgetId)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 
@@ -60,9 +69,16 @@ class VaultWidgetProvider : AppWidgetProvider() {
                     val appWidgetIds = appWidgetManager.getAppWidgetIds(
                         android.content.ComponentName(context, VaultWidgetProvider::class.java)
                     )
+                    val lockIntent = Intent(context, VaultWidgetProvider::class.java).apply {
+                        action = ACTION_LOCK_VAULT
+                    }
+                    val pendingIntent = PendingIntent.getBroadcast(
+                        context, 0, lockIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                     for (appWidgetId in appWidgetIds) {
                         val views = RemoteViews(context.packageName, R.layout.vault_widget)
                         views.setTextViewText(R.id.tv_protected_count, "Vault Secured & Locked! ($totalProtected items)")
+                        views.setOnClickPendingIntent(R.id.btn_lock_widget, pendingIntent)
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
                 } catch (e: Exception) {
@@ -74,26 +90,24 @@ class VaultWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private suspend fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val views = RemoteViews(context.packageName, R.layout.vault_widget)
 
-        scope.launch {
-            val db = PureLockDatabase.getDatabase(context)
-            val lockedCount = db.appLockDao().getAllLockedApps().first().count { it.isLocked }
-            val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
-            val totalProtected = lockedCount + vaultCount
+        val db = PureLockDatabase.getDatabase(context)
+        val lockedCount = db.appLockDao().getAllLockedApps().first().count { it.isLocked }
+        val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
+        val totalProtected = lockedCount + vaultCount
 
-            views.setTextViewText(R.id.tv_protected_count, "Protected Items: $totalProtected (Apps: $lockedCount, Vault: $vaultCount)")
+        views.setTextViewText(R.id.tv_protected_count, "Protected Items: $totalProtected (Apps: $lockedCount, Vault: $vaultCount)")
 
-            val intent = Intent(context, VaultWidgetProvider::class.java).apply {
-                action = ACTION_LOCK_VAULT
-            }
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            views.setOnClickPendingIntent(R.id.btn_lock_widget, pendingIntent)
-
-            appWidgetManager.updateAppWidget(appWidgetId, views)
+        val intent = Intent(context, VaultWidgetProvider::class.java).apply {
+            action = ACTION_LOCK_VAULT
         }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        views.setOnClickPendingIntent(R.id.btn_lock_widget, pendingIntent)
+
+        appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 }

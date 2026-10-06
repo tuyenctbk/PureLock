@@ -123,7 +123,12 @@ class MainActivity : FragmentActivity() {
                         }
                     }
                     val filter = android.content.IntentFilter(android.content.Intent.ACTION_SCREEN_OFF)
-                    context.registerReceiver(screenOffReceiver, filter)
+                    androidx.core.content.ContextCompat.registerReceiver(
+                        context,
+                        screenOffReceiver,
+                        filter,
+                        androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+                    )
 
                     val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
                         when (event) {
@@ -134,7 +139,7 @@ class MainActivity : FragmentActivity() {
                             androidx.lifecycle.Lifecycle.Event.ON_START -> {
                                 if (appBackgroundTimestamp > 0L) {
                                     val elapsed = System.currentTimeMillis() - appBackgroundTimestamp
-                                    val timeoutMillis = if (inactivityTimeoutSec > 0) inactivityTimeoutSec * 1000L else 5000L
+                                    val timeoutMillis = if (inactivityTimeoutSec > 0) inactivityTimeoutSec * 1000L else 0L
                                     val returningFromSettings = com.example.util.PermissionManager.isReturningFromSettings()
 
                                     if (!returningFromSettings && elapsed >= timeoutMillis) {

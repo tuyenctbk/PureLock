@@ -491,6 +491,10 @@ class PureLockRepository(
         }
 
         val gracePeriod = preferences.gracePeriodMs.first()
+        if (com.example.service.PureLockAccessibilityService.isPackageSessionValid(packageName, gracePeriod)) {
+            return false
+        }
+
         if (gracePeriod == 0L) {
             return true
         }

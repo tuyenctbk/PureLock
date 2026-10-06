@@ -471,8 +471,7 @@ fun IntruderVaultScreen(
     }
 
     // Inspect Selfie Dialog
-    if (selectedSelfie != null) {
-        val selfie = selectedSelfie!!
+    selectedSelfie?.let { selfie ->
         AlertDialog(
             onDismissRequest = { selectedSelfie = null },
             title = {
@@ -600,9 +599,10 @@ fun IntruderVaultScreen(
                 Button(
                     onClick = {
                         if (title.isNotBlank()) {
-                            if (isEditing) {
+                            val currentItem = editingVaultItem
+                            if (isEditing && currentItem != null) {
                                 viewModel.updateEncryptedVaultItem(
-                                    editingVaultItem!!.copy(
+                                    currentItem.copy(
                                         title = title,
                                         secretContent = secretContent
                                     )
@@ -634,8 +634,7 @@ fun IntruderVaultScreen(
     }
 
     // Delete Vault Item Confirmation
-    if (itemToDelete != null) {
-        val item = itemToDelete!!
+    itemToDelete?.let { item ->
         AlertDialog(
             onDismissRequest = { itemToDelete = null },
             icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },

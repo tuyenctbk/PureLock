@@ -722,4 +722,7 @@
     <string name="suite_architecture_title">PureLock Security Architecture</string>
     <string name="suite_architecture_version_format">Version %1$s • Hardware Keystore &amp; SQLCipher AES-256</string>
     <string name="suite_architecture_footer">100% Offline • Zero Telemetry • Air-Gapped Privacy Engine</string>
+    <string name="tile_quick_lockdown_label">Quick Lockdown</string>
+    <string name="tile_vault_reauth_label">Vault Re-Auth</string>
+    <string name="autofill_service_label">PureLock Offline Autofill</string>
 </resources>

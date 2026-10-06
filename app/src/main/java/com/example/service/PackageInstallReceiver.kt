@@ -129,13 +129,25 @@ class PackageInstallReceiver : BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(com.example.R.drawable.splash_logo)
+            .setSmallIcon(com.example.R.drawable.ic_launcher_monochrome)
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        notificationManager.notify(packageName.hashCode(), builder.build())
+        val hasPermission = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            try {
+                notificationManager.notify(packageName.hashCode(), builder.build())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }

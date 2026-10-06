@@ -7,6 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +26,16 @@ class LockOverlayActivity : FragmentActivity() {
     }
 
     private lateinit var repository: PureLockRepository
+    private var lockedPackageState = mutableStateOf("com.android.settings")
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val newPackage = intent.getStringExtra(EXTRA_LOCKED_PACKAGE)
+        if (!newPackage.isNullOrEmpty()) {
+            lockedPackageState.value = newPackage
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +64,10 @@ class LockOverlayActivity : FragmentActivity() {
         val prefs = PureLockPreferences(this)
         repository = PureLockRepository(this, db.appLockDao(), db.intruderDao(), db.logDao(), db.scheduleRuleDao(), db.encryptedVaultDao(), db.userSettingDao(), prefs)
 
-        val lockedPackage = intent.getStringExtra(EXTRA_LOCKED_PACKAGE) ?: "com.android.settings"
+        lockedPackageState.value = intent.getStringExtra(EXTRA_LOCKED_PACKAGE) ?: "com.android.settings"
 
         setContent {
+            val lockedPackage by lockedPackageState
             PureLockTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     LockOverlayScreen(

@@ -520,15 +520,17 @@ fun InvisibleSuiteScreen(
     }
 
     // Info Popup Dialog (Details hidden behind hint icon)
-    if (infoDialogTitle != null && infoDialogMessage != null) {
+    val currentInfoTitle = infoDialogTitle
+    val currentInfoMessage = infoDialogMessage
+    if (currentInfoTitle != null && currentInfoMessage != null) {
         AlertDialog(
             onDismissRequest = {
                 infoDialogTitle = null
                 infoDialogMessage = null
             },
             icon = { Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text(infoDialogTitle!!, fontWeight = FontWeight.Bold) },
-            text = { Text(infoDialogMessage!!, style = MaterialTheme.typography.bodySmall) },
+            title = { Text(currentInfoTitle, fontWeight = FontWeight.Bold) },
+            text = { Text(currentInfoMessage, style = MaterialTheme.typography.bodySmall) },
             confirmButton = {
                 TextButton(onClick = {
                     infoDialogTitle = null

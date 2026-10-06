@@ -36,6 +36,8 @@ class QuickLockdownTileService : TileService() {
 
             // Trigger immediate mass lockdown
             repository.setAllAppsLockState(true)
+            repository.lockAllAndClearSessions()
+            com.example.util.ClipboardSecurityManager.clearClipboard(applicationContext, showNotification = false)
             repository.logSecurityEvent("QUICK_LOCKDOWN_TILE", "Emergency Quick Lockdown executed from Quick Settings Tile.")
 
             withContext(Dispatchers.Main) {

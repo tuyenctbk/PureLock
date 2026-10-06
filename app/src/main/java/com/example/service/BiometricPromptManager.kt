@@ -59,7 +59,8 @@ class BiometricPromptManager(private val context: Context) {
         description: String? = null,
         negativeButtonText: String = "Use PIN / Pattern",
         onSuccess: () -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        onDismiss: () -> Unit = {}
     ) {
         val executor = ContextCompat.getMainExecutor(activity)
         
@@ -87,8 +88,11 @@ class BiometricPromptManager(private val context: Context) {
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED || errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricPrompt.ERROR_CANCELED) {
-                        onError("Biometric prompt dismissed.")
+                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
+                        errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON ||
+                        errorCode == BiometricPrompt.ERROR_CANCELED
+                    ) {
+                        onDismiss()
                     } else {
                         onError(errString.toString())
                     }
@@ -115,7 +119,8 @@ class BiometricPromptManager(private val context: Context) {
         description: String? = null,
         negativeButtonText: String = "Use PIN / Pattern",
         onSuccess: () -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        onDismiss: () -> Unit = {}
     ) {
         val activity = context.findFragmentActivity()
         if (activity != null) {
@@ -128,7 +133,8 @@ class BiometricPromptManager(private val context: Context) {
                         description = description,
                         negativeButtonText = negativeButtonText,
                         onSuccess = onSuccess,
-                        onError = onError
+                        onError = onError,
+                        onDismiss = onDismiss
                     )
                 }
                 BiometricStatus.NOT_ENROLLED -> {

@@ -100,7 +100,7 @@
         <service
             android:name=".service.QuickLockdownTileService"
             android:icon="@drawable/splash_logo"
-            android:label="Quick Lockdown"
+            android:label="@string/tile_quick_lockdown_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
             <intent-filter>
@@ -112,7 +112,7 @@
         <service
             android:name=".service.QuickBiometricAuthTileService"
             android:icon="@drawable/splash_logo"
-            android:label="Vault Re-Auth"
+            android:label="@string/tile_vault_reauth_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
             <intent-filter>
@@ -123,7 +123,7 @@
         <!-- Zero-Cloud Android Autofill Service -->
         <service
             android:name=".service.PureLockAutofillService"
-            android:label="PureLock Offline Autofill"
+            android:label="@string/autofill_service_label"
             android:permission="android.permission.BIND_AUTOFILL_SERVICE"
             android:exported="true">
             <intent-filter>
