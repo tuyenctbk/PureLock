@@ -657,4 +657,7 @@
     <string name="suite_architecture_title">Kiến Trúc Bảo Mật PureLock</string>
     <string name="suite_architecture_version_format">Phiên Bản %1$s • Phần Cứng Keystore &amp; SQLCipher AES-256</string>
     <string name="suite_architecture_footer">100% Ngoại Tuyến • Không Thu Thập Dữ Liệu • Động Cơ Riêng Tư Cách Ly</string>
+    <string name="tile_quick_lockdown_label">Khóa Nhanh Tức Thì</string>
+    <string name="tile_vault_reauth_label">Khóa Lại Két Sắt</string>
+    <string name="autofill_service_label">Tự Động Điền Ngoại Tuyến PureLock</string>
 </resources>
