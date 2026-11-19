@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,8 +31,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.R
+import com.example.data.DatabaseEncryptionStatus
+import com.example.data.PureLockDatabase
+import com.example.data.VaultIntegrityResult
 import com.example.data.model.SecurityLogEntity
+import com.example.util.DonationEngagementManager
 import com.example.util.PermissionUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -45,11 +53,18 @@ fun PrivacyShieldScreen(
     val securityLogs by viewModel.securityLogs.collectAsState()
     val allApps by viewModel.allApps.collectAsState()
     val inactivityTimeoutSec by viewModel.inactivityTimeoutSec.collectAsState()
+    val donationEngagementState by viewModel.donationEngagementState.collectAsState()
+    val donationBillingState by viewModel.donationBillingState.collectAsState()
+    val pendingPostOpMilestone by viewModel.pendingPostOpSupportMilestone.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     var showExportDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
     var showAccessibilityDisclosure by remember { mutableStateOf(false) }
     var showRestrictedSettingsHelp by remember { mutableStateOf(false) }
+    var showSupportDialog by remember { mutableStateOf(false) }
+    var isRunningAudit by remember { mutableStateOf(false) }
+    var latestIntegrityResult by remember { mutableStateOf<VaultIntegrityResult?>(null) }
 
     var isAccessibilityGranted by remember { mutableStateOf(PermissionUtils.isAccessibilityServiceEnabled(context)) }
     var isOverlayGranted by remember { mutableStateOf(PermissionUtils.isOverlayPermissionGranted(context)) }
@@ -270,12 +285,161 @@ fun PrivacyShieldScreen(
                 }
             }
 
+            val dbEncryptionStatus by produceState(
+                initialValue = DatabaseEncryptionStatus(
+                    databaseName = PureLockDatabase.DATABASE_NAME,
+                    isSqlCipherLoaded = true,
+                    isEncryptedOnDisk = true,
+                    isKeyHardwareWrapped = false
+                ),
+                key1 = context
+            ) {
+                value = withContext(Dispatchers.IO) {
+                    PureLockDatabase.getEncryptionStatus(context)
+                }
+            }
+
+            // Interactive Cryptographic Vault Integrity Audit Card
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.audit_integrity_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = stringResource(R.string.audit_integrity_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.VerifiedUser,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    val auditResult = latestIntegrityResult
+                    if (auditResult != null) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.audit_integrity_passed_format, auditResult.totalItemsChecked),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    text = auditResult.hashDigest,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontFamily = com.example.ui.theme.MonoFontFamily,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                )
+                            }
+                        }
+
+                        if (DonationEngagementManager.shouldShowHomeBanner(donationEngagementState)) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .clickable { showSupportDialog = true }
+                                    .testTag("strip_post_audit_support")
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocalCafe,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.audit_integrity_support_strip),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.ChevronRight,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            if (!isRunningAudit) {
+                                isRunningAudit = true
+                                coroutineScope.launch {
+                                    try {
+                                        latestIntegrityResult = viewModel.runVaultIntegrityCheck()
+                                    } finally {
+                                        isRunningAudit = false
+                                    }
+                                }
+                            }
+                        },
+                        enabled = !isRunningAudit,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .testTag("btn_run_integrity_audit")
+                    ) {
+                        if (isRunningAudit) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.audit_integrity_running))
+                        } else {
+                            Icon(Icons.Default.Security, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.audit_integrity_run_btn))
+                        }
+                    }
+                }
+            }
+
             // Security Analytics Dashboard (Threat level gauge, activity bar chart, donut chart, interactive audit stream)
             SecurityAnalyticsDashboard(
                 securityLogs = securityLogs,
                 protectionScore = protectionScore,
-                isSqlCipherActive = true,
-                backgroundTimeoutSec = 30,
+                isSqlCipherActive = dbEncryptionStatus.isSqlCipherLoaded || dbEncryptionStatus.isEncryptedOnDisk,
+                backgroundTimeoutSec = inactivityTimeoutSec,
                 onClearLogs = { viewModel.clearAllSecurityLogs() },
                 onExportLogs = { showExportDialog = true }
             )
@@ -426,6 +590,30 @@ fun PrivacyShieldScreen(
             dismissButton = {
                 TextButton(onClick = { showExportDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
+        )
+    }
+
+    val milestone = pendingPostOpMilestone
+    if (milestone != null) {
+        PostOperationSupportDialog(
+            milestoneCount = milestone,
+            onSupportClick = {
+                viewModel.dismissPostOpSupportPrompt()
+                showSupportDialog = true
+            },
+            onDismiss = { viewModel.dismissPostOpSupportPrompt() }
+        )
+    }
+
+    if (showSupportDialog) {
+        SupportDevelopmentDialog(
+            engagementState = donationEngagementState,
+            billingState = donationBillingState,
+            onLaunchGooglePlay = { launchContext, tier ->
+                viewModel.launchGooglePlayDonation(launchContext, tier)
+            },
+            onClearBillingStatus = { viewModel.clearDonationBillingStatus() },
+            onDismiss = { showSupportDialog = false }
         )
     }
 }

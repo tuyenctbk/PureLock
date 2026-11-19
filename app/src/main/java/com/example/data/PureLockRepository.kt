@@ -15,9 +15,11 @@ import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
 import com.example.data.model.UserSettingEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 data class VaultIntegrityResult(
@@ -78,8 +80,10 @@ class PureLockRepository(
         username: String = "",
         websiteOrApp: String = "",
         notes: String = "",
-        isPinned: Boolean = false
+        isPinned: Boolean = false,
+        isFavorite: Boolean = false
     ) {
+        val now = System.currentTimeMillis()
         val item = EncryptedVaultEntity(
             title = title,
             secretContent = secretContent,
@@ -87,14 +91,17 @@ class PureLockRepository(
             username = username,
             websiteOrApp = websiteOrApp,
             notes = notes,
-            isPinned = isPinned
+            isPinned = isPinned,
+            isFavorite = isFavorite,
+            timestamp = now,
+            updatedTimestamp = now
         )
         encryptedVaultDao.insertVaultItem(item)
         logSecurityEvent("VAULT_ITEM_ADDED", "Encrypted $category credential stored in Room DB: $title")
     }
 
     suspend fun updateEncryptedVaultItem(item: EncryptedVaultEntity) {
-        encryptedVaultDao.updateVaultItem(item)
+        encryptedVaultDao.updateVaultItem(item.copy(updatedTimestamp = System.currentTimeMillis()))
         logSecurityEvent("VAULT_ITEM_UPDATED", "Encrypted ${item.category} credential updated: ${item.title}")
     }
 
@@ -118,7 +125,7 @@ class PureLockRepository(
         logSecurityEvent("VAULT_ITEM_RESTORED", "Encrypted secret #$id restored from Trash Bin.")
     }
 
-    suspend fun purgeTrashVault(purgeDays: Int) {
+    suspend fun purgeTrashVault(purgeDays: Int) = withContext(Dispatchers.IO) {
         val cutoff = System.currentTimeMillis() - (purgeDays.toLong() * 24 * 60 * 60 * 1000)
         val purgedCount = encryptedVaultDao.purgeOldTrash(cutoff)
         if (purgedCount > 0) {
@@ -136,9 +143,9 @@ class PureLockRepository(
         logSecurityEvent("VAULT_ITEM_DELETED", "Encrypted item #$id permanently removed from local DB.")
     }
 
-    suspend fun initializeDefaultAppsIfNeeded() {
+    suspend fun initializeDefaultAppsIfNeeded() = withContext(Dispatchers.IO) {
         val existing = appLockDao.getAllLockedApps().first()
-        if (existing.isNotEmpty()) return
+        if (existing.isNotEmpty()) return@withContext
 
         val installedApps = getInstalledUserApps()
         if (installedApps.isNotEmpty()) {
@@ -152,7 +159,7 @@ class PureLockRepository(
         )
     }
 
-    suspend fun clearOldLogsAndCache() {
+    suspend fun clearOldLogsAndCache() = withContext(Dispatchers.IO) {
         val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
         val logsCleared = logDao.deleteLogsOlderThan(thirtyDaysAgo)
         var cacheFilesCleared = 0
@@ -184,26 +191,36 @@ class PureLockRepository(
         val resolveInfos = mutableListOf<android.content.pm.ResolveInfo>()
 
         // 1. Standard mobile launcher apps
-        val intent = Intent(Intent.ACTION_MAIN, null).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
+        try {
+            val intent = Intent(Intent.ACTION_MAIN, null).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+            }
+            resolveInfos.addAll(pm.queryIntentActivities(intent, 0))
+        } catch (_: Exception) {
         }
-        resolveInfos.addAll(pm.queryIntentActivities(intent, 0))
 
         // 2. Android TV Leanback launcher apps
-        val tvIntent = Intent(Intent.ACTION_MAIN, null).apply {
-            addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+        try {
+            val tvIntent = Intent(Intent.ACTION_MAIN, null).apply {
+                addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+            }
+            resolveInfos.addAll(pm.queryIntentActivities(tvIntent, 0))
+        } catch (_: Exception) {
         }
-        resolveInfos.addAll(pm.queryIntentActivities(tvIntent, 0))
 
         val result = mutableListOf<LockedAppEntity>()
         val seenPackages = mutableSetOf<String>()
 
         for (info in resolveInfos) {
-            val packageName = info.activityInfo.packageName
+            val packageName = info.activityInfo?.packageName ?: continue
             if (packageName == context.packageName) continue // Skip PureLock itself
             if (!seenPackages.add(packageName)) continue
 
-            val appName = info.loadLabel(pm).toString()
+            val appName = try {
+                info.loadLabel(pm)?.toString()?.takeIf { it.isNotBlank() } ?: packageName
+            } catch (_: Exception) {
+                packageName
+            }
             val category = categorizeApp(packageName, appName)
             // Lock sensitive categories by default
             val defaultLocked = category in listOf("FINANCIAL", "SOCIAL", "SYSTEM")
@@ -220,7 +237,7 @@ class PureLockRepository(
         return result
     }
 
-    suspend fun refreshInstalledApps(): Int {
+    suspend fun refreshInstalledApps(): Int = withContext(Dispatchers.IO) {
         val installedApps = getInstalledUserApps()
         val existingApps = appLockDao.getAllLockedApps().first()
         val existingMap = existingApps.associateBy { it.packageName }
@@ -239,10 +256,10 @@ class PureLockRepository(
                 "Discovered and indexed ${toInsert.size} new apps in App Shield catalog."
             )
         }
-        return toInsert.size
+        toInsert.size
     }
 
-    private fun categorizeApp(packageName: String, appName: String): String {
+    fun categorizeApp(packageName: String, appName: String): String {
         val lowerPkg = packageName.lowercase()
         val lowerName = appName.lowercase()
 
@@ -281,13 +298,11 @@ class PureLockRepository(
     }
 
     suspend fun setAllAppsLockState(isLocked: Boolean) {
-        val apps = appLockDao.getAllLockedApps().first()
-        val updated = apps.map { it.copy(isLocked = isLocked) }
-        appLockDao.upsertApps(updated)
+        val updatedCount = appLockDao.updateAllLockStates(isLocked)
         logDao.insertLog(
             SecurityLogEntity(
                 action = if (isLocked) "MASS_SHIELD_ENABLE" else "MASS_SHIELD_DISABLE",
-                details = "Updated ${apps.size} apps lock status to $isLocked"
+                details = "Updated $updatedCount apps lock status to $isLocked"
             )
         )
     }
@@ -330,10 +345,10 @@ class PureLockRepository(
         )
     }
 
-    suspend fun runVaultIntegrityCheck(): VaultIntegrityResult {
-        val apps = appLockDao.getAllLockedApps().first()
-        val vaultItems = encryptedVaultDao.getAllVaultItems().first()
-        val rules = scheduleRuleDao.getAllRules().first()
+    suspend fun runVaultIntegrityCheck(): VaultIntegrityResult = withContext(Dispatchers.IO) {
+        val apps = appLockDao.getIntegrityTuples()
+        val vaultItems = encryptedVaultDao.getIntegrityTuples()
+        val rules = scheduleRuleDao.getIntegrityTuples()
 
         val sb = StringBuilder()
         apps.forEach { sb.append("${it.packageName}:${it.isLocked}:${it.category}|") }
@@ -349,7 +364,7 @@ class PureLockRepository(
 
         logSecurityEvent("VAULT_INTEGRITY_CHECK", "Vault Integrity Audit Passed: $details")
 
-        return VaultIntegrityResult(
+        VaultIntegrityResult(
             isIntact = true,
             hashDigest = "SHA256:${hashHex.take(16).uppercase()}...",
             fullHashHex = hashHex,
@@ -396,7 +411,7 @@ class PureLockRepository(
         logSecurityEvent("PACKAGE_UNINSTALLED", "Application uninstalled and removed from security shield: $appName ($packageName)")
     }
 
-    suspend fun syncInstalledAppsWithDevice(): Int {
+    suspend fun syncInstalledAppsWithDevice(): Int = withContext(Dispatchers.IO) {
         val installed = getInstalledUserApps()
         val installedPackages = installed.map { it.packageName }.toSet()
         val existing = appLockDao.getAllLockedApps().first()
@@ -429,94 +444,123 @@ class PureLockRepository(
         if (removedCount > 0) {
             logSecurityEvent("APPS_SYNCED", "Synchronized installed apps: purged $removedCount uninstalled applications from database.")
         }
-        return removedCount
+        removedCount
     }
 
-    suspend fun isAppLockRequired(packageName: String): Boolean {
-        val app = appLockDao.getLockedAppByPackage(packageName) ?: return false
+    suspend fun isAppLockRequired(packageName: String, gracePeriodOverrideMs: Long? = null): Boolean = withContext(Dispatchers.IO) {
+        val app = appLockDao.getLockedAppByPackage(packageName) ?: return@withContext false
 
         // 1. If user disabled lock for this app in App Shield, never lock it
-        if (!app.isLocked) return false
+        if (!app.isLocked) return@withContext false
 
         // 2. Safety threshold: If unlocked within last 1500ms, do not relock
         // (prevents overlay finish race condition)
         val now = System.currentTimeMillis()
         if (now - app.lastUnlockedTimestamp < 1500L) {
-            return false
+            return@withContext false
         }
 
-        // 3. Check active schedule rules if any exist for this package
+        // 3. Check active schedule rules if any exist for this package (backed by idx_schedule_rules_pkg_enabled)
         val rules = scheduleRuleDao.getActiveRulesForPackage(packageName)
         if (rules.isNotEmpty()) {
             val cal = Calendar.getInstance()
             val currentHour = cal.get(Calendar.HOUR_OF_DAY)
             val currentMinute = cal.get(Calendar.MINUTE)
-            val currentDayIndex = cal.get(Calendar.DAY_OF_WEEK) // 1=SUN, 2=MON, ..., 7=SAT
-            val dayToken = when (currentDayIndex) {
-                Calendar.SUNDAY -> "SUN"
-                Calendar.MONDAY -> "MON"
-                Calendar.TUESDAY -> "TUE"
-                Calendar.WEDNESDAY -> "WED"
-                Calendar.THURSDAY -> "THU"
-                Calendar.FRIDAY -> "FRI"
-                Calendar.SATURDAY -> "SAT"
-                else -> ""
-            }
+            val currentDayIndex = cal.get(Calendar.DAY_OF_WEEK)
 
-            val currentMinutesOfDay = currentHour * 60 + currentMinute
-            var matchesSchedule = false
-
-            for (rule in rules) {
-                if (rule.daysString.contains(dayToken)) {
-                    val startMins = rule.startHour * 60 + rule.startMinute
-                    val endMins = rule.endHour * 60 + rule.endMinute
-
-                    val active = if (startMins <= endMins) {
-                        currentMinutesOfDay in startMins..endMins
-                    } else {
-                        // Overnight rule (e.g. 22:00 to 06:00)
-                        currentMinutesOfDay >= startMins || currentMinutesOfDay <= endMins
-                    }
-                    if (active) {
-                        matchesSchedule = true
-                        break
-                    }
-                }
+            val matchesSchedule = rules.any { rule ->
+                isScheduleRuleActiveAt(rule, currentDayIndex, currentHour, currentMinute)
             }
 
             if (!matchesSchedule) {
                 // Outside active schedule range -> Do not lock right now
-                return false
+                return@withContext false
             }
         }
 
-        val gracePeriod = preferences.gracePeriodMs.first()
+        val gracePeriod = gracePeriodOverrideMs ?: preferences.gracePeriodMs.first()
         if (com.example.service.PureLockAccessibilityService.isPackageSessionValid(packageName, gracePeriod)) {
-            return false
+            return@withContext false
         }
 
         if (gracePeriod == 0L) {
-            return true
+            return@withContext true
         }
         if (gracePeriod == -1L) {
-            return app.lastUnlockedTimestamp == 0L
+            return@withContext app.lastUnlockedTimestamp == 0L
         }
 
         val elapsed = now - app.lastUnlockedTimestamp
-        return elapsed > gracePeriod
+        elapsed > gracePeriod
     }
 
-    suspend fun resetAllUnlockedSessions() {
+    suspend fun isPackageProtected(packageName: String): Boolean = withContext(Dispatchers.IO) {
+        appLockDao.getLockedAppByPackage(packageName)?.isLocked == true
+    }
+
+    suspend fun resetAllUnlockedSessions() = withContext(Dispatchers.IO) {
         appLockDao.resetAllUnlockedTimestamps()
         com.example.service.PureLockAccessibilityService.clearAllSessions()
     }
 
-    suspend fun lockAllAndClearSessions() {
+    suspend fun lockAllAndClearSessions() = withContext(Dispatchers.IO) {
         resetAllUnlockedSessions()
         logSecurityEvent("VAULT_LOCKDOWN", "Emergency lockdown triggered. All session tokens cleared.")
     }
 
     suspend fun clearSecurityLogs() {
         logDao.clearLogs()
+    }
+
+    companion object {
+        private fun dayTokenFor(calendarDayOfWeek: Int): String = when (calendarDayOfWeek) {
+            Calendar.SUNDAY -> "SUN"
+            Calendar.MONDAY -> "MON"
+            Calendar.TUESDAY -> "TUE"
+            Calendar.WEDNESDAY -> "WED"
+            Calendar.THURSDAY -> "THU"
+            Calendar.FRIDAY -> "FRI"
+            Calendar.SATURDAY -> "SAT"
+            else -> ""
+        }
+
+        private fun previousDayOfWeek(calendarDayOfWeek: Int): Int = when (calendarDayOfWeek) {
+            Calendar.SUNDAY -> Calendar.SATURDAY
+            Calendar.MONDAY -> Calendar.SUNDAY
+            Calendar.TUESDAY -> Calendar.MONDAY
+            Calendar.WEDNESDAY -> Calendar.TUESDAY
+            Calendar.THURSDAY -> Calendar.WEDNESDAY
+            Calendar.FRIDAY -> Calendar.THURSDAY
+            Calendar.SATURDAY -> Calendar.FRIDAY
+            else -> calendarDayOfWeek
+        }
+
+        /**
+         * Evaluates whether a schedule rule is active at a given (dayOfWeek, hourOfDay, minute).
+         * Properly handles overnight windows (e.g., 22:00 - 06:00 on MON is active Mon 22:00-23:59
+         * and Tue 00:00-06:00, not Mon 02:00).
+         */
+        fun isScheduleRuleActiveAt(
+            rule: ScheduleRuleEntity,
+            calendarDayOfWeek: Int,
+            hourOfDay: Int,
+            minute: Int
+        ): Boolean {
+            if (!rule.isEnabled) return false
+            val activeDays = rule.daysString.split(",").map { it.trim().uppercase() }.filter { it.isNotEmpty() }.toSet()
+            val todayToken = dayTokenFor(calendarDayOfWeek)
+            val yesterdayToken = dayTokenFor(previousDayOfWeek(calendarDayOfWeek))
+
+            val currentMins = hourOfDay * 60 + minute
+            val startMins = rule.startHour * 60 + rule.startMinute
+            val endMins = rule.endHour * 60 + rule.endMinute
+
+            return if (startMins <= endMins) {
+                todayToken in activeDays && currentMins in startMins..endMins
+            } else {
+                (todayToken in activeDays && currentMins >= startMins) ||
+                    (yesterdayToken in activeDays && currentMins <= endMins)
+            }
+        }
     }
 }

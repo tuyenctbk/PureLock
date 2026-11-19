@@ -25,7 +25,15 @@ class PackageInstallReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         val scope = CoroutineScope(Dispatchers.IO)
 
+        val isReplacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
+
         if (intent.action == Intent.ACTION_PACKAGE_REMOVED || intent.action == Intent.ACTION_PACKAGE_FULLY_REMOVED) {
+            // App updates fire ACTION_PACKAGE_REMOVED with EXTRA_REPLACING=true before ACTION_PACKAGE_ADDED.
+            // Never remove the app or wipe its lock state during an update.
+            if (isReplacing) {
+                pendingResult.finish()
+                return
+            }
             scope.launch {
                 try {
                     val db = PureLockDatabase.getDatabase(context)
@@ -70,21 +78,20 @@ class PackageInstallReceiver : BroadcastReceiver() {
                         prefs
                     )
 
-                    val lowerPkg = packageName.lowercase()
-                    val lowerName = appName.lowercase()
-                    val category = when {
-                        lowerPkg.contains("bank") || lowerPkg.contains("pay") || lowerName.contains("bank") -> "FINANCIAL"
-                        lowerPkg.contains("chat") || lowerPkg.contains("message") || lowerPkg.contains("social") -> "SOCIAL"
-                        lowerPkg.contains("photo") || lowerPkg.contains("gallery") -> "MEDIA"
-                        else -> "OTHER"
+                    val existing = db.appLockDao().getLockedAppByPackage(packageName)
+                    if (isReplacing && existing != null) {
+                        // Preserve lock state, category, and stats during app update; refresh label only
+                        db.appLockDao().upsertApp(existing.copy(appName = appName))
+                        return@launch
                     }
 
-                    // Register package in local DB
-                    val autoLock = category in listOf("FINANCIAL", "SOCIAL")
+                    val category = repository.categorizeApp(packageName, appName)
+                    val autoLock = existing?.isLocked ?: (category in listOf("FINANCIAL", "SOCIAL"))
                     repository.addNewlyInstalledApp(packageName, appName, category, autoLock)
 
-                    // Send local notification
-                    sendNewAppNotification(context, packageName, appName, autoLock)
+                    if (!isReplacing) {
+                        sendNewAppNotification(context, packageName, appName, autoLock)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {
@@ -97,7 +104,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
     }
 
     private fun sendNewAppNotification(context: Context, packageName: String, appName: String, isAlreadyLocked: Boolean) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
         val channelId = "purelock_new_app_channel"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

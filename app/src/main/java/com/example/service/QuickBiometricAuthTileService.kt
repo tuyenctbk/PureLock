@@ -11,50 +11,59 @@ import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.N)
 class QuickBiometricAuthTileService : TileService() {
 
+    private val tileScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onClick() {
         super.onClick()
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            val db = PureLockDatabase.getDatabase(applicationContext)
-            val prefs = PureLockPreferences(applicationContext)
-            val repository = PureLockRepository(
-                applicationContext,
-                db.appLockDao(),
-                db.intruderDao(),
-                db.logDao(),
-                db.scheduleRuleDao(),
-                db.encryptedVaultDao(),
-                db.userSettingDao(),
-                prefs
-            )
+        tileScope.launch {
+            try {
+                val db = PureLockDatabase.getDatabase(applicationContext)
+                val prefs = PureLockPreferences(applicationContext)
+                val repository = PureLockRepository(
+                    applicationContext,
+                    db.appLockDao(),
+                    db.intruderDao(),
+                    db.logDao(),
+                    db.scheduleRuleDao(),
+                    db.encryptedVaultDao(),
+                    db.userSettingDao(),
+                    prefs
+                )
 
-            repository.logSecurityEvent(
-                "QUICK_BIOMETRIC_REAUTH",
-                "Quick Biometric Re-Auth triggered from Quick Settings / Always-on-Display tile."
-            )
+                repository.logSecurityEvent(
+                    "QUICK_BIOMETRIC_REAUTH",
+                    "Quick Biometric Re-Auth triggered from Quick Settings / Always-on-Display tile."
+                )
+            } catch (_: Exception) {
+            }
 
             val intent = Intent(applicationContext, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 putExtra("shortcut_action", "VIEW_VAULT")
             }
             withContext(Dispatchers.Main) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    val pendingIntent = android.app.PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        intent,
-                        android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                    )
-                    startActivityAndCollapse(pendingIntent)
-                } else {
-                    @Suppress("DEPRECATION")
-                    startActivityAndCollapse(intent)
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        val pendingIntent = android.app.PendingIntent.getActivity(
+                            applicationContext,
+                            0,
+                            intent,
+                            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                        )
+                        startActivityAndCollapse(pendingIntent)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        startActivityAndCollapse(intent)
+                    }
+                } catch (_: Exception) {
                 }
             }
         }
@@ -68,6 +77,14 @@ class QuickBiometricAuthTileService : TileService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             tile.subtitle = "Biometric Unlock"
         }
-        tile.updateTile()
+        try {
+            tile.updateTile()
+        } catch (_: Exception) {
+        }
+    }
+
+    override fun onDestroy() {
+        tileScope.cancel()
+        super.onDestroy()
     }
 }

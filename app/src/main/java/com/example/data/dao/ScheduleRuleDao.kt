@@ -7,6 +7,12 @@ import androidx.room.Query
 import com.example.data.model.ScheduleRuleEntity
 import kotlinx.coroutines.flow.Flow
 
+data class ScheduleIntegrityTuple(
+    val id: Long,
+    val packageName: String,
+    val isEnabled: Boolean
+)
+
 @Dao
 interface ScheduleRuleDao {
     @Query("SELECT * FROM schedule_rules ORDER BY id DESC")
@@ -14,6 +20,9 @@ interface ScheduleRuleDao {
 
     @Query("SELECT * FROM schedule_rules WHERE packageName = :packageName AND isEnabled = 1")
     suspend fun getActiveRulesForPackage(packageName: String): List<ScheduleRuleEntity>
+
+    @Query("SELECT id, packageName, isEnabled FROM schedule_rules ORDER BY id ASC")
+    suspend fun getIntegrityTuples(): List<ScheduleIntegrityTuple>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRule(rule: ScheduleRuleEntity)

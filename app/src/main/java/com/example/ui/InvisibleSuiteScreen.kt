@@ -41,28 +41,35 @@ fun InvisibleSuiteScreen(
     val decoyType by viewModel.decoyType.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
     val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
+    val shakeSensitivity by viewModel.shakeSensitivity.collectAsState()
     val inactivityTimeoutSec by viewModel.inactivityTimeoutSec.collectAsState()
     val gracePeriodMs by viewModel.gracePeriodMs.collectAsState()
     val duressPin by viewModel.duressPin.collectAsState()
     val randomKeyboard by viewModel.randomKeyboard.collectAsState()
     val hidePatternPath by viewModel.hidePatternPath.collectAsState()
     val intruderCapture by viewModel.intruderCapture.collectAsState()
+    val biometricEnabled by viewModel.biometricEnabled.collectAsState()
+    val clipboardAutoClearSec by viewModel.clipboardAutoClearSec.collectAsState()
+    val donationEngagementState by viewModel.donationEngagementState.collectAsState()
+    val donationBillingState by viewModel.donationBillingState.collectAsState()
 
     val context = LocalContext.current
     var infoDialogTitle by remember { mutableStateOf<String?>(null) }
     var infoDialogMessage by remember { mutableStateOf<String?>(null) }
+    var showSupportDialog by remember { mutableStateOf(false) }
 
     var showChangePinDialog by remember { mutableStateOf(false) }
     var newPinInput by remember { mutableStateOf(masterPin) }
 
     var showChangePatternDialog by remember { mutableStateOf(false) }
-    var newPatternInput by remember { mutableStateOf(masterPattern) }
+    var newPatternNodes by remember { mutableStateOf(listOf<Int>()) }
 
     var showChangeKnockDialog by remember { mutableStateOf(false) }
     var newKnockList by remember { mutableStateOf(listOf<Int>()) }
 
     var showDuressPinDialog by remember { mutableStateOf(false) }
     var newDuressPinInput by remember { mutableStateOf(duressPin) }
+    var duressPinError by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = Modifier
@@ -175,7 +182,7 @@ fun InvisibleSuiteScreen(
                     onClick = {
                         when (securityType) {
                             "PATTERN" -> {
-                                newPatternInput = masterPattern
+                                newPatternNodes = masterPattern.split(',').mapNotNull { it.trim().toIntOrNull() }.filter { it in 1..9 }
                                 showChangePatternDialog = true
                             }
                             "KNOCK" -> {
@@ -221,6 +228,23 @@ fun InvisibleSuiteScreen(
                         testTag = "switch_hide_pattern"
                     )
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                // Biometric Quick Unlock toggle
+                val bioTitle = stringResource(R.string.onboarding_biometrics_title)
+                val bioDesc = stringResource(R.string.onboarding_biometrics_desc)
+                SettingsSwitchRow(
+                    icon = Icons.Default.Fingerprint,
+                    title = bioTitle,
+                    checked = biometricEnabled,
+                    onCheckedChange = { viewModel.setBiometricEnabled(it) },
+                    onInfoClick = {
+                        infoDialogTitle = bioTitle
+                        infoDialogMessage = bioDesc
+                    },
+                    testTag = "switch_biometric_enabled"
+                )
             }
 
             // Section 2: Camouflage & Stealth Decoys
@@ -229,35 +253,32 @@ fun InvisibleSuiteScreen(
                     Text(stringResource(R.string.suite_decoy_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                     Text(stringResource(R.string.suite_decoy_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
 
+                    val activeDecoy = when {
+                        decoyType == "FAKE_CRASH" -> "FAKE_CRASH"
+                        decoyType == "CALCULATOR" || (stealthDecoy && decoyType == "NONE") -> "CALCULATOR"
+                        else -> "NONE"
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         FilterChip(
-                            selected = decoyType == "NONE" && !stealthDecoy,
-                            onClick = {
-                                viewModel.setDecoyType("NONE")
-                                viewModel.setStealthDecoy(false)
-                            },
+                            selected = activeDecoy == "NONE",
+                            onClick = { viewModel.setDecoyType("NONE") },
                             label = { Text(stringResource(R.string.suite_decoy_none), fontSize = 11.sp) },
                             modifier = Modifier.weight(1f).testTag("chip_decoy_none")
                         )
                         FilterChip(
-                            selected = decoyType == "CALCULATOR" || (stealthDecoy && decoyType == "NONE"),
-                            onClick = {
-                                viewModel.setDecoyType("CALCULATOR")
-                                viewModel.setStealthDecoy(true)
-                            },
+                            selected = activeDecoy == "CALCULATOR",
+                            onClick = { viewModel.setDecoyType("CALCULATOR") },
                             label = { Text(stringResource(R.string.suite_decoy_calculator), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Calculate, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_decoy_calculator")
                         )
                         FilterChip(
-                            selected = decoyType == "FAKE_CRASH",
-                            onClick = {
-                                viewModel.setDecoyType("FAKE_CRASH")
-                                viewModel.setStealthDecoy(false)
-                            },
+                            selected = activeDecoy == "FAKE_CRASH",
+                            onClick = { viewModel.setDecoyType("FAKE_CRASH") },
                             label = { Text(stringResource(R.string.suite_decoy_fake_crash), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_decoy_fake_crash")
@@ -276,6 +297,7 @@ fun InvisibleSuiteScreen(
                     subtitle = if (duressPin.isNotBlank()) stringResource(R.string.suite_pin_current_subtitle) else stringResource(R.string.perm_status_inactive),
                     onClick = {
                         newDuressPinInput = duressPin
+                        duressPinError = null
                         showDuressPinDialog = true
                     },
                     onInfoClick = {
@@ -350,6 +372,9 @@ fun InvisibleSuiteScreen(
                 // Shake to Lock
                 val shakeTitle = stringResource(R.string.suite_shake_title)
                 val shakeDesc = stringResource(R.string.suite_shake_dialog_desc)
+                val hasAccelerometer = remember(context) {
+                    com.example.service.ShakeToLockSensorController.isAccelerometerAvailable(context)
+                }
                 SettingsSwitchRow(
                     icon = Icons.Default.Vibration,
                     title = shakeTitle,
@@ -361,6 +386,105 @@ fun InvisibleSuiteScreen(
                     },
                     testTag = "switch_shake_lock"
                 )
+
+                AnimatedVisibility(
+                    visible = shakeToLockEnabled,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.shake_to_lock_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Surface(
+                                color = if (hasAccelerometer) {
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f)
+                                } else {
+                                    MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
+                                },
+                                shape = RoundedCornerShape(999.dp),
+                                modifier = Modifier.testTag("shake_sensor_status_badge")
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = if (hasAccelerometer) Icons.Default.Sensors else Icons.Default.SensorsOff,
+                                        contentDescription = null,
+                                        tint = if (hasAccelerometer) {
+                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.onErrorContainer
+                                        },
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Text(
+                                        text = if (hasAccelerometer) {
+                                            stringResource(R.string.perm_status_active)
+                                        } else {
+                                            stringResource(R.string.perm_status_inactive)
+                                        },
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = if (hasAccelerometer) {
+                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.onErrorContainer
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        val activeSensitivity = com.example.service.ShakeSensitivity.fromKey(shakeSensitivity)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            listOf(
+                                Triple(com.example.service.ShakeSensitivity.HIGH, Icons.Default.Bolt, "chip_shake_sensitivity_high"),
+                                Triple(com.example.service.ShakeSensitivity.MEDIUM, Icons.Default.Tune, "chip_shake_sensitivity_medium"),
+                                Triple(com.example.service.ShakeSensitivity.LOW, Icons.Default.Shield, "chip_shake_sensitivity_low")
+                            ).forEach { (preset, presetIcon, tag) ->
+                                FilterChip(
+                                    selected = activeSensitivity == preset,
+                                    onClick = { viewModel.setShakeSensitivity(preset.key) },
+                                    label = {
+                                        Text(
+                                            text = preset.badgeLabel,
+                                            fontSize = 11.sp,
+                                            fontWeight = if (activeSensitivity == preset) FontWeight.Bold else FontWeight.Medium
+                                        )
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = presetIcon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag(tag)
+                                )
+                            }
+                        }
+                    }
+                }
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
 
@@ -472,6 +596,145 @@ fun InvisibleSuiteScreen(
                         )
                     }
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                // Clipboard Auto-Clear Delay
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.clipboard_clear_delay_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = if (clipboardAutoClearSec <= 0) {
+                                    stringResource(R.string.clipboard_delay_disabled)
+                                } else {
+                                    stringResource(R.string.suite_clipboard_autoclear_format, clipboardAutoClearSec)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                        val clipTitle = stringResource(R.string.clipboard_clear_delay_title)
+                        val clipDesc = stringResource(R.string.clipboard_clear_delay_desc)
+                        IconButton(
+                            onClick = {
+                                infoDialogTitle = clipTitle
+                                infoDialogMessage = clipDesc
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = stringResource(R.string.details),
+                                tint = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(10 to "10s", 30 to "30s", 60 to "60s", 0 to stringResource(R.string.suite_decoy_none)).forEach { (sec, label) ->
+                            FilterChip(
+                                selected = clipboardAutoClearSec == sec,
+                                onClick = { viewModel.setClipboardAutoClearSec(sec) },
+                                label = { Text(label, fontSize = 11.sp) },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("chip_clipboard_clear_$sec")
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Static Permanent Support Development Section (Settings / About)
+            SettingsSectionCard(title = stringResource(R.string.settings_support_section_title)) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = if (donationEngagementState.isActiveSupporter) Icons.Default.Verified else Icons.Default.Favorite,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = if (donationEngagementState.isActiveSupporter) {
+                                        stringResource(R.string.donation_supporter_active_title)
+                                    } else {
+                                        stringResource(R.string.settings_support_card_title)
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = if (donationEngagementState.isActiveSupporter) {
+                                        stringResource(R.string.donation_supporter_active_desc)
+                                    } else {
+                                        stringResource(R.string.settings_support_card_desc)
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            }
+                        }
+                    }
+
+                    if (donationEngagementState.isActiveSupporter) {
+                        OutlinedButton(
+                            onClick = { showSupportDialog = true },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .testTag("btn_settings_support")
+                        ) {
+                            Icon(Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.settings_support_cta))
+                        }
+                    } else {
+                        Button(
+                            onClick = { showSupportDialog = true },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .testTag("btn_settings_support")
+                        ) {
+                            Icon(Icons.Default.LocalCafe, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.settings_support_cta))
+                        }
+                    }
+                }
             }
 
             // PureLock Security Architecture & Brand Card
@@ -553,6 +816,9 @@ fun InvisibleSuiteScreen(
                     OutlinedTextField(
                         value = newPinInput,
                         onValueChange = { if (it.length <= 8 && it.all { char -> char.isDigit() }) newPinInput = it },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                        ),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().testTag("input_new_pin")
                     )
@@ -560,6 +826,7 @@ fun InvisibleSuiteScreen(
             },
             confirmButton = {
                 Button(
+                    enabled = newPinInput.length >= 4,
                     onClick = {
                         if (newPinInput.length >= 4) {
                             viewModel.setMasterPin(newPinInput)
@@ -577,29 +844,54 @@ fun InvisibleSuiteScreen(
         )
     }
 
-    // Change Pattern Dialog
+    // Change Pattern Dialog (Interactive 3x3 Grid to prevent invalid pattern lockouts)
     if (showChangePatternDialog) {
         AlertDialog(
             onDismissRequest = { showChangePatternDialog = false },
             title = { Text(stringResource(R.string.suite_set_master_pattern_title), fontWeight = FontWeight.Bold) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.suite_set_master_pattern_desc), style = MaterialTheme.typography.bodySmall)
-                    OutlinedTextField(
-                        value = newPatternInput,
-                        onValueChange = { newPatternInput = it },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (newPatternNodes.isEmpty()) {
+                            stringResource(R.string.onboarding_draw_pattern_hint)
+                        } else {
+                            stringResource(R.string.onboarding_selected_nodes_format, newPatternNodes.joinToString("-"))
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
                     )
+                    PatternGridDrawer(
+                        selectedNodes = newPatternNodes,
+                        hidePath = false,
+                        onNodeSelected = { node ->
+                            if (!newPatternNodes.contains(node)) {
+                                newPatternNodes = newPatternNodes + node
+                            }
+                        },
+                        onPatternCompleted = {}
+                    )
+                    if (newPatternNodes.isNotEmpty()) {
+                        TextButton(onClick = { newPatternNodes = emptyList() }) {
+                            Text(stringResource(R.string.onboarding_reset_pattern))
+                        }
+                    }
                 }
             },
             confirmButton = {
                 Button(
+                    enabled = newPatternNodes.size >= 4,
                     onClick = {
-                        if (newPatternInput.isNotBlank()) {
-                            viewModel.setMasterPattern(newPatternInput)
+                        if (newPatternNodes.size >= 4) {
+                            viewModel.setMasterPattern(newPatternNodes.joinToString(","))
                             showChangePatternDialog = false
                             Toast.makeText(context, context.getString(R.string.suite_master_pattern_updated_toast), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.onboarding_pattern_min_nodes_error), Toast.LENGTH_SHORT).show()
                         }
                     }
                 ) {
@@ -725,18 +1017,44 @@ fun InvisibleSuiteScreen(
                     Text(stringResource(R.string.suite_set_duress_pin_desc), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newDuressPinInput,
-                        onValueChange = { if (it.length <= 8 && it.all { char -> char.isDigit() }) newDuressPinInput = it },
+                        onValueChange = {
+                            if (it.length <= 8 && it.all { char -> char.isDigit() }) {
+                                newDuressPinInput = it
+                                duressPinError = null
+                            }
+                        },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                        ),
+                        isError = duressPinError != null,
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().testTag("input_duress_pin")
                     )
+                    if (duressPinError != null) {
+                        Text(
+                            text = duressPinError ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.setDuressPin(newDuressPinInput)
-                        showDuressPinDialog = false
-                        Toast.makeText(context, context.getString(R.string.suite_duress_pin_configured_toast), Toast.LENGTH_SHORT).show()
+                        when {
+                            newDuressPinInput.isNotEmpty() && newDuressPinInput.length < 4 -> {
+                                duressPinError = context.getString(R.string.onboarding_pin_min_length_error)
+                            }
+                            newDuressPinInput.isNotEmpty() && newDuressPinInput == masterPin -> {
+                                duressPinError = context.getString(R.string.suite_set_duress_pin_desc)
+                            }
+                            else -> {
+                                viewModel.setDuressPin(newDuressPinInput)
+                                showDuressPinDialog = false
+                                Toast.makeText(context, context.getString(R.string.suite_duress_pin_configured_toast), Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 ) {
                     Text(stringResource(R.string.save))
@@ -745,6 +1063,18 @@ fun InvisibleSuiteScreen(
             dismissButton = {
                 TextButton(onClick = { showDuressPinDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
+        )
+    }
+
+    if (showSupportDialog) {
+        SupportDevelopmentDialog(
+            engagementState = donationEngagementState,
+            billingState = donationBillingState,
+            onLaunchGooglePlay = { launchContext, tier ->
+                viewModel.launchGooglePlayDonation(launchContext, tier)
+            },
+            onClearBillingStatus = { viewModel.clearDonationBillingStatus() },
+            onDismiss = { showSupportDialog = false }
         )
     }
 }

@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <!-- Enforce zero-cloud storage for PureLock encrypted database and Keystore-wrapped passphrase -->
+        <exclude domain="database" path="purelock_privacy_encrypted.db" />
+        <exclude domain="database" path="purelock_privacy_encrypted.db-wal" />
+        <exclude domain="database" path="purelock_privacy_encrypted.db-shm" />
+        <exclude domain="sharedpref" path="purelock_sec_vault.xml" />
+        <exclude domain="sharedpref" path="pure_lock_checksum_prefs.xml" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!-- Android Keystore TEE keys are hardware-bound and non-transferable -->
+        <exclude domain="database" path="purelock_privacy_encrypted.db" />
+        <exclude domain="database" path="purelock_privacy_encrypted.db-wal" />
+        <exclude domain="database" path="purelock_privacy_encrypted.db-shm" />
+        <exclude domain="sharedpref" path="purelock_sec_vault.xml" />
+        <exclude domain="sharedpref" path="pure_lock_checksum_prefs.xml" />
     </device-transfer>
-    -->
 </data-extraction-rules>

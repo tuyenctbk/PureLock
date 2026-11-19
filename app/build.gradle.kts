@@ -115,6 +115,8 @@ dependencies {
   implementation(libs.androidx.room.runtime)
   implementation(libs.sqlcipher.android)
   implementation(libs.androidx.biometric)
+  implementation(libs.android.billing.ktx)
+  implementation(libs.zxing.core)
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.analytics)
   implementation(libs.firebase.crashlytics)

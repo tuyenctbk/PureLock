@@ -1,9 +1,15 @@
 package com.example.data.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "schedule_rules")
+@Entity(
+    tableName = "schedule_rules",
+    indices = [
+        Index(value = ["packageName", "isEnabled"], name = "idx_schedule_rules_pkg_enabled")
+    ]
+)
 data class ScheduleRuleEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,

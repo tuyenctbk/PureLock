@@ -8,6 +8,14 @@ import androidx.room.Update
 import com.example.data.model.EncryptedVaultEntity
 import kotlinx.coroutines.flow.Flow
 
+data class VaultIntegrityTuple(
+    val id: Long,
+    val title: String,
+    val category: String,
+    val timestamp: Long,
+    val isDeleted: Boolean
+)
+
 @Dao
 interface EncryptedVaultDao {
 
@@ -29,6 +37,9 @@ interface EncryptedVaultDao {
     @Query("SELECT * FROM encrypted_vault_items ORDER BY updatedTimestamp DESC")
     fun getAllVaultItems(): Flow<List<EncryptedVaultEntity>>
 
+    @Query("SELECT id, title, category, timestamp, isDeleted FROM encrypted_vault_items ORDER BY id ASC")
+    suspend fun getIntegrityTuples(): List<VaultIntegrityTuple>
+
     @Query("SELECT * FROM encrypted_vault_items WHERE id = :id LIMIT 1")
     suspend fun getVaultItemById(id: Long): EncryptedVaultEntity?
 
@@ -38,11 +49,11 @@ interface EncryptedVaultDao {
     @Update
     suspend fun updateVaultItem(item: EncryptedVaultEntity)
 
-    @Query("UPDATE encrypted_vault_items SET isPinned = :isPinned WHERE id = :id")
-    suspend fun setPinned(id: Long, isPinned: Boolean)
+    @Query("UPDATE encrypted_vault_items SET isPinned = :isPinned, updatedTimestamp = :updatedAt WHERE id = :id")
+    suspend fun setPinned(id: Long, isPinned: Boolean, updatedAt: Long = System.currentTimeMillis())
 
-    @Query("UPDATE encrypted_vault_items SET isFavorite = :isFavorite WHERE id = :id")
-    suspend fun setFavorite(id: Long, isFavorite: Boolean)
+    @Query("UPDATE encrypted_vault_items SET isFavorite = :isFavorite, updatedTimestamp = :updatedAt WHERE id = :id")
+    suspend fun setFavorite(id: Long, isFavorite: Boolean, updatedAt: Long = System.currentTimeMillis())
 
     @Query("UPDATE encrypted_vault_items SET isDeleted = 1, deletedTimestamp = :deletedTimestamp WHERE id = :id")
     suspend fun moveToTrash(id: Long, deletedTimestamp: Long = System.currentTimeMillis())

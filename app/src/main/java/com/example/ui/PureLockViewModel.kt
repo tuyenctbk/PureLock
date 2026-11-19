@@ -21,6 +21,8 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     val repository: PureLockRepository
     val userSettings: UserSettingsManager
 
+    private val donationBillingManager: com.example.service.DonationBillingManager
+
     init {
         val db = PureLockDatabase.getDatabase(application)
         val prefs = PureLockPreferences(application)
@@ -36,13 +38,36 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
             prefs
         )
 
-        viewModelScope.launch {
-            repository.initializeDefaultAppsIfNeeded()
-            repository.clearOldLogsAndCache()
-            repository.preferences.trashPurgeDays.first().let { days ->
-                repository.purgeTrashVault(days)
+        donationBillingManager = com.example.service.DonationBillingManager(
+            context = application,
+            onSupporterVerified = { tierId ->
+                viewModelScope.launch {
+                    userSettings.activateSupporterStatus(tierId)
+                    repository.logSecurityEvent(
+                        "SUPPORTER_ACTIVATED",
+                        "Voluntary Google Play support verified ($tierId). Active Supporter badge unlocked."
+                    )
+                }
+            }
+        )
+        donationBillingManager.startConnectionAndLoad()
+
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                repository.initializeDefaultAppsIfNeeded()
+                repository.clearOldLogsAndCache()
+                repository.preferences.trashPurgeDays.first().let { days ->
+                    repository.purgeTrashVault(days)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
+    }
+
+    override fun onCleared() {
+        donationBillingManager.destroy()
+        super.onCleared()
     }
 
     val encryptedVaultItems: StateFlow<List<EncryptedVaultEntity>> = repository.encryptedVaultItems
@@ -66,7 +91,8 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         username: String = "",
         websiteOrApp: String = "",
         notes: String = "",
-        isPinned: Boolean = false
+        isPinned: Boolean = false,
+        isFavorite: Boolean = false
     ) {
         viewModelScope.launch {
             repository.saveEncryptedVaultItem(
@@ -76,14 +102,17 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                 username = username,
                 websiteOrApp = websiteOrApp,
                 notes = notes,
-                isPinned = isPinned
+                isPinned = isPinned,
+                isFavorite = isFavorite
             )
+            recordSuccessfulOperation()
         }
     }
 
     fun updateEncryptedVaultItem(item: EncryptedVaultEntity) {
         viewModelScope.launch {
             repository.updateEncryptedVaultItem(item)
+            recordSuccessfulOperation()
         }
     }
 
@@ -173,6 +202,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         clearClipboardNow()
         viewModelScope.launch {
             repository.logSecurityEvent("SENSITIVE_STATE_CLEARED", "Screen lock / app background transition executed: sensitive state and clipboard purged.")
+        }
+    }
+
+    fun triggerEmergencySessionLockdown() {
+        viewModelScope.launch {
+            repository.resetAllUnlockedSessions()
         }
     }
 
@@ -270,9 +305,80 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    // --- Non-Intrusive Multi-Channel Donation Engagement & Billing ---
+    private var launchRecordedThisProcess = false
+    private var postOpPromptShownThisSession = false
+
+    val donationEngagementState: StateFlow<com.example.util.DonationEngagementState> =
+        userSettings.donationEngagementState
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = com.example.util.DonationEngagementState()
+            )
+
+    val shouldShowHomeDonationBanner: StateFlow<Boolean> = donationEngagementState
+        .map { com.example.util.DonationEngagementManager.shouldShowHomeBanner(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val donationBillingState: StateFlow<com.example.service.DonationBillingUiState>
+        get() = donationBillingManager.uiState
+
+    private val _pendingPostOpSupportMilestone = MutableStateFlow<Int?>(null)
+    val pendingPostOpSupportMilestone: StateFlow<Int?> = _pendingPostOpSupportMilestone.asStateFlow()
+
+    fun recordAppLaunch() {
+        if (launchRecordedThisProcess) return
+        launchRecordedThisProcess = true
+        viewModelScope.launch {
+            userSettings.recordAppLaunch()
+        }
+    }
+
+    fun recordSuccessfulOperation() {
+        viewModelScope.launch {
+            val (prevCount, updatedState) = userSettings.recordSuccessfulOperation()
+            if (com.example.util.DonationEngagementManager.shouldShowPostOperationPrompt(
+                    state = updatedState,
+                    sessionAlreadyPrompted = postOpPromptShownThisSession
+                )
+            ) {
+                val milestone = com.example.util.DonationEngagementManager.getMilestoneReached(
+                    previousCount = prevCount,
+                    newCount = updatedState.successfulOperationsCount
+                ) ?: updatedState.successfulOperationsCount
+                postOpPromptShownThisSession = true
+                userSettings.recordDonationPromptShown()
+                _pendingPostOpSupportMilestone.value = milestone
+            }
+        }
+    }
+
+    fun dismissDonationBanner() {
+        viewModelScope.launch {
+            userSettings.dismissDonationBanner()
+        }
+    }
+
+    fun dismissPostOpSupportPrompt() {
+        _pendingPostOpSupportMilestone.value = null
+    }
+
+    fun launchGooglePlayDonation(context: Context, tier: com.example.service.DonationTier) {
+        donationBillingManager.launchDonationFlow(context, tier)
+    }
+
+    fun refreshDonationBilling() {
+        donationBillingManager.refreshPurchases()
+    }
+
+    fun clearDonationBillingStatus() {
+        donationBillingManager.clearStatusMessage()
+    }
+
     // Preference States from UserSettingsManager & Room
     val duressPin: StateFlow<String> = userSettings.duressPin
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0000")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val masterPin: StateFlow<String> = userSettings.masterPin
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1234")
@@ -347,6 +453,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     val shakeToLockEnabled: StateFlow<Boolean> get() = shakeToLock
 
+    val shakeSensitivity: StateFlow<String> = userSettings.shakeSensitivity
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "MEDIUM")
+
     val trashPurgeDays: StateFlow<Int> = userSettings.trashPurgeDays
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
 
@@ -400,6 +509,14 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
     fun toggleShakeToLock(enabled: Boolean) = setShakeToLock(enabled)
 
+    fun setShakeSensitivity(level: String) {
+        val normalized = com.example.service.ShakeSensitivity.fromKey(level).key
+        viewModelScope.launch {
+            userSettings.setShakeSensitivity(normalized)
+            repository.logSecurityEvent("SETTINGS_CHANGED", "Shake to Lock sensitivity set to $normalized.")
+        }
+    }
+
     fun setTrashPurgeDays(days: Int) {
         viewModelScope.launch {
             userSettings.setTrashPurgeDays(days)
@@ -428,12 +545,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             userSettings.setStealthModeActive(active)
             if (active) {
-                try {
-                    val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-                    clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("", ""))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                clearClipboardNow()
                 repository.logSecurityEvent("STEALTH_MODE_ENABLED", "Stealth Mode activated: Network traffic restricted & clipboard history purged.")
             } else {
                 repository.logSecurityEvent("STEALTH_MODE_DISABLED", "Stealth Mode deactivated.")
@@ -562,7 +674,11 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     suspend fun runVaultIntegrityCheck(): com.example.data.VaultIntegrityResult {
-        return repository.runVaultIntegrityCheck()
+        val result = repository.runVaultIntegrityCheck()
+        if (result.isIntact) {
+            recordSuccessfulOperation()
+        }
+        return result
     }
 
     fun exportConfigToCsv(): String {
@@ -604,7 +720,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         return try {
             val lines = csvData.lines().filter { it.isNotBlank() }
             if (lines.size <= 1) return false
-            viewModelScope.launch {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                 val header = lines.first()
                 if (header.startsWith("RecordType")) {
                     // Full Human-Readable CSV format
@@ -669,7 +785,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     private val backupManager by lazy { com.example.service.OfflineBackupManager(getApplication()) }
 
     suspend fun exportEncryptedBackup(passphrase: String): String {
-        return backupManager.exportEncryptedBackup(passphrase)
+        val result = backupManager.exportEncryptedBackup(passphrase)
+        recordSuccessfulOperation()
+        return result
     }
 
     suspend fun importEncryptedBackup(backupJson: String, passphrase: String): Boolean {
@@ -677,7 +795,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     suspend fun exportEncryptedNotesJson(passphrase: String): String {
-        return backupManager.exportEncryptedNotesJson(passphrase)
+        val result = backupManager.exportEncryptedNotesJson(passphrase)
+        recordSuccessfulOperation()
+        return result
     }
 
     suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean {
@@ -685,7 +805,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     suspend fun exportEncryptedNotesToFile(passphrase: String): java.io.File {
-        return backupManager.exportEncryptedNotesToFile(passphrase)
+        val file = backupManager.exportEncryptedNotesToFile(passphrase)
+        recordSuccessfulOperation()
+        return file
     }
 
     suspend fun importEncryptedNotesFromFile(file: java.io.File, passphrase: String): Boolean {
@@ -722,6 +844,11 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                 logSecurityEvent("AUTO_LOCK_TRIGGERED", "App automatically locked after $sec seconds of inactivity.")
             }
         }
+    }
+
+    fun cancelAutoLockTimer() {
+        autoLockJob?.cancel()
+        autoLockJob = null
     }
 
     fun onUserActivity(onTimeout: () -> Unit = {}) {

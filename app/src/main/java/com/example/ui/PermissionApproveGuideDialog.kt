@@ -1,8 +1,12 @@
 package com.example.ui
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -144,8 +148,17 @@ fun PermissionApproveGuideContent(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // State for re-checking permissions on ON_RESUME
+    // State for re-checking permissions on ON_RESUME or runtime permission result
     var refreshTrigger by remember { mutableIntStateOf(0) }
+
+    val runtimePermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        refreshTrigger++
+        if (!granted) {
+            PermissionManager.openAppSettings(context)
+        }
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -246,7 +259,21 @@ fun PermissionApproveGuideContent(
                     expandedItemId = if (expandedItemId == item.id) null else item.id
                 },
                 onActionClicked = {
-                    item.openAction(context)
+                    when (item.id) {
+                        "camera" -> {
+                            PermissionManager.recordSettingsOpened()
+                            runtimePermissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                        "notification" -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                PermissionManager.recordSettingsOpened()
+                                runtimePermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                item.openAction(context)
+                            }
+                        }
+                        else -> item.openAction(context)
+                    }
                 }
             )
         }
@@ -259,6 +286,7 @@ fun PermissionApproveGuideContent(
                     if (onTestLockRequested != null) {
                         onTestLockRequested()
                     } else {
+                        PermissionManager.recordSettingsOpened()
                         Toast.makeText(context, context.getString(R.string.perm_guide_test_toast), Toast.LENGTH_SHORT).show()
                         val intent = Intent(context, LockOverlayActivity::class.java).apply {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)

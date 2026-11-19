@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.IntruderSelfieEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -98,13 +100,13 @@ fun IntruderVaultScreen(
                     )
                     Column {
                         Text(
-                            text = if (selectedTab == 0) "Intruder Vault" else "Secret Notes",
+                            text = if (selectedTab == 0) stringResource(R.string.intruder_title) else stringResource(R.string.vault_dashboard_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = if (selectedTab == 0) "${intruderSelfies.size} Snapshots Captured" else "${encryptedVaultItems.size} Encrypted Secrets",
+                            text = if (selectedTab == 0) stringResource(R.string.tab_intruder_photos, intruderSelfies.size) else stringResource(R.string.tab_secret_vault, encryptedVaultItems.size),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -193,57 +195,43 @@ fun IntruderVaultScreen(
                 )
             }
 
-            // Content Area
-            if (selectedTab == 0) {
-                // Intruder Photos Tab
-                if (intruderSelfies.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(24.dp)
+            // Content Area with smooth animated tab transition
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    fadeIn() togetherWith fadeOut()
+                },
+                label = "IntruderTabTransition",
+                modifier = Modifier.weight(1f)
+            ) { tabIndex ->
+                if (tabIndex == 0) {
+                    // Intruder Photos Tab
+                    if (intruderSelfies.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Shield,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.outline,
-                                modifier = Modifier.size(44.dp)
-                            )
-                            Text(
-                                text = "No Intruders Detected",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "When someone enters an incorrect PIN or pattern, their photo is discreetly captured here.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.outline,
-                                textAlign = TextAlign.Center
-                            )
+                            EmptyIntruderIllustration()
                         }
-                    }
-                } else {
+                    } else {
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(minSize = 140.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         items(intruderSelfies, key = { it.id }) { selfie ->
-                            val bitmap = remember(selfie.photoData) {
-                                try {
-                                    val bytes = Base64.decode(selfie.photoData, Base64.DEFAULT)
-                                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                                } catch (e: Exception) {
-                                    null
+                            val bitmap by produceState<androidx.compose.ui.graphics.ImageBitmap?>(
+                                initialValue = null,
+                                key1 = selfie.photoData
+                            ) {
+                                value = withContext(Dispatchers.IO) {
+                                    try {
+                                        val bytes = Base64.decode(selfie.photoData, Base64.DEFAULT)
+                                        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                                    } catch (_: Exception) {
+                                        null
+                                    }
                                 }
                             }
 
@@ -263,10 +251,11 @@ fun IntruderVaultScreen(
                                             .height(130.dp)
                                             .background(MaterialTheme.colorScheme.surface)
                                     ) {
-                                        if (bitmap != null) {
+                                        val currentBitmap = bitmap
+                                        if (currentBitmap != null) {
                                             Image(
-                                                bitmap = bitmap,
-                                                contentDescription = "Intruder photo",
+                                                bitmap = currentBitmap,
+                                                contentDescription = stringResource(R.string.snapshots),
                                                 modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
                                             )
@@ -282,7 +271,7 @@ fun IntruderVaultScreen(
 
                                     Column(modifier = Modifier.padding(8.dp)) {
                                         Text(
-                                            text = selfie.attemptedAppName.ifEmpty { "PureLock" },
+                                            text = selfie.attemptedAppName.ifEmpty { stringResource(R.string.app_name) },
                                             style = MaterialTheme.typography.labelMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.onSurface,
@@ -300,64 +289,72 @@ fun IntruderVaultScreen(
                         }
                     }
                 }
-            } else {
-                // Secret Notes Tab
-                OutlinedTextField(
-                    value = vaultSearchQuery,
-                    onValueChange = { vaultSearchQuery = it },
-                    modifier = Modifier.fillMaxWidth().testTag("input_vault_search"),
-                    placeholder = { Text(stringResource(R.string.search_vault_placeholder), style = MaterialTheme.typography.bodyMedium) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
-                    trailingIcon = {
-                        if (vaultSearchQuery.isNotEmpty()) {
-                            IconButton(onClick = { vaultSearchQuery = "" }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Clear", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                if (filteredNotes.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.outline,
-                                modifier = Modifier.size(44.dp)
-                            )
-                            Text(
-                                text = if (vaultSearchQuery.isNotEmpty()) "No Secrets Match Query" else "Encrypted Vault is Empty",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "Store passwords, recovery codes, and sensitive notes encrypted at rest.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.outline,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
                 } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.weight(1f)
+                    // Secret Notes Tab
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
+                        OutlinedTextField(
+                            value = vaultSearchQuery,
+                            onValueChange = { vaultSearchQuery = it },
+                            modifier = Modifier.fillMaxWidth().testTag("input_vault_search"),
+                            placeholder = { Text(stringResource(R.string.search_vault_placeholder), style = MaterialTheme.typography.bodyMedium) },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
+                            trailingIcon = {
+                                if (vaultSearchQuery.isNotEmpty()) {
+                                    IconButton(onClick = { vaultSearchQuery = "" }) {
+                                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear), tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        if (filteredNotes.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (vaultSearchQuery.isNotEmpty()) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                        modifier = Modifier.padding(24.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.SearchOff,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.outline,
+                                            modifier = Modifier.size(44.dp)
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.no_matching_secrets),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.no_secrets_match_query, vaultSearchQuery),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.outline,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                } else {
+                                    EmptyVaultIllustration(
+                                        onAddFirstSecret = { showAddVaultDialog = true }
+                                    )
+                                }
+                            }
+                        } else {
+                            LazyColumn(
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
                         items(filteredNotes, key = { it.id }) { item ->
                             Surface(
                                 color = MaterialTheme.colorScheme.surface,
@@ -418,7 +415,6 @@ fun IntruderVaultScreen(
                                         IconButton(
                                             onClick = {
                                                 viewModel.copyVaultItemToClipboard(item)
-                                                Toast.makeText(context, context.getString(R.string.clipboard_copied_toast), Toast.LENGTH_SHORT).show()
                                             },
                                             modifier = Modifier.size(36.dp)
                                         ) {
@@ -450,6 +446,8 @@ fun IntruderVaultScreen(
             }
         }
     }
+    }
+    }
 
     // Vault Info Dialog
     if (showVaultInfoDialog) {
@@ -476,7 +474,7 @@ fun IntruderVaultScreen(
             onDismissRequest = { selectedSelfie = null },
             title = {
                 Text(
-                    text = "Intruder: ${selfie.attemptedAppName.ifEmpty { "PureLock" }}",
+                    text = stringResource(R.string.intruder_attempt_app, selfie.attemptedAppName.ifEmpty { stringResource(R.string.app_name) }),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -486,19 +484,25 @@ fun IntruderVaultScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val bitmap = remember(selfie.photoData) {
-                        try {
-                            val bytes = Base64.decode(selfie.photoData, Base64.DEFAULT)
-                            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                        } catch (e: Exception) {
-                            null
+                    val bitmap by produceState<androidx.compose.ui.graphics.ImageBitmap?>(
+                        initialValue = null,
+                        key1 = selfie.photoData
+                    ) {
+                        value = withContext(Dispatchers.IO) {
+                            try {
+                                val bytes = Base64.decode(selfie.photoData, Base64.DEFAULT)
+                                BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                            } catch (_: Exception) {
+                                null
+                            }
                         }
                     }
 
-                    if (bitmap != null) {
+                    val detailBitmap = bitmap
+                    if (detailBitmap != null) {
                         Image(
-                            bitmap = bitmap,
-                            contentDescription = "Intruder snapshot",
+                            bitmap = detailBitmap,
+                            contentDescription = stringResource(R.string.snapshots),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(220.dp)
@@ -508,7 +512,7 @@ fun IntruderVaultScreen(
                     }
 
                     Text(
-                        text = "Captured: ${dateFormat.format(Date(selfie.timestamp))}",
+                        text = stringResource(R.string.intruder_attempt_at, dateFormat.format(Date(selfie.timestamp))),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -557,9 +561,9 @@ fun IntruderVaultScreen(
     // Add / Edit Secret Note Dialog
     if (showAddVaultDialog || editingVaultItem != null) {
         val isEditing = editingVaultItem != null
-        var title by remember { mutableStateOf(editingVaultItem?.title ?: "") }
-        var secretContent by remember { mutableStateOf(editingVaultItem?.secretContent ?: "") }
-        var isPasswordVisible by remember { mutableStateOf(false) }
+        var title by remember(editingVaultItem?.id) { mutableStateOf(editingVaultItem?.title ?: "") }
+        var secretContent by remember(editingVaultItem?.id) { mutableStateOf(editingVaultItem?.secretContent ?: "") }
+        var isPasswordVisible by remember(editingVaultItem?.id) { mutableStateOf(false) }
 
         AlertDialog(
             onDismissRequest = {

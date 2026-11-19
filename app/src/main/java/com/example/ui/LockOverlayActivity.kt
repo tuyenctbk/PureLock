@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -51,12 +52,7 @@ class LockOverlayActivity : FragmentActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                val homeIntent = Intent(Intent.ACTION_MAIN).apply {
-                    addCategory(Intent.CATEGORY_HOME)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                startActivity(homeIntent)
-                finish()
+                navigateHomeSafely()
             }
         })
 
@@ -68,7 +64,11 @@ class LockOverlayActivity : FragmentActivity() {
 
         setContent {
             val lockedPackage by lockedPackageState
-            PureLockTheme {
+            val dsTheme by repository.userSettings.themeMode.collectAsState(initial = "SYSTEM")
+            val roomTheme by repository.roomThemeMode.collectAsState(initial = null)
+            val activeThemeMode = roomTheme ?: dsTheme
+
+            PureLockTheme(themeMode = activeThemeMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     LockOverlayScreen(
                         packageName = lockedPackage,
@@ -76,22 +76,32 @@ class LockOverlayActivity : FragmentActivity() {
                         onUnlocked = {
                             com.example.service.PureLockAccessibilityService.onPackageUnlocked(lockedPackage)
                             lifecycleScope.launch {
-                                repository.updateLastUnlocked(lockedPackage)
-                                finish()
+                                try {
+                                    repository.updateLastUnlocked(lockedPackage)
+                                } finally {
+                                    finish()
+                                }
                             }
                         },
                         onCancelled = {
-                            // Return to home screen
-                            val homeIntent = Intent(Intent.ACTION_MAIN).apply {
-                                addCategory(Intent.CATEGORY_HOME)
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            }
-                            startActivity(homeIntent)
-                            finish()
+                            navigateHomeSafely()
                         }
                     )
                 }
             }
+        }
+    }
+
+    private fun navigateHomeSafely() {
+        try {
+            val homeIntent = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_HOME)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            startActivity(homeIntent)
+        } catch (_: Exception) {
+        } finally {
+            finish()
         }
     }
 }

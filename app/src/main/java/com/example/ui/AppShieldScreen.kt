@@ -51,7 +51,7 @@ fun AppShieldScreen(
     var showInfoDialog by remember { mutableStateOf(false) }
     var showPermGuideDialog by remember { mutableStateOf(false) }
 
-    val categories = listOf("ALL", "FINANCIAL", "SOCIAL", "SYSTEM", "MEDIA", "GAMES")
+    val categories = listOf("ALL", "FINANCIAL", "SOCIAL", "SYSTEM", "MEDIA", "GAMES", "OTHER")
 
     val filteredApps = remember(allApps, searchQuery, selectedCategory, selectedStatusFilter) {
         allApps.filter { app ->
@@ -233,6 +233,24 @@ fun AppShieldScreen(
                 }
             }
 
+            // Animated Shield Coverage Progress Strip
+            if (allApps.isNotEmpty()) {
+                val coverageFraction by animateFloatAsState(
+                    targetValue = (activeCount.toFloat() / allApps.size.toFloat()).coerceIn(0f, 1f),
+                    animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+                    label = "ShieldCoverageFraction"
+                )
+                LinearProgressIndicator(
+                    progress = { coverageFraction },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
+
             // Core Privileges Inactive Warning Banner
             ShieldInactiveWarningBanner(
                 onClickOpenGuide = { showPermGuideDialog = true }
@@ -375,10 +393,12 @@ fun AppShieldScreen(
                         items = filteredApps,
                         key = { it.packageName }
                     ) { app ->
-                        AppShieldItemCard(
-                            app = app,
-                            onToggle = { viewModel.toggleAppLock(app.packageName, app.isLocked) }
-                        )
+                        Box(modifier = Modifier.animateItem()) {
+                            AppShieldItemCard(
+                                app = app,
+                                onToggle = { viewModel.toggleAppLock(app.packageName, app.isLocked) }
+                            )
+                        }
                     }
                 }
             }
@@ -522,7 +542,8 @@ private fun AppShieldItemCard(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Text(
                         text = app.category.lowercase().replaceFirstChar { it.uppercase() },
@@ -534,16 +555,19 @@ private fun AppShieldItemCard(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AnimatedLockToggleIcon(
                     isLocked = app.isLocked,
-                    onToggle = onToggle
+                    onToggle = null
                 )
 
                 Switch(
                     checked = app.isLocked,
-                    onCheckedChange = { onToggle() },
+                    onCheckedChange = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onToggle()
+                    },
                     thumbContent = if (app.isLocked) {
                         { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) }
                     } else {
@@ -559,7 +583,7 @@ private fun AppShieldItemCard(
 @Composable
 fun AnimatedLockToggleIcon(
     isLocked: Boolean,
-    onToggle: () -> Unit,
+    onToggle: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val transition = updateTransition(targetState = isLocked, label = "LockToggleTransition")
@@ -590,7 +614,7 @@ fun AnimatedLockToggleIcon(
             .size(34.dp)
             .clip(CircleShape)
             .background(containerColor)
-            .clickable { onToggle() }
+            .then(if (onToggle != null) Modifier.clickable { onToggle() } else Modifier)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale

@@ -64,10 +64,10 @@ fun VaultInsightsDialog(
         else (avgEntropy.coerceIn(0.0, 100.0)).toInt()
     }
 
-    // Strength tier breakdown
+    // Strength tier breakdown (half-open intervals to avoid floating-point gaps)
     val weakCount = remember(entropyList) { entropyList.count { it < 35.0 } }
-    val fairCount = remember(entropyList) { entropyList.count { it in 35.0..54.9 } }
-    val goodCount = remember(entropyList) { entropyList.count { it in 55.0..74.9 } }
+    val fairCount = remember(entropyList) { entropyList.count { it >= 35.0 && it < 55.0 } }
+    val goodCount = remember(entropyList) { entropyList.count { it >= 55.0 && it < 75.0 } }
     val strongCount = remember(entropyList) { entropyList.count { it >= 75.0 } }
 
     // Category breakdown
@@ -80,6 +80,7 @@ fun VaultInsightsDialog(
                 "PASSWORD" -> "Passwords"
                 "CREDENTIAL" -> "Credentials"
                 "PIN", "BANK_PIN" -> "PINs"
+                "CODE_2FA" -> "2FA"
                 "API_KEY" -> "API Keys"
                 "RECOVERY_KEY" -> "Recovery Keys"
                 "CARD" -> "Cards"
@@ -645,15 +646,16 @@ private fun D3CategoryDonutChart(
 
             var startAngle = -90f
             var colorIdx = 0
+            val gap = if (categoryCounts.size > 1) 2f else 0f
             categoryCounts.forEach { (_, count) ->
-                val sweep = (count.toFloat() / totalCount) * 360f
+                val sweep = (count.toFloat() / totalCount.coerceAtLeast(1)) * 360f
                 val color = palette[colorIdx % palette.size]
                 colorIdx++
 
                 drawArc(
                     color = color,
                     startAngle = startAngle,
-                    sweepAngle = sweep - 2f, // 2 degree gap for clean D3 look
+                    sweepAngle = (sweep - gap).coerceAtLeast(1f),
                     useCenter = false,
                     topLeft = topLeft,
                     size = arcSize,

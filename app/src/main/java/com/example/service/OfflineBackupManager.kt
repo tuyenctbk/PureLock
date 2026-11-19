@@ -7,7 +7,9 @@ import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.LockedAppEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.data.model.SecurityLogEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
@@ -28,7 +30,7 @@ class OfflineBackupManager(private val context: Context) {
         private const val SALT_LENGTH = 16
     }
 
-    suspend fun exportEncryptedBackup(passphrase: String): String {
+    suspend fun exportEncryptedBackup(passphrase: String): String = withContext(Dispatchers.IO) {
         val db = PureLockDatabase.getDatabase(context)
 
         val lockedApps = db.appLockDao().getAllLockedApps().first()
@@ -89,7 +91,9 @@ class OfflineBackupManager(private val context: Context) {
                     put("websiteOrApp", item.websiteOrApp)
                     put("notes", item.notes)
                     put("isPinned", item.isPinned)
+                    put("isFavorite", item.isFavorite)
                     put("timestamp", item.timestamp)
+                    put("updatedTimestamp", item.updatedTimestamp)
                     put("isDeleted", item.isDeleted)
                     put("deletedTimestamp", item.deletedTimestamp)
                 })
@@ -123,10 +127,11 @@ class OfflineBackupManager(private val context: Context) {
             put("ciphertext", Base64.encodeToString(ciphertext, Base64.NO_WRAP))
         }
 
-        return encryptedPackage.toString(2)
+        com.example.data.UserSettingsManager(context).setLastBackupTimestamp(System.currentTimeMillis())
+        return@withContext encryptedPackage.toString(2)
     }
 
-    suspend fun exportEncryptedNotesJson(passphrase: String): String {
+    suspend fun exportEncryptedNotesJson(passphrase: String): String = withContext(Dispatchers.IO) {
         val db = PureLockDatabase.getDatabase(context)
         val vaultItems = db.encryptedVaultDao().getAllVaultItems().first()
 
@@ -146,7 +151,9 @@ class OfflineBackupManager(private val context: Context) {
                     put("websiteOrApp", item.websiteOrApp)
                     put("notes", item.notes)
                     put("isPinned", item.isPinned)
+                    put("isFavorite", item.isFavorite)
                     put("timestamp", item.timestamp)
+                    put("updatedTimestamp", item.updatedTimestamp)
                     put("isDeleted", item.isDeleted)
                     put("deletedTimestamp", item.deletedTimestamp)
                 })
@@ -176,7 +183,8 @@ class OfflineBackupManager(private val context: Context) {
             put("ciphertext", Base64.encodeToString(ciphertext, Base64.NO_WRAP))
         }
 
-        return encryptedPackage.toString(2)
+        com.example.data.UserSettingsManager(context).setLastBackupTimestamp(System.currentTimeMillis())
+        return@withContext encryptedPackage.toString(2)
     }
 
     fun getBackupDirectory(): java.io.File {
@@ -187,23 +195,23 @@ class OfflineBackupManager(private val context: Context) {
         return dir
     }
 
-    suspend fun exportEncryptedNotesToFile(passphrase: String): java.io.File {
+    suspend fun exportEncryptedNotesToFile(passphrase: String): java.io.File = withContext(Dispatchers.IO) {
         val encryptedJson = exportEncryptedNotesJson(passphrase)
         val backupDir = getBackupDirectory()
         val fileName = "purelock_notes_encrypted_${System.currentTimeMillis()}.plk"
         val file = java.io.File(backupDir, fileName)
         file.writeText(encryptedJson, StandardCharsets.UTF_8)
-        return file
+        file
     }
 
-    suspend fun importEncryptedNotesFromFile(file: java.io.File, passphrase: String): Boolean {
-        if (!file.exists()) return false
+    suspend fun importEncryptedNotesFromFile(file: java.io.File, passphrase: String): Boolean = withContext(Dispatchers.IO) {
+        if (!file.exists()) return@withContext false
         val content = file.readText(StandardCharsets.UTF_8)
-        return importEncryptedNotesJson(content, passphrase)
+        importEncryptedNotesJson(content, passphrase)
     }
 
-    suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean {
-        return try {
+    suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean = withContext(Dispatchers.IO) {
+        try {
             val packageObj = JSONObject(jsonPackageStr)
             val salt = Base64.decode(packageObj.getString("salt"), Base64.NO_WRAP)
             val iv = Base64.decode(packageObj.getString("iv"), Base64.NO_WRAP)
@@ -220,9 +228,13 @@ class OfflineBackupManager(private val context: Context) {
             val db = PureLockDatabase.getDatabase(context)
 
             if (backupDataObj.has("vaultItems")) {
+                val existingKeys = db.encryptedVaultDao().getAllVaultItems().first()
+                    .map { "${it.title}|${it.secretContent}|${it.category}|${it.timestamp}" }
+                    .toMutableSet()
                 val vaultArray = backupDataObj.getJSONArray("vaultItems")
                 for (i in 0 until vaultArray.length()) {
                     val itemObj = vaultArray.getJSONObject(i)
+                    val ts = itemObj.optLong("timestamp", System.currentTimeMillis())
                     val entity = EncryptedVaultEntity(
                         id = 0L,
                         title = itemObj.getString("title"),
@@ -232,11 +244,16 @@ class OfflineBackupManager(private val context: Context) {
                         websiteOrApp = itemObj.optString("websiteOrApp", ""),
                         notes = itemObj.optString("notes", ""),
                         isPinned = itemObj.optBoolean("isPinned", false),
-                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis()),
+                        isFavorite = itemObj.optBoolean("isFavorite", false),
+                        timestamp = ts,
+                        updatedTimestamp = itemObj.optLong("updatedTimestamp", ts),
                         isDeleted = itemObj.optBoolean("isDeleted", false),
                         deletedTimestamp = itemObj.optLong("deletedTimestamp", 0L)
                     )
-                    db.encryptedVaultDao().insertVaultItem(entity)
+                    val key = "${entity.title}|${entity.secretContent}|${entity.category}|${entity.timestamp}"
+                    if (existingKeys.add(key)) {
+                        db.encryptedVaultDao().insertVaultItem(entity)
+                    }
                 }
             }
             true
@@ -246,23 +263,23 @@ class OfflineBackupManager(private val context: Context) {
         }
     }
 
-    suspend fun exportEncryptedBackupToFile(passphrase: String): java.io.File {
+    suspend fun exportEncryptedBackupToFile(passphrase: String): java.io.File = withContext(Dispatchers.IO) {
         val encryptedJson = exportEncryptedBackup(passphrase)
         val backupDir = getBackupDirectory()
         val fileName = "purelock_full_backup_${System.currentTimeMillis()}.plk"
         val file = java.io.File(backupDir, fileName)
         file.writeText(encryptedJson, StandardCharsets.UTF_8)
-        return file
+        file
     }
 
-    suspend fun importEncryptedBackupFromFile(file: java.io.File, passphrase: String): Boolean {
-        if (!file.exists()) return false
+    suspend fun importEncryptedBackupFromFile(file: java.io.File, passphrase: String): Boolean = withContext(Dispatchers.IO) {
+        if (!file.exists()) return@withContext false
         val content = file.readText(StandardCharsets.UTF_8)
-        return importEncryptedBackup(content, passphrase)
+        importEncryptedBackup(content, passphrase)
     }
 
-    suspend fun importEncryptedBackup(jsonPackageStr: String, passphrase: String): Boolean {
-        return try {
+    suspend fun importEncryptedBackup(jsonPackageStr: String, passphrase: String): Boolean = withContext(Dispatchers.IO) {
+        try {
             val packageObj = JSONObject(jsonPackageStr)
             val salt = Base64.decode(packageObj.getString("salt"), Base64.NO_WRAP)
             val iv = Base64.decode(packageObj.getString("iv"), Base64.NO_WRAP)
@@ -295,8 +312,11 @@ class OfflineBackupManager(private val context: Context) {
                 }
             }
 
-            // Restore Schedule Rules
+            // Restore Schedule Rules (deduplicated)
             if (backupDataObj.has("scheduleRules")) {
+                val existingRuleKeys = db.scheduleRuleDao().getAllRules().first()
+                    .map { "${it.packageName}|${it.startHour}:${it.startMinute}|${it.endHour}:${it.endMinute}|${it.daysString}" }
+                    .toMutableSet()
                 val rulesArray = backupDataObj.getJSONArray("scheduleRules")
                 for (i in 0 until rulesArray.length()) {
                     val ruleObj = rulesArray.getJSONObject(i)
@@ -311,15 +331,22 @@ class OfflineBackupManager(private val context: Context) {
                         isEnabled = ruleObj.optBoolean("isEnabled", true),
                         daysString = ruleObj.optString("daysString", "MON,TUE,WED,THU,FRI,SAT,SUN")
                     )
-                    db.scheduleRuleDao().insertRule(entity)
+                    val ruleKey = "${entity.packageName}|${entity.startHour}:${entity.startMinute}|${entity.endHour}:${entity.endMinute}|${entity.daysString}"
+                    if (existingRuleKeys.add(ruleKey)) {
+                        db.scheduleRuleDao().insertRule(entity)
+                    }
                 }
             }
 
-            // Restore Vault Items
+            // Restore Vault Items (deduplicated, preserving isFavorite and updatedTimestamp)
             if (backupDataObj.has("vaultItems")) {
+                val existingVaultKeys = db.encryptedVaultDao().getAllVaultItems().first()
+                    .map { "${it.title}|${it.secretContent}|${it.category}|${it.timestamp}" }
+                    .toMutableSet()
                 val vaultArray = backupDataObj.getJSONArray("vaultItems")
                 for (i in 0 until vaultArray.length()) {
                     val itemObj = vaultArray.getJSONObject(i)
+                    val ts = itemObj.optLong("timestamp", System.currentTimeMillis())
                     val entity = EncryptedVaultEntity(
                         id = 0L,
                         title = itemObj.getString("title"),
@@ -329,11 +356,16 @@ class OfflineBackupManager(private val context: Context) {
                         websiteOrApp = itemObj.optString("websiteOrApp", ""),
                         notes = itemObj.optString("notes", ""),
                         isPinned = itemObj.optBoolean("isPinned", false),
-                        timestamp = itemObj.optLong("timestamp", System.currentTimeMillis()),
+                        isFavorite = itemObj.optBoolean("isFavorite", false),
+                        timestamp = ts,
+                        updatedTimestamp = itemObj.optLong("updatedTimestamp", ts),
                         isDeleted = itemObj.optBoolean("isDeleted", false),
                         deletedTimestamp = itemObj.optLong("deletedTimestamp", 0L)
                     )
-                    db.encryptedVaultDao().insertVaultItem(entity)
+                    val key = "${entity.title}|${entity.secretContent}|${entity.category}|${entity.timestamp}"
+                    if (existingVaultKeys.add(key)) {
+                        db.encryptedVaultDao().insertVaultItem(entity)
+                    }
                 }
             }
 

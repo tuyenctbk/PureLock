@@ -42,41 +42,41 @@ class VaultWidgetProvider : AppWidgetProvider() {
         super.onReceive(context, intent)
         if (intent.action == ACTION_LOCK_VAULT) {
             val pendingResult = goAsync()
-            val db = PureLockDatabase.getDatabase(context)
-            val prefs = com.example.data.PureLockPreferences(context)
-            val repository = com.example.data.PureLockRepository(
-                context,
-                db.appLockDao(),
-                db.intruderDao(),
-                db.logDao(),
-                db.scheduleRuleDao(),
-                db.encryptedVaultDao(),
-                db.userSettingDao(),
-                prefs
-            )
+            val appContext = context.applicationContext
             scope.launch {
                 try {
+                    val db = PureLockDatabase.getDatabase(appContext)
+                    val prefs = com.example.data.PureLockPreferences(appContext)
+                    val repository = com.example.data.PureLockRepository(
+                        appContext,
+                        db.appLockDao(),
+                        db.intruderDao(),
+                        db.logDao(),
+                        db.scheduleRuleDao(),
+                        db.encryptedVaultDao(),
+                        db.userSettingDao(),
+                        prefs
+                    )
                     // 1. Immediately revoke all active sessions and reset unlock timestamps
                     repository.lockAllAndClearSessions()
-                    com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
+                    com.example.util.ClipboardSecurityManager.clearClipboard(appContext, showNotification = false)
 
-                    val lockedApps = db.appLockDao().getAllLockedApps().first()
-                    val lockedCount = lockedApps.count { it.isLocked }
-                    val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
+                    val lockedCount = db.appLockDao().getActiveLockedAppsCount().first()
+                    val vaultCount = db.encryptedVaultDao().getActiveVaultItems().first().size
                     val totalProtected = lockedCount + vaultCount
 
-                    val appWidgetManager = AppWidgetManager.getInstance(context)
+                    val appWidgetManager = AppWidgetManager.getInstance(appContext)
                     val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                        android.content.ComponentName(context, VaultWidgetProvider::class.java)
+                        android.content.ComponentName(appContext, VaultWidgetProvider::class.java)
                     )
-                    val lockIntent = Intent(context, VaultWidgetProvider::class.java).apply {
+                    val lockIntent = Intent(appContext, VaultWidgetProvider::class.java).apply {
                         action = ACTION_LOCK_VAULT
                     }
                     val pendingIntent = PendingIntent.getBroadcast(
-                        context, 0, lockIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                        appContext, 0, lockIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                     for (appWidgetId in appWidgetIds) {
-                        val views = RemoteViews(context.packageName, R.layout.vault_widget)
+                        val views = RemoteViews(appContext.packageName, R.layout.vault_widget)
                         views.setTextViewText(R.id.tv_protected_count, "Vault Secured & Locked! ($totalProtected items)")
                         views.setOnClickPendingIntent(R.id.btn_lock_widget, pendingIntent)
                         appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -95,7 +95,7 @@ class VaultWidgetProvider : AppWidgetProvider() {
 
         val db = PureLockDatabase.getDatabase(context)
         val lockedCount = db.appLockDao().getAllLockedApps().first().count { it.isLocked }
-        val vaultCount = db.encryptedVaultDao().getAllVaultItems().first().size
+        val vaultCount = db.encryptedVaultDao().getActiveVaultItems().first().size
         val totalProtected = lockedCount + vaultCount
 
         views.setTextViewText(R.id.tv_protected_count, "Protected Items: $totalProtected (Apps: $lockedCount, Vault: $vaultCount)")

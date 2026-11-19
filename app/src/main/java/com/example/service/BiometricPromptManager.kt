@@ -19,7 +19,7 @@ fun Context.findFragmentActivity(): FragmentActivity? {
     var current: Context? = this
     while (current is ContextWrapper) {
         if (current is FragmentActivity) {
-            return current
+            return if (!current.isFinishing && !current.isDestroyed) current else null
         }
         current = current.baseContext
     }

@@ -1,9 +1,30 @@
 package com.example.data.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "encrypted_vault_items")
+@Entity(
+    tableName = "encrypted_vault_items",
+    indices = [
+        Index(
+            value = ["isDeleted", "isPinned", "isFavorite", "updatedTimestamp"],
+            name = "idx_vault_active_sort"
+        ),
+        Index(
+            value = ["isDeleted", "category", "updatedTimestamp"],
+            name = "idx_vault_active_category"
+        ),
+        Index(
+            value = ["isDeleted", "deletedTimestamp"],
+            name = "idx_vault_trash_purge"
+        ),
+        Index(
+            value = ["updatedTimestamp"],
+            name = "idx_vault_updated_ts"
+        )
+    ]
+)
 data class EncryptedVaultEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

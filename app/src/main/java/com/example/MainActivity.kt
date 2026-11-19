@@ -18,6 +18,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,18 +41,31 @@ class MainActivity : FragmentActivity() {
 
     private val viewModel: PureLockViewModel by viewModels()
 
+    private val shortcutActionState = mutableStateOf<String?>(null)
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        shortcutActionState.value = intent.getStringExtra("shortcut_action")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        shortcutActionState.value = intent?.getStringExtra("shortcut_action")
 
         // Perform periodic background checks
         com.example.service.DatabaseChecksumManager(this).validateChecksumAndLog()
         com.example.service.BackupHealthService(this).checkBackupHealth()
 
+        viewModel.recordAppLaunch()
+
         setContent {
             val themeMode by viewModel.themeMode.collectAsState()
             val inactivityTimeoutSec by viewModel.inactivityTimeoutSec.collectAsState()
             val shakeToLockEnabled by viewModel.shakeToLockEnabled.collectAsState()
+            val shakeSensitivity by viewModel.shakeSensitivity.collectAsState()
+            val hapticFeedbackEnabled by viewModel.hapticFeedbackEnabled.collectAsState()
             val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState()
 
             PureLockTheme(themeMode = themeMode) {
@@ -61,7 +75,10 @@ class MainActivity : FragmentActivity() {
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
-                val shortcutAction = remember { intent?.getStringExtra("shortcut_action") }
+                val latestInactivityTimeoutSec by rememberUpdatedState(inactivityTimeoutSec)
+                val latestAppAuthenticated by rememberUpdatedState(appAuthenticated)
+
+                val shortcutAction by shortcutActionState
                 val startRoute = remember(shortcutAction) {
                     when (shortcutAction) {
                         "VIEW_SHIELD" -> "shield"
@@ -71,41 +88,63 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                // Shake to Lock Accelerometer Sensor Listener
-                DisposableEffect(shakeToLockEnabled) {
-                    if (!shakeToLockEnabled) {
-                        onDispose { }
-                    } else {
-                        val sensorManager = context.getSystemService(android.content.Context.SENSOR_SERVICE) as? android.hardware.SensorManager
-                        val accelerometer = sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER)
+                val latestHapticEnabled by rememberUpdatedState(hapticFeedbackEnabled)
+                val parsedSensitivity = remember(shakeSensitivity) {
+                    com.example.service.ShakeSensitivity.fromKey(shakeSensitivity)
+                }
 
-                        var lastShakeTime = 0L
-                        val listener = object : android.hardware.SensorEventListener {
-                            override fun onSensorChanged(event: android.hardware.SensorEvent?) {
-                                if (event == null) return
-                                val x = event.values[0]
-                                val y = event.values[1]
-                                val z = event.values[2]
-
-                                val gForce = Math.sqrt((x * x + y * y + z * z).toDouble()) / android.hardware.SensorManager.GRAVITY_EARTH
-                                val currentTime = System.currentTimeMillis()
-                                if (gForce > 2.5 && currentTime - lastShakeTime > 1500) {
-                                    lastShakeTime = currentTime
-                                    appAuthenticated = false
-                                    viewModel.clearSensitiveState()
-                                    viewModel.logSecurityEvent("SHAKE_TO_LOCK", "Emergency lockdown triggered via Shake to Lock gesture.")
+                // Lifecycle-aware, gravity-filtered Shake-to-Lock Accelerometer Controller
+                val shakeController = remember(context) {
+                    com.example.service.ShakeToLockSensorController(
+                        context = context,
+                        onShakeDetected = {
+                            if (latestAppAuthenticated) {
+                                if (latestHapticEnabled) {
+                                    com.example.service.ShakeToLockSensorController.triggerLockHapticFeedback(context)
                                 }
+                                appAuthenticated = false
+                                viewModel.cancelAutoLockTimer()
+                                viewModel.clearSensitiveState()
+                                viewModel.triggerEmergencySessionLockdown()
+                                viewModel.logSecurityEvent(
+                                    "SHAKE_TO_LOCK",
+                                    "Emergency lockdown triggered inside PureLock via accelerometer shake gesture."
+                                )
                             }
-
-                            override fun onAccuracyChanged(sensor: android.hardware.Sensor?, accuracy: Int) {}
                         }
+                    )
+                }
 
-                        if (sensorManager != null && accelerometer != null) {
-                            sensorManager.registerListener(listener, accelerometer, android.hardware.SensorManager.SENSOR_DELAY_UI)
+                LaunchedEffect(parsedSensitivity) {
+                    shakeController.updateSensitivity(parsedSensitivity)
+                }
+
+                DisposableEffect(lifecycleOwner, shakeToLockEnabled, appAuthenticated, parsedSensitivity) {
+                    val shouldListen = shakeToLockEnabled && appAuthenticated
+                    if (!shouldListen) {
+                        shakeController.stop()
+                        onDispose { shakeController.stop() }
+                    } else {
+                        if (lifecycleOwner.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
+                            shakeController.start(parsedSensitivity)
                         }
-
+                        val sensorLifecycleObserver = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                            when (event) {
+                                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> {
+                                    if (latestAppAuthenticated) {
+                                        shakeController.start(parsedSensitivity)
+                                    }
+                                }
+                                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> {
+                                    shakeController.stop()
+                                }
+                                else -> {}
+                            }
+                        }
+                        lifecycleOwner.lifecycle.addObserver(sensorLifecycleObserver)
                         onDispose {
-                            sensorManager?.unregisterListener(listener)
+                            lifecycleOwner.lifecycle.removeObserver(sensorLifecycleObserver)
+                            shakeController.stop()
                         }
                     }
                 }
@@ -117,8 +156,11 @@ class MainActivity : FragmentActivity() {
                     val screenOffReceiver = object : android.content.BroadcastReceiver() {
                         override fun onReceive(c: android.content.Context?, intent: android.content.Intent?) {
                             if (intent?.action == android.content.Intent.ACTION_SCREEN_OFF) {
-                                appAuthenticated = false
-                                viewModel.clearSensitiveState()
+                                if (latestAppAuthenticated) {
+                                    appAuthenticated = false
+                                    viewModel.cancelAutoLockTimer()
+                                    viewModel.clearSensitiveState()
+                                }
                             }
                         }
                     }
@@ -133,22 +175,37 @@ class MainActivity : FragmentActivity() {
                     val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
                         when (event) {
                             androidx.lifecycle.Lifecycle.Event.ON_STOP -> {
-                                appBackgroundTimestamp = System.currentTimeMillis()
-                                viewModel.clearSensitiveState()
+                                if (latestAppAuthenticated) {
+                                    appBackgroundTimestamp = System.currentTimeMillis()
+                                    viewModel.cancelAutoLockTimer()
+                                    if (!com.example.util.PermissionManager.isReturningFromSettings()) {
+                                        viewModel.clearSensitiveState()
+                                    }
+                                }
+                            }
+                            androidx.lifecycle.Lifecycle.Event.ON_RESUME -> {
+                                viewModel.refreshDonationBilling()
                             }
                             androidx.lifecycle.Lifecycle.Event.ON_START -> {
                                 if (appBackgroundTimestamp > 0L) {
                                     val elapsed = System.currentTimeMillis() - appBackgroundTimestamp
-                                    val timeoutMillis = if (inactivityTimeoutSec > 0) inactivityTimeoutSec * 1000L else 0L
+                                    val timeoutSec = latestInactivityTimeoutSec
+                                    val timeoutMillis = if (timeoutSec > 0) timeoutSec * 1000L else 0L
                                     val returningFromSettings = com.example.util.PermissionManager.isReturningFromSettings()
+                                    if (returningFromSettings) {
+                                        com.example.util.PermissionManager.clearReturningFromSettings()
+                                    }
 
-                                    if (!returningFromSettings && elapsed >= timeoutMillis) {
+                                    if (latestAppAuthenticated && !returningFromSettings && elapsed >= timeoutMillis) {
                                         appAuthenticated = false
+                                        viewModel.cancelAutoLockTimer()
                                         viewModel.clearSensitiveState()
                                         viewModel.logSecurityEvent(
                                             "BACKGROUND_AUTO_LOCK",
                                             "PureLock secured on background return. Master authentication required."
                                         )
+                                    } else if (latestAppAuthenticated) {
+                                        lastInteractionTime = System.currentTimeMillis()
                                     }
                                     appBackgroundTimestamp = 0L
                                 }
@@ -182,6 +239,8 @@ class MainActivity : FragmentActivity() {
                         viewModel.onUserActivity {
                             appAuthenticated = false
                         }
+                    } else if (!appAuthenticated) {
+                        viewModel.cancelAutoLockTimer()
                     }
                 }
 
@@ -202,6 +261,9 @@ class MainActivity : FragmentActivity() {
                             com.example.ui.OnboardingScreen(
                                 onOnboardingComplete = { pin, securityType, pattern ->
                                     viewModel.completeOnboarding(pin, securityType, pattern)
+                                    appAuthenticated = true
+                                    lastInteractionTime = System.currentTimeMillis()
+                                    viewModel.unlockApp()
                                 }
                             )
                         } else if (!isAuthenticated) {
@@ -211,6 +273,8 @@ class MainActivity : FragmentActivity() {
                                 onUnlocked = {
                                     appAuthenticated = true
                                     lastInteractionTime = System.currentTimeMillis()
+                                    viewModel.unlockApp()
+                                    viewModel.recordVaultUnlock()
                                 },
                                 onCancelled = { finish() }
                             )
@@ -219,16 +283,39 @@ class MainActivity : FragmentActivity() {
                             val navBackStackEntry by navController.currentBackStackEntryAsState()
                             val currentRoute = navBackStackEntry?.destination?.route ?: "vault"
 
+                            // Handle warm app shortcut intents while already authenticated
+                            LaunchedEffect(shortcutAction) {
+                                val targetRoute = when (shortcutAction) {
+                                    "VIEW_SHIELD" -> "shield"
+                                    "VIEW_INTRUDER" -> "intruder"
+                                    "VIEW_AUDIT" -> "audit"
+                                    else -> null
+                                }
+                                if (targetRoute != null && targetRoute != currentRoute) {
+                                    navController.navigate(targetRoute) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                    shortcutActionState.value = null
+                                }
+                            }
+
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onPress = {
-                                                lastInteractionTime = System.currentTimeMillis()
-                                                viewModel.onUserActivity { appAuthenticated = false }
+                                        awaitPointerEventScope {
+                                            while (true) {
+                                                awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
+                                                val now = System.currentTimeMillis()
+                                                if (now - lastInteractionTime > 500L) {
+                                                    lastInteractionTime = now
+                                                }
                                             }
-                                        )
+                                        }
                                     }
                             ) {
                                 Scaffold(
@@ -262,8 +349,13 @@ class MainActivity : FragmentActivity() {
                                                         restoreState = true
                                                     }
                                                 },
-                                                icon = { Icon(Icons.Default.Lock, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_vault)) },
-                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_vault), fontSize = 11.sp, fontWeight = if (currentRoute == "vault") FontWeight.Bold else FontWeight.Normal) },
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = if (currentRoute == "vault") Icons.Filled.Lock else Icons.Outlined.Lock,
+                                                        contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_vault)
+                                                    )
+                                                },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_vault), fontSize = 11.sp, fontWeight = if (currentRoute == "vault") FontWeight.Bold else FontWeight.Medium) },
                                                 modifier = Modifier.testTag("nav_item_vault")
                                             )
 
@@ -280,8 +372,13 @@ class MainActivity : FragmentActivity() {
                                                         restoreState = true
                                                     }
                                                 },
-                                                icon = { Icon(Icons.Default.Shield, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_shield)) },
-                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_shield), fontSize = 11.sp, fontWeight = if (currentRoute == "shield") FontWeight.Bold else FontWeight.Normal) },
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = if (currentRoute == "shield") Icons.Filled.Shield else Icons.Outlined.Shield,
+                                                        contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_shield)
+                                                    )
+                                                },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_shield), fontSize = 11.sp, fontWeight = if (currentRoute == "shield") FontWeight.Bold else FontWeight.Medium) },
                                                 modifier = Modifier.testTag("nav_item_shield")
                                             )
 
@@ -298,8 +395,13 @@ class MainActivity : FragmentActivity() {
                                                         restoreState = true
                                                     }
                                                 },
-                                                icon = { Icon(Icons.Default.CameraAlt, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_intruder)) },
-                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_intruder), fontSize = 11.sp, fontWeight = if (currentRoute == "intruder") FontWeight.Bold else FontWeight.Normal) },
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = if (currentRoute == "intruder") Icons.Filled.CameraAlt else Icons.Outlined.CameraAlt,
+                                                        contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_intruder)
+                                                    )
+                                                },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_intruder), fontSize = 11.sp, fontWeight = if (currentRoute == "intruder") FontWeight.Bold else FontWeight.Medium) },
                                                 modifier = Modifier.testTag("nav_item_intruder")
                                             )
 
@@ -316,8 +418,13 @@ class MainActivity : FragmentActivity() {
                                                         restoreState = true
                                                     }
                                                 },
-                                                icon = { Icon(Icons.Default.Tune, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_settings)) },
-                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_settings), fontSize = 11.sp, fontWeight = if (currentRoute == "suite") FontWeight.Bold else FontWeight.Normal) },
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = if (currentRoute == "suite") Icons.Filled.Tune else Icons.Outlined.Tune,
+                                                        contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_settings)
+                                                    )
+                                                },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_settings), fontSize = 11.sp, fontWeight = if (currentRoute == "suite") FontWeight.Bold else FontWeight.Medium) },
                                                 modifier = Modifier.testTag("nav_item_suite")
                                             )
 
@@ -334,8 +441,13 @@ class MainActivity : FragmentActivity() {
                                                         restoreState = true
                                                     }
                                                 },
-                                                icon = { Icon(Icons.Default.VerifiedUser, contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_audit)) },
-                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_audit), fontSize = 11.sp, fontWeight = if (currentRoute == "audit") FontWeight.Bold else FontWeight.Normal) },
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = if (currentRoute == "audit") Icons.Filled.VerifiedUser else Icons.Outlined.VerifiedUser,
+                                                        contentDescription = androidx.compose.ui.res.stringResource(R.string.nav_audit)
+                                                    )
+                                                },
+                                                label = { Text(androidx.compose.ui.res.stringResource(R.string.nav_audit), fontSize = 11.sp, fontWeight = if (currentRoute == "audit") FontWeight.Bold else FontWeight.Medium) },
                                                 modifier = Modifier.testTag("nav_item_audit")
                                             )
                                         }
@@ -375,13 +487,29 @@ class MainActivity : FragmentActivity() {
                                         composable("vault") {
                                             EncryptedVaultDashboardScreen(
                                                 viewModel = viewModel,
-                                                onNavigateToSettings = { navController.navigate("suite") }
+                                                onNavigateToSettings = {
+                                                    navController.navigate("suite") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                }
                                             )
                                         }
                                         composable("shield") {
                                             AppShieldScreen(
                                                 viewModel = viewModel,
-                                                onNavigateToSettings = { navController.navigate("suite") }
+                                                onNavigateToSettings = {
+                                                    navController.navigate("suite") {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                }
                                             )
                                         }
                                         composable("intruder") {

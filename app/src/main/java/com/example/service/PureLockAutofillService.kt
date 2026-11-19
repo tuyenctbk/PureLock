@@ -50,18 +50,21 @@ class PureLockAutofillService : AutofillService() {
             return
         }
 
+        val targetPackage = structure.activityComponent?.packageName?.lowercase() ?: ""
+        val webDomains = mutableSetOf<String>()
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
 
-        findAutofillNodes(rootViewNode, usernameIds, passwordIds)
+        findAutofillNodes(rootViewNode, usernameIds, passwordIds, webDomains)
 
         if (usernameIds.isEmpty() && passwordIds.isEmpty()) {
             callback.onSuccess(null)
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        val job = CoroutineScope(Dispatchers.IO).launch {
             try {
+                if (cancellationSignal.isCanceled) return@launch
                 val db = PureLockDatabase.getDatabase(applicationContext)
                 val prefs = PureLockPreferences(applicationContext)
                 val repository = PureLockRepository(
@@ -76,14 +79,34 @@ class PureLockAutofillService : AutofillService() {
                 )
 
                 val vaultItems = repository.activeVaultItems.first()
+                if (cancellationSignal.isCanceled) return@launch
                 if (vaultItems.isEmpty()) {
                     callback.onSuccess(null)
                     return@launch
                 }
 
+                // Rank matching domain/package items and credential categories first
+                val rankedItems = vaultItems.sortedByDescending { item ->
+                    var score = 0
+                    val itemSite = item.websiteOrApp.lowercase()
+                    val itemTitle = item.title.lowercase()
+                    if (webDomains.any { d -> d.isNotBlank() && (itemSite.contains(d) || itemTitle.contains(d)) }) {
+                        score += 100
+                    }
+                    if (targetPackage.isNotBlank()) {
+                        val pkgToken = targetPackage.substringAfterLast('.')
+                        if (itemSite.contains(targetPackage) || (pkgToken.length >= 3 && (itemSite.contains(pkgToken) || itemTitle.contains(pkgToken)))) {
+                            score += 50
+                        }
+                    }
+                    if (item.category in listOf("PASSWORD", "PIN", "CODE_2FA")) score += 20
+                    if (item.isFavorite) score += 5
+                    score
+                }
+
                 val fillResponseBuilder = FillResponse.Builder()
 
-                vaultItems.take(5).forEach { item ->
+                rankedItems.take(5).forEach { item ->
                     val presentation = RemoteViews(packageName, android.R.layout.activity_list_item).apply {
                         setImageViewResource(android.R.id.icon, com.example.R.drawable.splash_logo)
                         setTextViewText(android.R.id.text1, "PureLock: ${item.title} (${item.category})")
@@ -112,14 +135,22 @@ class PureLockAutofillService : AutofillService() {
 
                 repository.logSecurityEvent(
                     "AUTOFILL_REQUEST",
-                    "PureLock Autofill Service provided offline suggestion for ${vaultItems.size} encrypted secrets."
+                    "PureLock Autofill Service provided offline suggestion for ${rankedItems.take(5).size} encrypted secrets."
                 )
 
-                callback.onSuccess(fillResponseBuilder.build())
+                if (!cancellationSignal.isCanceled) {
+                    callback.onSuccess(fillResponseBuilder.build())
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                callback.onSuccess(null)
+                if (!cancellationSignal.isCanceled) {
+                    callback.onSuccess(null)
+                }
             }
+        }
+
+        cancellationSignal.setOnCancelListener {
+            job.cancel()
         }
     }
 
@@ -130,27 +161,35 @@ class PureLockAutofillService : AutofillService() {
     private fun findAutofillNodes(
         node: android.app.assist.AssistStructure.ViewNode,
         usernameIds: MutableList<AutofillId>,
-        passwordIds: MutableList<AutofillId>
+        passwordIds: MutableList<AutofillId>,
+        webDomains: MutableSet<String>
     ) {
+        node.webDomain?.lowercase()?.takeIf { it.isNotBlank() }?.let { webDomains.add(it) }
+
         val autofillHints = node.autofillHints
         val hint = node.hint?.lowercase() ?: ""
         val idEntry = node.idEntry?.lowercase() ?: ""
 
-        val isUsername = (autofillHints?.contains(android.view.View.AUTOFILL_HINT_USERNAME) == true) ||
-                (autofillHints?.contains(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS) == true) ||
-                hint.contains("user") || hint.contains("email") || idEntry.contains("user") || idEntry.contains("email")
-
         val isPassword = (autofillHints?.contains(android.view.View.AUTOFILL_HINT_PASSWORD) == true) ||
                 hint.contains("pass") || idEntry.contains("pass")
 
+        val isUsername = !isPassword && (
+                (autofillHints?.contains(android.view.View.AUTOFILL_HINT_USERNAME) == true) ||
+                        (autofillHints?.contains(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS) == true) ||
+                        hint.contains("user") || hint.contains("email") || idEntry.contains("user") || idEntry.contains("email")
+                )
+
         val autofillId = node.autofillId
         if (autofillId != null) {
-            if (isUsername) usernameIds.add(autofillId)
-            if (isPassword) passwordIds.add(autofillId)
+            if (isPassword) {
+                passwordIds.add(autofillId)
+            } else if (isUsername) {
+                usernameIds.add(autofillId)
+            }
         }
 
         for (i in 0 until node.childCount) {
-            findAutofillNodes(node.getChildAt(i), usernameIds, passwordIds)
+            findAutofillNodes(node.getChildAt(i), usernameIds, passwordIds, webDomains)
         }
     }
 }

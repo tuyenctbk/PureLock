@@ -59,8 +59,16 @@ object SmartPromptsManager {
                 "Protect your personal privacy with PureLock! Zero-cloud offline app lock & encrypted vault. Download now: https://play.google.com/store/apps/details?id=$packageName"
             )
         }
-        context.startActivity(Intent.createChooser(shareIntent, "Share PureLock via"))
-        FirebaseManager.logEvent("share_app_action")
+        try {
+            val chooser = Intent.createChooser(shareIntent, "Share PureLock via").apply {
+                if (context !is android.app.Activity) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            context.startActivity(chooser)
+            FirebaseManager.logEvent("share_app_action")
+        } catch (_: Exception) {
+        }
     }
 
     fun openPlayStoreForRating(context: Context) {
@@ -68,12 +76,23 @@ object SmartPromptsManager {
         try {
             val marketIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                if (context !is android.app.Activity) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
             }
             context.startActivity(marketIntent)
-        } catch (e: Exception) {
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
-            context.startActivity(webIntent)
+            FirebaseManager.logEvent("rate_app_action")
+        } catch (_: Exception) {
+            try {
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")).apply {
+                    if (context !is android.app.Activity) {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                }
+                context.startActivity(webIntent)
+                FirebaseManager.logEvent("rate_app_action")
+            } catch (_: Exception) {
+            }
         }
-        FirebaseManager.logEvent("rate_app_action")
     }
 }

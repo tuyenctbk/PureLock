@@ -30,7 +30,7 @@ class PasswordGeneratorService {
         
         // Ambiguous characters: 0, O, o, 1, l, I, |
         const val UPPER_NO_AMBIGUOUS = "ABCDEFGHJKLMNPQRSTUVWXYZ"
-        const val LOWER_NO_AMBIGUOUS = "abcdefghijkmnopqrstuvwxyz"
+        const val LOWER_NO_AMBIGUOUS = "abcdefghijkmnpqrstuvwxyz"
         const val DIGITS_NO_AMBIGUOUS = "23456789"
         const val SYMBOLS_NO_AMBIGUOUS = "!@#$%^&*()_+-=[]{};:,.<>?"
 

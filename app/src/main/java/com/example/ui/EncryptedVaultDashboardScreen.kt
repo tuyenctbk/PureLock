@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -59,19 +61,37 @@ fun EncryptedVaultDashboardScreen(
 
     val encryptedVaultItems by viewModel.encryptedVaultItems.collectAsState()
     val trashVaultItems by viewModel.trashVaultItems.collectAsState()
+    val trashPurgeDays by viewModel.trashPurgeDays.collectAsState()
     val activeCopiedItemId by viewModel.activeCopiedItemId.collectAsState()
     val clipboardCountdown by viewModel.clipboardCountdown.collectAsState()
     val isSensitiveClipActive by viewModel.isSensitiveClipActive.collectAsState()
+    val donationEngagementState by viewModel.donationEngagementState.collectAsState()
+    val shouldShowHomeDonationBanner by viewModel.shouldShowHomeDonationBanner.collectAsState()
+    val donationBillingState by viewModel.donationBillingState.collectAsState()
+    val pendingPostOpMilestone by viewModel.pendingPostOpSupportMilestone.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf(VaultFilterCategory.ALL) }
     var revealedItemIds by remember { mutableStateOf(setOf<Long>()) }
+
+    // Automatically re-mask revealed secrets whenever app transitions to background
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_STOP) {
+                revealedItemIds = emptySet()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     var showAddEditDialog by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
     var itemToDelete by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
     var showEmptyTrashDialog by remember { mutableStateOf(false) }
     var showInsightsDialog by remember { mutableStateOf(false) }
+    var showSupportDialog by remember { mutableStateOf(false) }
 
     // Filter items based on category and search query
     val displayedItems = remember(
@@ -104,6 +124,7 @@ fun EncryptedVaultDashboardScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             if (selectedCategory != VaultFilterCategory.TRASH) {
                 FloatingActionButton(
@@ -181,20 +202,76 @@ fun EncryptedVaultDashboardScreen(
                                     Text(stringResource(R.string.vault_empty_trash_button), fontSize = 12.sp)
                                 }
                             } else if (selectedCategory != VaultFilterCategory.TRASH) {
+                                if (donationEngagementState.isActiveSupporter) {
+                                    Surface(
+                                        shape = RoundedCornerShape(18.dp),
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
+                                        modifier = Modifier
+                                            .heightIn(min = 36.dp)
+                                            .clip(RoundedCornerShape(18.dp))
+                                            .clickable { showSupportDialog = true }
+                                            .testTag("badge_active_supporter")
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Verified,
+                                                contentDescription = stringResource(R.string.donation_supporter_badge),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(15.dp)
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.donation_supporter_badge),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    IconButton(
+                                        onClick = { showSupportDialog = true },
+                                        modifier = Modifier.testTag("btn_header_support")
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(38.dp)
+                                                .clip(CircleShape)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.FavoriteBorder,
+                                                contentDescription = stringResource(R.string.donation_dialog_title),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    }
+                                }
+
                                 IconButton(
                                     onClick = { showInsightsDialog = true },
-                                    modifier = Modifier
-                                        .size(38.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .testTag("btn_vault_insights")
+                                    modifier = Modifier.testTag("btn_vault_insights")
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Analytics,
-                                        contentDescription = stringResource(R.string.vault_insights_title),
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp)
-                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(38.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Analytics,
+                                            contentDescription = stringResource(R.string.vault_insights_title),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -276,6 +353,77 @@ fun EncryptedVaultDashboardScreen(
                     }
                 }
 
+                // Non-Intrusive Compact Home Support Banner (only after >=2d install, >=3 launches, >=3 ops, not supporter, 14d dismiss cooldown)
+                item {
+                    AnimatedVisibility(
+                        visible = shouldShowHomeDonationBanner && selectedCategory != VaultFilterCategory.TRASH,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("banner_home_donation")
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primaryContainer),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocalCafe,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.donation_banner_title),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.donation_banner_subtitle),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                }
+                                FilledTonalButton(
+                                    onClick = { showSupportDialog = true },
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                    modifier = Modifier.testTag("btn_banner_support")
+                                ) {
+                                    Text(stringResource(R.string.donation_banner_cta), fontSize = 12.sp)
+                                }
+                                IconButton(
+                                    onClick = { viewModel.dismissDonationBanner() },
+                                    modifier = Modifier.testTag("btn_banner_dismiss")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.donation_banner_dismiss_cd),
+                                        tint = MaterialTheme.colorScheme.outline,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Search Bar
                 item {
                     OutlinedTextField(
@@ -348,103 +496,121 @@ fun EncryptedVaultDashboardScreen(
                     }
                 }
 
-                // Empty State
+                // Rich Animated Empty States
                 if (displayedItems.isEmpty()) {
                     item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(32.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (selectedCategory == VaultFilterCategory.TRASH) Icons.Default.DeleteOutline else Icons.Default.LockClock,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(48.dp),
-                                    tint = MaterialTheme.colorScheme.outline
+                        when {
+                            selectedCategory == VaultFilterCategory.TRASH -> {
+                                EmptyTrashIllustration(trashPurgeDays = trashPurgeDays)
+                            }
+                            searchQuery.isNotEmpty() -> {
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 24.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(32.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.SearchOff,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(44.dp),
+                                            tint = MaterialTheme.colorScheme.outline
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.vault_empty_no_match, searchQuery),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                        OutlinedButton(onClick = { searchQuery = "" }) {
+                                            Text(stringResource(R.string.clear_search))
+                                        }
+                                    }
+                                }
+                            }
+                            selectedCategory == VaultFilterCategory.ALL -> {
+                                EmptyVaultIllustration(
+                                    onAddFirstSecret = {
+                                        editingItem = null
+                                        showAddEditDialog = true
+                                    }
                                 )
-                                Text(
-                                    text = if (selectedCategory == VaultFilterCategory.TRASH) {
-                                        stringResource(R.string.vault_trash_empty_title)
-                                    } else if (searchQuery.isNotEmpty()) {
-                                        stringResource(R.string.vault_empty_no_match, searchQuery)
-                                    } else {
-                                        stringResource(R.string.vault_empty_in_category, stringResource(selectedCategory.labelRes))
+                            }
+                            else -> {
+                                EmptyCategoryIllustration(
+                                    categoryKey = selectedCategory.categoryKey,
+                                    categoryLabel = stringResource(selectedCategory.labelRes),
+                                    onAddSecret = {
+                                        editingItem = null
+                                        showAddEditDialog = true
                                     },
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = if (selectedCategory == VaultFilterCategory.TRASH) {
-                                        stringResource(R.string.vault_trash_empty_desc)
-                                    } else {
-                                        stringResource(R.string.vault_empty_category_desc)
-                                    },
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    onClearCategory = {
+                                        selectedCategory = VaultFilterCategory.ALL
+                                    }
                                 )
                             }
                         }
                     }
                 } else {
-                    // Encrypted Entries List
+                    // Encrypted Entries List with smooth placement animation
                     items(displayedItems, key = { it.id }) { item ->
                         val isRevealed = revealedItemIds.contains(item.id)
                         val isRecentlyCopied = activeCopiedItemId == item.id
 
-                        VaultItemCard(
-                            item = item,
-                            isRevealed = isRevealed,
-                            isRecentlyCopied = isRecentlyCopied,
-                            isInTrash = selectedCategory == VaultFilterCategory.TRASH,
-                            onToggleReveal = {
-                                revealedItemIds = if (isRevealed) {
-                                    revealedItemIds - item.id
-                                } else {
-                                    revealedItemIds + item.id
+                        Box(modifier = Modifier.animateItem()) {
+                            VaultItemCard(
+                                item = item,
+                                isRevealed = isRevealed,
+                                isRecentlyCopied = isRecentlyCopied,
+                                isInTrash = selectedCategory == VaultFilterCategory.TRASH,
+                                onToggleReveal = {
+                                    revealedItemIds = if (isRevealed) {
+                                        revealedItemIds - item.id
+                                    } else {
+                                        revealedItemIds + item.id
+                                    }
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                },
+                                onCopySecret = {
+                                    viewModel.copyVaultItemToClipboard(item)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                onToggleFavorite = {
+                                    viewModel.toggleVaultItemFavorite(item.id, !item.isFavorite)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                },
+                                onTogglePin = {
+                                    viewModel.toggleVaultItemPin(item.id, !item.isPinned)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                },
+                                onEdit = {
+                                    editingItem = item
+                                    showAddEditDialog = true
+                                },
+                                onMoveToTrash = {
+                                    revealedItemIds = revealedItemIds - item.id
+                                    if (editingItem?.id == item.id) editingItem = null
+                                    viewModel.moveVaultItemToTrash(item.id)
+                                    Toast.makeText(context, context.getString(R.string.vault_moved_to_trash, item.title), Toast.LENGTH_SHORT).show()
+                                },
+                                onRestore = {
+                                    viewModel.restoreVaultItemFromTrash(item.id)
+                                    Toast.makeText(context, context.getString(R.string.vault_restored_from_trash, item.title), Toast.LENGTH_SHORT).show()
+                                },
+                                onPermanentDelete = {
+                                    itemToDelete = item
                                 }
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            },
-                            onCopySecret = {
-                                viewModel.copyVaultItemToClipboard(item)
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            },
-                            onToggleFavorite = {
-                                viewModel.toggleVaultItemFavorite(item.id, !item.isFavorite)
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            },
-                            onTogglePin = {
-                                viewModel.toggleVaultItemPin(item.id, !item.isPinned)
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            },
-                            onEdit = {
-                                editingItem = item
-                                showAddEditDialog = true
-                            },
-                            onMoveToTrash = {
-                                revealedItemIds = revealedItemIds - item.id
-                                if (editingItem?.id == item.id) editingItem = null
-                                viewModel.moveVaultItemToTrash(item.id)
-                                Toast.makeText(context, context.getString(R.string.vault_moved_to_trash, item.title), Toast.LENGTH_SHORT).show()
-                            },
-                            onRestore = {
-                                viewModel.restoreVaultItemFromTrash(item.id)
-                                Toast.makeText(context, context.getString(R.string.vault_restored_from_trash, item.title), Toast.LENGTH_SHORT).show()
-                            },
-                            onPermanentDelete = {
-                                itemToDelete = item
-                            }
-                        )
+                            )
+                        }
                     }
                 }
 
@@ -487,7 +653,8 @@ fun EncryptedVaultDashboardScreen(
                         username = username,
                         websiteOrApp = website,
                         notes = notes,
-                        isPinned = isPinned
+                        isPinned = isPinned,
+                        isFavorite = isFavorite
                     )
                     Toast.makeText(context, savedToast, Toast.LENGTH_SHORT).show()
                 }
@@ -575,6 +742,32 @@ fun EncryptedVaultDashboardScreen(
             onDismiss = { showInsightsDialog = false }
         )
     }
+
+    // Post-Operation Milestone Prompt (only shown right after a completed task when cooldown permits)
+    val milestone = pendingPostOpMilestone
+    if (milestone != null) {
+        PostOperationSupportDialog(
+            milestoneCount = milestone,
+            onSupportClick = {
+                viewModel.dismissPostOpSupportPrompt()
+                showSupportDialog = true
+            },
+            onDismiss = { viewModel.dismissPostOpSupportPrompt() }
+        )
+    }
+
+    // Multi-Channel Support Dialog
+    if (showSupportDialog) {
+        SupportDevelopmentDialog(
+            engagementState = donationEngagementState,
+            billingState = donationBillingState,
+            onLaunchGooglePlay = { launchContext, tier ->
+                viewModel.launchGooglePlayDonation(launchContext, tier)
+            },
+            onClearBillingStatus = { viewModel.clearDonationBillingStatus() },
+            onDismiss = { showSupportDialog = false }
+        )
+    }
 }
 
 /**
@@ -616,6 +809,7 @@ fun VaultItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .animateContentSize()
             .testTag("card_vault_item_${item.id}"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -791,9 +985,9 @@ fun VaultItemCard(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = if (isRevealed) item.secretContent else "••••••••••••••••",
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = com.example.ui.theme.MonoFontFamily,
                             fontWeight = if (isRevealed) FontWeight.Medium else FontWeight.Bold,
-                            fontSize = if (isRevealed) 13.sp else 16.sp,
+                            fontSize = if (isRevealed) 13.sp else 15.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             letterSpacing = if (isRevealed) 0.sp else 2.sp,
                             maxLines = if (isRevealed) 4 else 1,
@@ -802,13 +996,13 @@ fun VaultItemCard(
                     }
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Reveal / Mask toggle button
                         IconButton(
                             onClick = onToggleReveal,
-                            modifier = Modifier.size(32.dp).testTag("btn_reveal_${item.id}")
+                            modifier = Modifier.size(40.dp).testTag("btn_reveal_${item.id}")
                         ) {
                             Icon(
                                 imageVector = if (isRevealed) Icons.Default.VisibilityOff else Icons.Default.Visibility,
@@ -822,7 +1016,7 @@ fun VaultItemCard(
                         IconButton(
                             onClick = onCopySecret,
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(40.dp)
                                 .clip(CircleShape)
                                 .background(if (isRecentlyCopied) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
                                 .testTag("btn_copy_${item.id}")
@@ -831,7 +1025,7 @@ fun VaultItemCard(
                                 imageVector = if (isRecentlyCopied) Icons.Default.Check else Icons.Default.ContentCopy,
                                 contentDescription = "Copy to clipboard",
                                 tint = if (isRecentlyCopied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(17.dp)
                             )
                         }
                     }
@@ -870,14 +1064,14 @@ fun AddEditVaultEntryDialog(
         isFavorite: Boolean
     ) -> Unit
 ) {
-    var title by remember { mutableStateOf(initialItem?.title ?: "") }
-    var secret by remember { mutableStateOf(initialItem?.secretContent ?: "") }
-    var category by remember { mutableStateOf(initialItem?.category ?: "PASSWORD") }
-    var username by remember { mutableStateOf(initialItem?.username ?: "") }
-    var website by remember { mutableStateOf(initialItem?.websiteOrApp ?: "") }
-    var notes by remember { mutableStateOf(initialItem?.notes ?: "") }
-    var isPinned by remember { mutableStateOf(initialItem?.isPinned ?: false) }
-    var isFavorite by remember { mutableStateOf(initialItem?.isFavorite ?: false) }
+    var title by remember(initialItem?.id) { mutableStateOf(initialItem?.title ?: "") }
+    var secret by remember(initialItem?.id) { mutableStateOf(initialItem?.secretContent ?: "") }
+    var category by remember(initialItem?.id) { mutableStateOf(initialItem?.category ?: "PASSWORD") }
+    var username by remember(initialItem?.id) { mutableStateOf(initialItem?.username ?: "") }
+    var website by remember(initialItem?.id) { mutableStateOf(initialItem?.websiteOrApp ?: "") }
+    var notes by remember(initialItem?.id) { mutableStateOf(initialItem?.notes ?: "") }
+    var isPinned by remember(initialItem?.id) { mutableStateOf(initialItem?.isPinned ?: false) }
+    var isFavorite by remember(initialItem?.id) { mutableStateOf(initialItem?.isFavorite ?: false) }
 
     var isSecretVisible by remember { mutableStateOf(false) }
     var showPasswordGenerator by remember { mutableStateOf(false) }
@@ -902,6 +1096,7 @@ fun AddEditVaultEntryDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {

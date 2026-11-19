@@ -75,6 +75,7 @@ object PermissionUtils {
      * Launches System Accessibility Settings screen.
      */
     fun openAccessibilitySettings(context: Context): Boolean {
+        PermissionManager.recordSettingsOpened()
         return try {
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -91,6 +92,7 @@ object PermissionUtils {
      * Launches Display Over Other Apps (Overlay) permission settings screen.
      */
     fun openOverlaySettings(context: Context): Boolean {
+        PermissionManager.recordSettingsOpened()
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val intent = Intent(
@@ -124,6 +126,7 @@ object PermissionUtils {
      * via the three vertical dots (⋮) in the top-right corner.
      */
     fun openAppInfoSettings(context: Context): Boolean {
+        PermissionManager.recordSettingsOpened()
         return try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:${context.packageName}")

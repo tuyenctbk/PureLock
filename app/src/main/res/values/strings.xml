@@ -725,4 +725,74 @@
     <string name="tile_quick_lockdown_label">Quick Lockdown</string>
     <string name="tile_vault_reauth_label">Vault Re-Auth</string>
     <string name="autofill_service_label">PureLock Offline Autofill</string>
+
+    <!-- Voluntary Multi-Channel Support & Donations -->
+    <string name="donation_dialog_title">Support PureLock</string>
+    <string name="donation_dialog_subtitle">100% Offline • Zero Ads • Independent Privacy Software</string>
+    <string name="donation_tab_google_play">Google Play</string>
+    <string name="donation_tab_paypal_qr">PayPal &amp; QR</string>
+    <string name="donation_tab_kofi">Ko-fi</string>
+
+    <string name="donation_tier_1_title">Espresso Tip</string>
+    <string name="donation_tier_1_desc">Fuel a focused bug-fix session</string>
+    <string name="donation_tier_2_title">Coffee &amp; Security</string>
+    <string name="donation_tier_2_desc">Support ongoing SQLCipher &amp; OS updates</string>
+    <string name="donation_tier_3_title">Privacy Patron</string>
+    <string name="donation_tier_3_desc">Help keep PureLock ad-free for everyone</string>
+    <string name="donation_tier_4_title">Guardian Champion</string>
+    <string name="donation_tier_4_desc">Sponsor major new offline security modules</string>
+
+    <string name="donation_play_cta_format">Support via Google Play (%1$s)</string>
+    <string name="donation_play_connecting">Connecting to Google Play…</string>
+    <string name="donation_play_cancelled">Purchase cancelled. Thank you for considering PureLock!</string>
+    <string name="donation_play_already_owned">Your supporter tier is already verified on Google Play. Restoring badge…</string>
+    <string name="donation_play_unavailable_fallback">Google Play Billing is unavailable on this device or session. Try PayPal or Ko-fi tabs.</string>
+    <string name="donation_play_error_format">Google Play Billing notice: %1$s</string>
+    <string name="donation_play_no_activity_error">Unable to attach billing sheet to active screen. Reopen Support from inside Settings.</string>
+    <string name="donation_play_sku_missing_fallback">Google Play supporter tiers are not published yet for this build. Use PayPal or Ko-fi to contribute.</string>
+    <string name="donation_play_success_thank_you">Thank you! Your Active Supporter badge is now unlocked.</string>
+    <string name="donation_play_pending">Payment is pending confirmation on Google Play. Your badge unlocks automatically once cleared.</string>
+
+    <string name="donation_paypal_choose_amount">Choose Amount (USD)</string>
+    <string name="donation_paypal_any_amount">Any Amount</string>
+    <string name="donation_paypal_custom_hint">Custom USD (e.g. 7.50)</string>
+    <string name="donation_paypal_qr_caption">Scan QR code with another phone or banking app</string>
+    <string name="donation_paypal_open">Open PayPal</string>
+    <string name="donation_paypal_copy">Copy Link</string>
+    <string name="donation_paypal_share">Share</string>
+    <string name="donation_paypal_share_chooser">Share PureLock Support Link</string>
+    <string name="donation_paypal_share_body">Support PureLock — 100% offline, zero-telemetry Android privacy vault:</string>
+    <string name="donation_link_copied_toast">Support link copied to clipboard</string>
+    <string name="donation_browser_fallback_toast">No browser app found — link copied to clipboard</string>
+
+    <string name="donation_kofi_card_title">Buy the Indie Developer a Coffee</string>
+    <string name="donation_kofi_card_desc">PureLock operates completely offline without ads, trackers, or cloud subscriptions. Every Ko-fi tip directly funds independent security maintenance.</string>
+    <string name="donation_kofi_open_btn">Support on Ko-fi</string>
+
+    <string name="donation_supporter_badge">Supporter</string>
+    <string name="donation_supporter_active_title">Active Supporter Verified</string>
+    <string name="donation_supporter_active_desc">Thank you for supporting independent privacy software! All donation prompts are permanently hidden.</string>
+
+    <string name="donation_banner_title">Enjoying offline privacy?</string>
+    <string name="donation_banner_subtitle">100% ad-free &amp; independent. Tap to support.</string>
+    <string name="donation_banner_cta">Support</string>
+    <string name="donation_banner_dismiss_cd">Dismiss support banner</string>
+
+    <string name="settings_support_section_title">SUPPORT DEVELOPMENT</string>
+    <string name="settings_support_card_title">Support PureLock</string>
+    <string name="settings_support_card_desc">100% Offline &amp; Ad-Free • Zero Telemetry. Voluntary tips via Google Play, PayPal QR, or Ko-fi help sustain development.</string>
+    <string name="settings_support_cta">Open Support Options</string>
+
+    <string name="post_op_support_title">Milestone: %1$d Actions Secured</string>
+    <string name="post_op_support_body">PureLock just helped protect your privacy again—100% offline with zero ads or tracking. If it saved you time or peace of mind, consider supporting indie development.</string>
+    <string name="post_op_support_cta">Support Development</string>
+    <string name="post_op_support_later">Not Now</string>
+
+    <string name="audit_integrity_title">Cryptographic Integrity Audit</string>
+    <string name="audit_integrity_desc">Compute a live SHA-256 verification digest across all encrypted vault records, protected apps, and schedule rules.</string>
+    <string name="audit_integrity_run_btn">Run Integrity Audit</string>
+    <string name="audit_integrity_running">Verifying SHA-256 Digest…</string>
+    <string name="audit_integrity_passed_format">Passed • %1$d entities verified</string>
+    <string name="audit_integrity_support_strip">Vault verified intact! Support independent offline development.</string>
 </resources>
+

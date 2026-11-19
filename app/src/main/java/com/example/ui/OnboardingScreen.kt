@@ -5,8 +5,11 @@ import android.provider.Settings
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,9 +20,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,15 +50,19 @@ fun OnboardingScreen(
         FirebaseManager.logScreenView("onboarding_step_$currentStep")
     }
 
+    androidx.activity.compose.BackHandler(enabled = currentStep > 0) {
+        currentStep--
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
+                        Color(0xFF030712),
                         Color(0xFF0F172A),
-                        Color(0xFF1E293B),
-                        Color(0xFF0F172A)
+                        Color(0xFF090D16)
                     )
                 )
             )
@@ -61,27 +70,42 @@ fun OnboardingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .safeDrawingPadding()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Header Indicator Dots
+            // Animated Header Indicator Dots
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(4) { index ->
+                    val dotWidth by androidx.compose.animation.core.animateDpAsState(
+                        targetValue = if (index == currentStep) 28.dp else 8.dp,
+                        animationSpec = androidx.compose.animation.core.spring(
+                            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
+                        ),
+                        label = "OnboardingDotWidth_$index"
+                    )
+                    val dotColor by animateColorAsState(
+                        targetValue = when {
+                            index == currentStep -> Color(0xFF38BDF8)
+                            index < currentStep -> Color(0xFF10B981)
+                            else -> Color(0xFF334155)
+                        },
+                        animationSpec = androidx.compose.animation.core.tween(250),
+                        label = "OnboardingDotColor_$index"
+                    )
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
-                            .size(if (index == currentStep) 24.dp else 8.dp, 8.dp)
+                            .size(width = dotWidth, height = 8.dp)
                             .clip(CircleShape)
-                            .background(
-                                if (index == currentStep) Color(0xFF2563EB) else Color(0xFF475569)
-                            )
+                            .background(dotColor)
                     )
                 }
             }
@@ -91,11 +115,11 @@ fun OnboardingScreen(
                 targetState = currentStep,
                 transitionSpec = {
                     if (targetState > initialState) {
-                        slideInHorizontally { width -> width } + fadeIn() togetherWith
-                                slideOutHorizontally { width -> -width } + fadeOut()
+                        (slideInHorizontally { width -> width / 3 } + fadeIn()) togetherWith
+                                (slideOutHorizontally { width -> -width / 3 } + fadeOut())
                     } else {
-                        slideInHorizontally { width -> -width } + fadeIn() togetherWith
-                                slideOutHorizontally { width -> width } + fadeOut()
+                        (slideInHorizontally { width -> -width / 3 } + fadeIn()) togetherWith
+                                (slideOutHorizontally { width -> width / 3 } + fadeOut())
                     }
                 },
                 label = "OnboardingTransition",
@@ -125,14 +149,18 @@ fun OnboardingScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (currentStep > 0) {
                     OutlinedButton(
                         onClick = { currentStep-- },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier
+                            .height(48.dp)
+                            .testTag("btn_onboarding_back")
                     ) {
                         Text(stringResource(R.string.onboarding_btn_back))
                     }
@@ -171,12 +199,14 @@ fun OnboardingScreen(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.height(48.dp)
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier
+                        .height(48.dp)
+                        .testTag("btn_onboarding_next")
                 ) {
                     Text(
                         text = if (currentStep == 3) stringResource(R.string.onboarding_btn_enter) else stringResource(R.string.onboarding_btn_continue),
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -239,6 +269,7 @@ private fun OnboardingStepSecuritySetup(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -360,9 +391,14 @@ private fun OnboardingStepSecuritySetup(
         // Master PIN (Always required as primary or essential fallback)
         OutlinedTextField(
             value = pin,
-            onValueChange = onPinChanged,
+            onValueChange = { value ->
+                if (value.length <= 8 && value.all { it.isDigit() }) {
+                    onPinChanged(value)
+                }
+            },
             label = { Text(if (selectedSecurityType == "PIN") stringResource(R.string.onboarding_master_pin_label) else stringResource(R.string.onboarding_fallback_pin_label)) },
             visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF2563EB),
@@ -379,9 +415,14 @@ private fun OnboardingStepSecuritySetup(
 
         OutlinedTextField(
             value = confirmPin,
-            onValueChange = onConfirmPinChanged,
+            onValueChange = { value ->
+                if (value.length <= 8 && value.all { it.isDigit() }) {
+                    onConfirmPinChanged(value)
+                }
+            },
             label = { Text(stringResource(R.string.onboarding_confirm_pin_label)) },
             visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF2563EB),
@@ -655,6 +696,17 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
 
 @Composable
 private fun OnboardingStepComplete() {
+    val badgeScale = remember { androidx.compose.animation.core.Animatable(0.6f) }
+    LaunchedEffect(Unit) {
+        badgeScale.animateTo(
+            targetValue = 1f,
+            animationSpec = androidx.compose.animation.core.spring(
+                dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+            )
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -662,18 +714,32 @@ private fun OnboardingStepComplete() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Surface(
-            modifier = Modifier.size(96.dp),
-            shape = CircleShape,
-            color = Color(0xFF166534)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Default.VerifiedUser,
-                    contentDescription = null,
-                    tint = Color(0xFF4ADE80),
-                    modifier = Modifier.size(56.dp)
-                )
+        Box(contentAlignment = Alignment.Center) {
+            Surface(
+                modifier = Modifier
+                    .size(124.dp)
+                    .clip(CircleShape),
+                shape = CircleShape,
+                color = Color(0xFF10B981).copy(alpha = 0.14f)
+            ) {}
+            Surface(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(CircleShape),
+                shape = CircleShape,
+                color = Color(0xFF166534)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VerifiedUser,
+                        contentDescription = null,
+                        tint = Color(0xFF4ADE80),
+                        modifier = Modifier.size((56 * badgeScale.value).dp)
+                    )
+                }
             }
         }
 
@@ -681,7 +747,7 @@ private fun OnboardingStepComplete() {
 
         Text(
             text = stringResource(R.string.onboarding_complete_title),
-            fontSize = 26.sp,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             textAlign = TextAlign.Center
@@ -691,7 +757,7 @@ private fun OnboardingStepComplete() {
 
         Text(
             text = stringResource(R.string.onboarding_complete_desc),
-            fontSize = 15.sp,
+            style = MaterialTheme.typography.bodyMedium,
             color = Color(0xFF94A3B8),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)

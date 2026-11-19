@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# SQLCipher for Android JNI & Room SupportOpenHelperFactory bindings
+-keep class net.zetetic.database.** { *; }
+-keep class net.zetetic.database.sqlcipher.** { *; }
+-dontwarn net.zetetic.database.**
+

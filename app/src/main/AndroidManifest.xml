@@ -22,6 +22,9 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="false" />
 
     <!-- Package Visibility Queries for App Shield Launcher & TV Detection (Android 11+ / API 30+) -->
     <queries>

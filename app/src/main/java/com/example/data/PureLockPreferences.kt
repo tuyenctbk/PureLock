@@ -13,6 +13,7 @@ class PureLockPreferences(context: Context) {
 
     val duressPin: Flow<String> = userSettings.duressPin
     val shakeToLock: Flow<Boolean> = userSettings.shakeToLock
+    val shakeSensitivity: Flow<String> = userSettings.shakeSensitivity
     val appLanguage: Flow<String> = userSettings.appLanguage
     val trashPurgeDays: Flow<Int> = userSettings.trashPurgeDays
     val biometricSettingsSecured: Flow<Boolean> = userSettings.biometricSettingsSecured
@@ -46,6 +47,7 @@ class PureLockPreferences(context: Context) {
     val ratePromptCount: Flow<Int> = userSettings.ratePromptCount
     val lastRatePromptTimestamp: Flow<Long> = userSettings.lastRatePromptTimestamp
     val totalVaultUnlocks: Flow<Int> = userSettings.totalVaultUnlocks
+    val donationEngagementState: Flow<com.example.util.DonationEngagementState> = userSettings.donationEngagementState
 
     suspend fun setMasterPin(pin: String) = userSettings.setMasterPin(pin)
     suspend fun setMasterPattern(pattern: String) = userSettings.setMasterPattern(pattern)
@@ -66,6 +68,7 @@ class PureLockPreferences(context: Context) {
     suspend fun setStealthModeActive(active: Boolean) = userSettings.setStealthModeActive(active)
     suspend fun setBiometricSettingsSecured(enabled: Boolean) = userSettings.setBiometricSettingsSecured(enabled)
     suspend fun setShakeToLock(enabled: Boolean) = userSettings.setShakeToLock(enabled)
+    suspend fun setShakeSensitivity(level: String) = userSettings.setShakeSensitivity(level)
     suspend fun setTrashPurgeDays(days: Int) = userSettings.setTrashPurgeDays(days)
     suspend fun setAppLanguage(langCode: String) = userSettings.setAppLanguage(langCode)
     suspend fun setLastBackupTimestamp(timestamp: Long) = userSettings.setLastBackupTimestamp(timestamp)
@@ -79,4 +82,9 @@ class PureLockPreferences(context: Context) {
     suspend fun recordSharePromptShown(hasShared: Boolean = false) = userSettings.recordSharePromptShown(hasShared)
     suspend fun recordRatePromptShown(hasRated: Boolean = false) = userSettings.recordRatePromptShown(hasRated)
     suspend fun incrementVaultUnlocks(): Int = userSettings.incrementVaultUnlocks()
+    suspend fun recordAppLaunch() = userSettings.recordAppLaunch()
+    suspend fun recordSuccessfulOperation() = userSettings.recordSuccessfulOperation()
+    suspend fun dismissDonationBanner() = userSettings.dismissDonationBanner()
+    suspend fun recordDonationPromptShown() = userSettings.recordDonationPromptShown()
+    suspend fun activateSupporterStatus(tierId: String) = userSettings.activateSupporterStatus(tierId)
 }

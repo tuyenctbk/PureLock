@@ -141,18 +141,28 @@ fun PureLockTheme(
     themeMode: String = "SYSTEM",
     darkTheme: Boolean = when (themeMode) {
         "LIGHT" -> false
-        "DARK", "AMOLED", "CYBER_MIDNIGHT", "OLED_BLACK", "EMERALD_VAULT", "SAPPHIRE_FROST" -> true
+        "DARK", "AMOLED", "CYBER_MIDNIGHT", "OLED_BLACK", "EMERALD", "EMERALD_VAULT", "SAPPHIRE", "SAPPHIRE_FROST" -> true
         else -> isSystemInDarkTheme()
     },
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when (themeMode) {
-        "AMOLED", "OLED_BLACK" -> AmoledDarkColorScheme
-        "EMERALD_VAULT" -> EmeraldDarkColorScheme
-        "SAPPHIRE_FROST" -> SapphireDarkColorScheme
+        "DARK", "AMOLED", "OLED_BLACK" -> AmoledDarkColorScheme
+        "EMERALD", "EMERALD_VAULT" -> EmeraldDarkColorScheme
+        "SAPPHIRE", "SAPPHIRE_FROST" -> SapphireDarkColorScheme
         "CYBER_MIDNIGHT" -> DarkColorScheme
         "LIGHT" -> LightColorScheme
+        "MONET" -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val context = LocalContext.current
+                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            } else if (darkTheme) {
+                DarkColorScheme
+            } else {
+                LightColorScheme
+            }
+        }
         else -> {
             if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val context = LocalContext.current
