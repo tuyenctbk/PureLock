@@ -112,6 +112,7 @@ private class PlayBillingGateway(
                 .enableOneTimeProducts()
                 .build()
         )
+        .enableAutoServiceReconnection()
         .build()
 
     override val isReady: Boolean
@@ -142,7 +143,9 @@ private class PlayBillingGateway(
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(products)
             .build()
-        billingClient.queryProductDetailsAsync(params, onResult)
+        billingClient.queryProductDetailsAsync(params) { billingResult, queryProductDetailsResult ->
+            onResult(billingResult, queryProductDetailsResult.productDetailsList)
+        }
     }
 
     override fun queryOwnedPurchases(onResult: (BillingResult, List<Purchase>) -> Unit) {
@@ -175,7 +178,7 @@ private class PlayBillingGateway(
 }
 
 /**
- * Lifecycle-aware, ViewModel-scoped Google Play Billing v7 manager.
+ * Lifecycle-aware, ViewModel-scoped Google Play Billing v8 manager.
  *
  * Implements [DefaultLifecycleObserver] to bind safely to an active [ComponentActivity] or
  * [Fragment] session via a [WeakReference], automatically connecting on [onStart],
