@@ -1,8 +1,8 @@
 # Google Play Store Listing & Accessibility Policy Documentation
 
 ## 1. App Title & Short Description
-- **App Title (max 30 chars)**: `PureLock: Privacy & App Lock`
-- **Short Description (max 80 chars)**: `Offline App Lock & AES-256 Vault. Zero cloud, zero ads, maximum privacy.`
+- **App Title (max 30 chars)**: `PureLock: Privacy App Lock`
+- **Short Description (max 80 chars)**: `Offline App Lock & SQLCipher AES-256 Vault. Zero ads, zero cloud, pure privacy.`
 
 ---
 
@@ -16,11 +16,11 @@ ACCESSIBILITY SERVICE API USAGE & DISCLOSURE
 ────────────────────────────────────────
 PureLock uses the AccessibilityService API strictly to provide its core App Lock (App Shield) feature.
 
-• How it is used: PureLock monitors window state change events (TYPE_WINDOW_STATE_CHANGED) in real-time solely to detect when a user-protected application is opened in the foreground. Once detected, PureLock immediately presents a secure PIN, Pattern, or Biometric lock overlay to prevent unauthorized access.
-• Privacy & Data Protection: PureLock DOES NOT read, capture, or access user screen content, keystrokes, passwords, or personal messages. 
-• Zero Data Collection: PureLock does not collect, store, or transmit any user data. PureLock operates completely offline with zero internet permissions (android.permission.INTERNET is not requested).
+• How it is used: PureLock monitors window state change events (TYPE_WINDOW_STATE_CHANGED) in real time solely to detect when a user-protected application is opened in the foreground. Once detected, PureLock immediately presents a secure PIN, Pattern, Knock Code, or Biometric lock overlay to prevent unauthorized access.
+• Privacy & Data Protection: PureLock DOES NOT read, capture, or access user screen content, keystrokes, passwords, or personal messages (canRetrieveWindowContent is disabled).
+• Zero Data Collection: PureLock does not collect, upload, or transmit your personal vault data, app usage, or credentials.
 
-Accessibility service permission is optional and only requested when you choose to protect applications with App Lock. It can be enabled or disabled anytime in your device's Accessibility Settings.
+Accessibility service permission is optional and only requested when you choose to protect applications with App Shield. It can be enabled or disabled anytime in your device's Accessibility Settings.
 ```
 
 ---
@@ -28,30 +28,30 @@ Accessibility service permission is optional and only requested when you choose 
 ## 3. Complete Full Description (English)
 
 ```text
-PureLock is a lightweight, privacy-focused security suite and encrypted vault engineered to protect your sensitive apps, passwords, and private notes. PureLock is 100% offline with zero cloud synchronization, zero trackers, and zero internet permissions.
+PureLock is a lightweight, ad-free privacy suite and encrypted vault built to protect your apps, passwords, 2FA codes, and private notes strictly on your device. Powered by SQLCipher AES-256 and hardware-backed Android Keystore encryption, PureLock works 100% offline with zero cloud accounts and zero ads.
 
-🔒 CORE FEATURES:
-• App Lock & App Shield: Protect any installed app (Social, Banking, Photos, Settings) with PIN, Pattern, or Biometrics.
-• Encrypted Secret Vault: Store passwords, secret credentials, and private notes with AES-256-GCM encryption.
-• Intruder Snapshot: Captures photos of unauthorized intruders on incorrect unlock attempts.
-• Decoy Vault: Set up a fake vault with a separate PIN for duress situations.
-• Shake-to-Lock: Instantly lock all protected apps and the vault with a fast shake gesture.
-• Offline Password Generator: Generate cryptographically secure passwords on the fly.
-• Autofill Service: Seamlessly autofill your credentials without sending data over the network.
+🔒 CORE SECURITY FEATURES:
+• App Shield (App Lock): Protect any installed app (Banking, Social, Photos, System) with PIN, 3×3 Pattern, 4-Quadrant Knock Code, or Biometrics (Fingerprint / Face ID).
+• Hardware-Encrypted Vault: Store passwords, secure notes, cards, 2FA codes, and PINs in a SQLCipher AES-256 database wrapped by Android Keystore. Includes Favorites, Pinning, Trash auto-purge, and Entropy Insights.
+• Camouflage & Stealth Decoys: Disguise your lock screen as a working Calculator or Fake Crash dialog, plus Randomized Keypad Scramble, Invisible Pattern Trail, and a Panic Duress PIN.
+• Shake-to-Lock Gesture: Gravity-filtered accelerometer emergency lockdown with adjustable sensitivity (High / Medium / Low).
+• Intruder Capture & Audit Analytics: Records failed unlock attempts locally with a SHA-256 Cryptographic Vault Integrity Audit and CSV log export.
+• Clipboard Auto-Wipe & Password Generator: Generates high-entropy passwords offline and automatically wipes copied secrets from clipboard memory.
+• Local Autofill, Quick Tiles, Widget & TV: Offline Android Autofill Service, Quick Settings Lockdown tile, Home Screen Vault Widget, encrypted .plk backups, and Android TV support.
 
-🛡️ 100% OFFLINE PRIVACY GUARANTEE:
-PureLock has ZERO internet permissions. Your encrypted data, photos, and app usage remain exclusively on your device at all times.
+🛡️ 100% LOCAL PRIVACY GUARANTEE:
+PureLock operates offline without cloud sync, ads, or user accounts. Your encrypted vault, PINs, patterns, and logs remain strictly on your device.
 
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API USAGE & DISCLOSURE
 ────────────────────────────────────────
 PureLock uses the AccessibilityService API strictly to provide its core App Lock (App Shield) feature.
 
-• How it is used: PureLock monitors window state change events (TYPE_WINDOW_STATE_CHANGED) in real-time solely to detect when a user-protected application is opened in the foreground. Once detected, PureLock immediately presents a secure PIN, Pattern, or Biometric lock overlay to prevent unauthorized access.
-• Privacy & Data Protection: PureLock DOES NOT read, capture, or access user screen content, keystrokes, passwords, or personal messages. 
-• Zero Data Collection: PureLock does not collect, store, or transmit any user data. PureLock operates completely offline with zero internet permissions (android.permission.INTERNET is not requested).
+• How it is used: PureLock monitors window state change events (TYPE_WINDOW_STATE_CHANGED) in real time solely to detect when a user-protected application is opened in the foreground. Once detected, PureLock immediately presents a secure PIN, Pattern, Knock Code, or Biometric lock overlay to prevent unauthorized access.
+• Privacy & Data Protection: PureLock DOES NOT read, capture, or access user screen content, keystrokes, passwords, or personal messages (canRetrieveWindowContent is disabled).
+• Zero Data Collection: PureLock does not collect, upload, or transmit your personal vault data, app usage, or credentials.
 
-Accessibility service permission is optional and only requested when you choose to protect applications with App Lock. It can be enabled or disabled anytime in your device's Accessibility Settings.
+Accessibility service permission is optional and only requested when you choose to protect applications with App Shield. It can be enabled or disabled anytime in your device's Accessibility Settings.
 ```
 
 ---

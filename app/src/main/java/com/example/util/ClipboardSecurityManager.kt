@@ -88,7 +88,7 @@ object ClipboardSecurityManager {
 
             if (autoClearDurationSec > 0) {
                 val toastMsg = if (label.isNotBlank()) {
-                    "\"$label\" - " + appContext.getString(R.string.copied_clipboard_countdown, autoClearDurationSec)
+                    appContext.getString(R.string.copied_item_clipboard_countdown, label, autoClearDurationSec)
                 } else {
                     appContext.getString(R.string.copied_clipboard_countdown, autoClearDurationSec)
                 }
@@ -98,7 +98,7 @@ object ClipboardSecurityManager {
                 autoClearJob?.cancel()
                 _clipboardClearCountdown.value = 0
                 val toastMsg = if (label.isNotBlank()) {
-                    "\"$label\" - " + appContext.getString(R.string.btn_copy)
+                    appContext.getString(R.string.copied_item_toast, label)
                 } else {
                     appContext.getString(R.string.btn_copy)
                 }

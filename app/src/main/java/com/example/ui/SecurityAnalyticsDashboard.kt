@@ -387,7 +387,11 @@ fun ThreatLevelGaugeCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                    color = if (isSqlCipherActive) {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
@@ -396,9 +400,19 @@ fun ThreatLevelGaugeCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
+                        Icon(
+                            imageVector = if (isSqlCipherActive) Icons.Default.Lock else Icons.Default.Sync,
+                            contentDescription = null,
+                            tint = if (isSqlCipherActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(12.dp)
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(R.string.badge_aes_sqlcipher), style = MaterialTheme.typography.labelSmall, fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(
+                            text = stringResource(if (isSqlCipherActive) R.string.badge_aes_sqlcipher else R.string.badge_sqlcipher_pending),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontSize = 11.sp,
+                            color = if (isSqlCipherActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
@@ -491,7 +505,7 @@ fun SecurityLogItemCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = log.action.replace("_", " "),
+                        text = localizedSecurityActionLabel(log.action),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
                         color = if (isThreat) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
@@ -540,7 +554,7 @@ fun SecurityLogDetailDialog(
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = log.action.replace("_", " "),
+                    text = localizedSecurityActionLabel(log.action),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -607,4 +621,34 @@ fun SecurityLogDetailDialog(
             }
         }
     )
+}
+
+@Composable
+private fun localizedSecurityActionLabel(action: String): String {
+    val resId = when (action.uppercase(Locale.ROOT)) {
+        "APP_LOCKED" -> R.string.log_action_app_locked
+        "APP_UNLOCKED" -> R.string.log_action_app_unlocked
+        "VAULT_ITEM_ADDED" -> R.string.log_action_vault_item_added
+        "VAULT_ITEM_UPDATED" -> R.string.log_action_vault_item_updated
+        "VAULT_ITEM_TRASHED" -> R.string.log_action_vault_item_trashed
+        "VAULT_ITEM_RESTORED" -> R.string.log_action_vault_item_restored
+        "VAULT_ITEM_DELETED" -> R.string.log_action_vault_item_deleted
+        "INTRUDER_DETECTED" -> R.string.log_action_intruder_detected
+        "PANIC_MODE_ACTIVATED" -> R.string.log_action_panic_mode_activated
+        "SHAKE_TO_LOCK" -> R.string.log_action_shake_to_lock
+        "BACKGROUND_AUTO_LOCK" -> R.string.log_action_background_auto_lock
+        "AUTO_LOCK_TRIGGERED" -> R.string.log_action_auto_lock_triggered
+        "VAULT_INTEGRITY_CHECK" -> R.string.log_action_vault_integrity_check
+        "VAULT_LOCKDOWN" -> R.string.log_action_vault_lockdown
+        "QUICK_LOCKDOWN_TILE" -> R.string.log_action_quick_lockdown_tile
+        "SETTINGS_CHANGED" -> R.string.log_action_settings_changed
+        "SHIELD_INITIALIZED" -> R.string.log_action_shield_initialized
+        "SENSITIVE_STATE_CLEARED" -> R.string.log_action_sensitive_state_cleared
+        "AUTOFILL_REQUEST" -> R.string.log_action_autofill_request
+        "NEW_PACKAGE_DETECTED" -> R.string.log_action_new_package_detected
+        "PACKAGE_UNINSTALLED" -> R.string.log_action_package_uninstalled
+        "APPS_SYNCED" -> R.string.log_action_apps_synced
+        else -> 0
+    }
+    return if (resId != 0) stringResource(resId) else action.replace("_", " ")
 }

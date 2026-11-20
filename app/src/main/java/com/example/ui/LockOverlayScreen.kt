@@ -190,7 +190,7 @@ fun LockOverlayScreen(
     }
 
     fun handleDigitPressed(digit: Int) {
-        if (!isConfigLoaded || isUnlockingSuccess) return
+        if (!isConfigLoaded || isUnlockingSuccess || masterPin.isEmpty()) return
         val hasValidDuress = duressPin.isNotBlank() && duressPin != masterPin
         val maxTargetLen = maxOf(
             masterPin.length.coerceAtLeast(4),
@@ -209,7 +209,9 @@ fun LockOverlayScreen(
 
             // 2. Check distinct Duress PIN (emergency panic mode)
             if (hasValidDuress && updated == duressPin) {
+                com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
                 scope.launch {
+                    repository.resetAllUnlockedSessions()
                     repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
                     repository.emptyTrashVault()
                 }
@@ -342,7 +344,9 @@ fun LockOverlayScreen(
             duressPin = duressPin,
             onUnlock = { handleSuccessUnlock() },
             onDuress = {
+                com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
                 scope.launch {
+                    repository.resetAllUnlockedSessions()
                     repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered via Calculator disguise! Panic mode triggered.")
                     repository.emptyTrashVault()
                 }
@@ -546,26 +550,30 @@ fun LockOverlayScreen(
                     leadingIcon = { Icon(Icons.Default.Pin, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.testTag("chip_pin_mode")
                 )
-                FilterChip(
-                    selected = securityType == "PATTERN",
-                    onClick = {
-                        securityType = "PATTERN"
-                        secondaryAuthNotice = null
-                    },
-                    label = { Text(stringResource(R.string.lock_mode_pattern)) },
-                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                    modifier = Modifier.testTag("chip_pattern_mode")
-                )
-                FilterChip(
-                    selected = securityType == "KNOCK",
-                    onClick = {
-                        securityType = "KNOCK"
-                        secondaryAuthNotice = null
-                    },
-                    label = { Text(stringResource(R.string.lock_mode_knock)) },
-                    leadingIcon = { Icon(Icons.Default.TouchApp, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                    modifier = Modifier.testTag("chip_knock_mode")
-                )
+                if (masterPattern.isNotBlank()) {
+                    FilterChip(
+                        selected = securityType == "PATTERN",
+                        onClick = {
+                            securityType = "PATTERN"
+                            secondaryAuthNotice = null
+                        },
+                        label = { Text(stringResource(R.string.lock_mode_pattern)) },
+                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        modifier = Modifier.testTag("chip_pattern_mode")
+                    )
+                }
+                if (masterKnock.isNotBlank()) {
+                    FilterChip(
+                        selected = securityType == "KNOCK",
+                        onClick = {
+                            securityType = "KNOCK"
+                            secondaryAuthNotice = null
+                        },
+                        label = { Text(stringResource(R.string.lock_mode_knock)) },
+                        leadingIcon = { Icon(Icons.Default.TouchApp, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        modifier = Modifier.testTag("chip_knock_mode")
+                    )
+                }
                 if (isBiometricEnabled && isBioHardwareAvailable) {
                     FilterChip(
                         selected = securityType == "BIOMETRIC",
@@ -735,6 +743,7 @@ fun LockOverlayScreen(
                                     }
                                 },
                                 onPatternCompleted = {
+                                    if (patternSelectedNodes.isEmpty()) return@PatternGridDrawer
                                     val userPatternStr = patternSelectedNodes.joinToString(",")
                                     if (userPatternStr == masterPattern) {
                                         handleSuccessUnlock()
@@ -1212,8 +1221,13 @@ fun CalculatorDisguiseView(
                         color = MaterialTheme.colorScheme.outline,
                         maxLines = 1
                     )
+                    val displayResultText = if (resultText == "Error") {
+                        stringResource(R.string.lock_calc_error)
+                    } else {
+                        resultText
+                    }
                     Text(
-                        text = if (displayExpr.isEmpty()) "0" else (if (resultText != "0" && displayExpr.contains(Regex("[-+×÷]"))) resultText else displayExpr),
+                        text = if (displayExpr.isEmpty()) "0" else (if (resultText != "0" && displayExpr.contains(Regex("[-+×÷%]"))) displayResultText else displayExpr),
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1345,7 +1359,7 @@ internal fun evaluateCalculatorExpression(expr: String): String {
         if (tokens.size == 2 && tokens[1] == "%") {
             val v = tokens[0].toDoubleOrNull() ?: return "0"
             val pct = v / 100.0
-            return if (pct % 1.0 == 0.0) pct.toLong().toString() else "%.4f".format(pct).trimEnd('0').trimEnd('.')
+            return if (pct % 1.0 == 0.0) pct.toLong().toString() else String.format(java.util.Locale.US, "%.4f", pct).trimEnd('0').trimEnd('.')
         }
 
         if (tokens.size >= 3) {
@@ -1363,7 +1377,7 @@ internal fun evaluateCalculatorExpression(expr: String): String {
                 }
                 i += 2
             }
-            if (res % 1.0 == 0.0) res.toLong().toString() else "%.2f".format(res)
+            if (res % 1.0 == 0.0) res.toLong().toString() else String.format(java.util.Locale.US, "%.2f", res)
         } else {
             val single = tokens[0].toDoubleOrNull()
             if (single != null) {

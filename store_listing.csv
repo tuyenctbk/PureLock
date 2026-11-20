@@ -1,407 +1,639 @@
 ﻿Language / Locale,Language Name,Title (<=30),Short Description (<=80),Full Description (<=4000)
-en-US,English (United States),PureLock: Privacy App Lock,"Offline App Lock & AES-256 Vault. Zero cloud, zero ads, maximum privacy.","PureLock is a lightweight, privacy-first security suite and encrypted vault engineered to protect your apps, passwords, and private notes. PureLock is 100% offline with zero cloud synchronization, zero trackers, and zero internet permissions.
+en-US,English (United States),PureLock: Privacy App Lock,"Offline App Lock & SQLCipher AES-256 Vault. Zero ads, zero cloud, pure privacy.","PureLock is a lightweight, ad-free privacy suite and encrypted vault built to protect your apps, passwords, 2FA codes, and private notes strictly on your device. Powered by SQLCipher AES-256 and hardware-backed Android Keystore encryption, PureLock works 100% offline with zero cloud accounts and zero ads.
 
-🔒 CORE FEATURES:
-• App Lock & App Shield: Protect any installed app (Social, Banking, Photos, Settings) with PIN, Pattern, or Biometrics.
-• Encrypted Secret Vault: Store passwords, secret credentials, and private notes with military-grade AES-256-GCM encryption.
-• Intruder Snapshot: Captures photos of unauthorized intruders on incorrect unlock attempts.
-• Decoy Vault: Set up a fake vault with a separate PIN for duress situations.
-• Shake-to-Lock: Instantly lock all protected apps and the vault with a fast shake gesture.
-• Offline Password Generator: Generate cryptographically secure passwords on the fly.
-• Autofill Service: Seamlessly autofill your credentials without sending data over the network.
+🔒 CORE SECURITY FEATURES:
+• App Shield (App Lock): Protect any installed app (Banking, Social, Photos, System) with PIN, 3×3 Pattern, 4-Quadrant Knock Code, or Biometrics (Fingerprint / Face ID).
+• Hardware-Encrypted Vault: Store passwords, secure notes, cards, 2FA codes, and PINs in a SQLCipher AES-256 database wrapped by Android Keystore. Includes Favorites, Pinning, Trash auto-purge, and Entropy Insights.
+• Camouflage & Stealth Decoys: Disguise your lock screen as a working Calculator or Fake Crash dialog, plus Randomized Keypad Scramble, Invisible Pattern Trail, and a Panic Duress PIN.
+• Shake-to-Lock Gesture: Gravity-filtered accelerometer emergency lockdown with adjustable sensitivity (High / Medium / Low).
+• Intruder Capture & Audit Analytics: Records failed unlock attempts locally with a SHA-256 Cryptographic Vault Integrity Audit and CSV log export.
+• Clipboard Auto-Wipe & Password Generator: Generates high-entropy passwords offline and automatically wipes copied secrets from clipboard memory.
+• Local Autofill, Quick Tiles, Widget & TV: Offline Android Autofill Service, Quick Settings Lockdown tile, Home Screen Vault Widget, encrypted .plk backups, and Android TV support.
 
-🛡️ 100% OFFLINE PRIVACY GUARANTEE:
-PureLock operates with ZERO internet permissions (android.permission.INTERNET is completely absent). Your encrypted data, photos, and app usage remain exclusively on your device at all times.
+🛡️ 100% LOCAL PRIVACY GUARANTEE:
+PureLock operates offline without cloud sync, ads, or user accounts. Your encrypted vault, PINs, patterns, and logs remain strictly on your device.
 
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API USAGE & DISCLOSURE
 ────────────────────────────────────────
 PureLock uses the AccessibilityService API strictly to provide its core App Lock (App Shield) feature.
 
-• How it is used: PureLock monitors window state change events (TYPE_WINDOW_STATE_CHANGED) in real-time solely to detect when a user-protected application is opened in the foreground. Once detected, PureLock immediately presents a secure PIN, Pattern, or Biometric lock overlay to prevent unauthorized access.
-• Privacy & Data Protection: PureLock DOES NOT read, capture, or access user screen content, keystrokes, passwords, or personal messages. 
-• Zero Data Collection: PureLock does not collect, store, or transmit any user data. PureLock operates completely offline with zero internet permissions (android.permission.INTERNET is not requested).
+• How it is used: PureLock monitors window state change events (TYPE_WINDOW_STATE_CHANGED) in real time solely to detect when a user-protected application is opened in the foreground. Once detected, PureLock immediately presents a secure PIN, Pattern, Knock Code, or Biometric lock overlay to prevent unauthorized access.
+• Privacy & Data Protection: PureLock DOES NOT read, capture, or access user screen content, keystrokes, passwords, or personal messages (canRetrieveWindowContent is disabled).
+• Zero Data Collection: PureLock does not collect, upload, or transmit your personal vault data, app usage, or credentials.
 
-Accessibility service permission is optional and only requested when you choose to protect applications with App Lock. It can be enabled or disabled anytime in your device's Accessibility Settings."
-es-419,Spanish (Latin America),PureLock: Bloqueo de Apps,"Bloqueo de apps offline y bóveda AES-256. Sin anuncios ni nube, pura privacidad.","PureLock es una suite de seguridad y bóveda cifrada 100% offline diseñada para proteger tus aplicaciones, contraseñas y notas privadas. Funciona sin sincronización en la nube, sin rastreadores y sin permisos de Internet.
+Accessibility service permission is optional and only requested when you choose to protect applications with App Shield. It can be enabled or disabled anytime in your device's Accessibility Settings."
+es-419,Spanish (Latin America),PureLock: Bloqueo de Apps,Bloqueo de apps offline y bóveda AES-256 SQLCipher. Sin anuncios ni nube.,"PureLock es una suite de privacidad sin anuncios y bóveda cifrada 100% offline para proteger tus aplicaciones, contraseñas, códigos 2FA y notas privadas directamente en tu dispositivo con SQLCipher AES-256 y Android Keystore.
 
 🔒 FUNCIONES PRINCIPALES:
-• Bloqueo de Apps (App Shield): Protege cualquier aplicación con PIN, Patrón o Biometría.
-• Bóveda Cifrada: Guarda contraseñas y notas con cifrado militar AES-256-GCM.
-• Foto de Intrusos: Captura selfies de intentos no autorizados con PIN incorrecto.
-• Bóveda Falsa (Decoy): Configura una bóveda señuelo para situaciones de coacción.
-• Agitar para Bloquear: Bloqueo de emergencia instantáneo al agitar el dispositivo.
-• Generador de Contraseñas: Crea claves seguras de alta entropía sin conexión.
-• Servicio de Autocompletado: Rellena credenciales directamente sin conexión a la red.
+• Escudo de Apps (App Shield): Protege cualquier aplicación con PIN, Patrón 3×3 (con trazo invisible), Código Knock de 4 cuadrantes o Biometría. Incluye teclado aleatorio y periodo de gracia configurable.
+• Bóveda Cifrada por Hardware: Guarda contraseñas, notas seguras, tarjetas, 2FA y PIN con cifrado SQLCipher AES-256, papelera con autopurga y estadísticas de entropía.
+• Camuflaje y Señuelos: Disfraza el bloqueo como Calculadora funcional o diálogo de error falso, además de PIN de coacción (Duress) para emergencias.
+• Agitar para Bloquear: Bloqueo de emergencia instantáneo al agitar el teléfono con sensibilidad ajustable.
+• Registro de Intrusos y Auditoría SHA-256: Registra intentos fallidos localmente, verifica la integridad criptográfica SHA-256 y exporta registros en CSV.
+• Autolimpieza del Portapapeles y Generador Offline: Crea contraseñas seguras y borra automáticamente los secretos copiados.
+• Autocompletado, Mosaicos y Widget: Servicio de autocompletado offline, mosaicos rápidos, widget de inicio, copias cifradas .plk y soporte para Android TV.
 
-🛡️ GARANTÍA DE PRIVACIDAD 100% OFFLINE:
-PureLock no tiene permisos de Internet. Tus datos cifrados y fotos permanecen exclusivamente en tu dispositivo.
+🛡️ GARANTÍA DE PRIVACIDAD LOCAL:
+PureLock funciona sin cuentas en la nube ni anuncios. Tus datos cifrados permanecen exclusivamente en tu dispositivo.
 
 ────────────────────────────────────────
 USO Y DIVULGACIÓN DE LA API DE ACCESIBILIDAD
 ────────────────────────────────────────
 PureLock utiliza la API de AccessibilityService estrictamente para proporcionar su función principal de Bloqueo de Aplicaciones (App Shield).
 
-• Cómo se utiliza: PureLock monitorea los eventos de cambio de ventana (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar cuándo se abre una aplicación protegida en primer plano y mostrar de inmediato la pantalla de bloqueo seguro (PIN, Patrón o Huella).
+• Cómo se utiliza: PureLock monitorea eventos de cambio de ventana (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar cuándo se abre una app protegida en primer plano y mostrar de inmediato la pantalla de bloqueo seguro (PIN, Patrón, Knock o Biometría).
 • Privacidad y Seguridad: PureLock NO lee, captura ni accede al contenido de la pantalla, pulsaciones de teclas, contraseñas ni mensajes personales.
-• Cero recolección de datos: PureLock no recopila ni transmite ningún dato. Funciona 100% sin conexión (offline) y sin permiso de Internet."
-es-ES,Spanish (Spain),PureLock: Bloqueo de Apps,"Bloqueo de apps offline y bóveda AES-256. Sin anuncios ni nube, pura privacidad.","PureLock es una suite de seguridad y bóveda cifrada 100% offline diseñada para proteger tus aplicaciones, contraseñas y notas privadas. Funciona sin sincronización en la nube, sin rastreadores y sin permisos de Internet.
+• Cero recolección de datos personales: Tus secretos y actividad de apps nunca salen de tu dispositivo."
+es-ES,Spanish (Spain),PureLock: Bloqueo de Apps,Bloqueo de apps offline y bóveda AES-256 SQLCipher. Sin anuncios ni nube.,"PureLock es una suite de seguridad sin anuncios y bóveda cifrada 100% offline diseñada para proteger tus aplicaciones, contraseñas, códigos 2FA y notas privadas en local mediante SQLCipher AES-256 y Android Keystore.
 
 🔒 FUNCIONES PRINCIPALES:
-• Bloqueo de Apps (App Shield): Protege cualquier aplicación con PIN, Patrón o Biometría.
-• Bóveda Cifrada: Guarda contraseñas y notas con cifrado militar AES-256-GCM.
-• Foto de Intrusos: Captura selfies de intentos no autorizados con PIN incorrecto.
-• Bóveda Falsa (Decoy): Configura una bóveda señuelo para situaciones de coacción.
-• Agitar para Bloquear: Bloqueo de emergencia instantáneo al agitar el dispositivo.
-• Generador de Contraseñas: Crea claves seguras de alta entropía sin conexión.
-• Servicio de Autocompletado: Rellena credenciales directamente sin conexión a la red.
+• Escudo de Apps (App Shield): Bloquea cualquier aplicación con PIN, Patrón (trazo invisible), Código Knock de 4 cuadrantes o Biometría, con teclado aleatorio y periodo de gracia.
+• Bóveda Cifrada por Hardware: Almacena contraseñas, notas, tarjetas y 2FA en una base de datos SQLCipher AES-256 con papelera automática y análisis de entropía.
+• Camuflaje y Señuelos: Pantalla de Calculadora funcional, aviso de cierre falso y PIN de coacción para situaciones de emergencia.
+• Agitar para Bloquear: Bloqueo inmediato al agitar el dispositivo con sensibilidad regulable.
+• Captura de Intrusos y Auditoría SHA-256: Registra accesos fallidos en local y verifica la integridad criptográfica de la bóveda.
+• Portapapeles Seguro y Generador Offline: Genera claves robustas y limpia automáticamente el portapapeles tras copiar.
+• Autocompletado, Accesos Rápidos y Widget: Autocompletado local, mosaicos de Ajustes Rápidos, widget de pantalla, copias cifradas .plk y Android TV.
 
-🛡️ GARANTÍA DE PRIVACIDAD 100% OFFLINE:
-PureLock no tiene permisos de Internet. Tus datos cifrados y fotos permanecen exclusivamente en tu dispositivo.
+🛡️ GARANTÍA DE PRIVACIDAD LOCAL:
+Sin sincronización en la nube, sin cuentas y sin anuncios. Todos tus datos permanecen únicamente en tu dispositivo.
 
 ────────────────────────────────────────
 USO Y DIVULGACIÓN DE LA API DE ACCESIBILIDAD
 ────────────────────────────────────────
-PureLock utiliza la API de AccessibilityService estrictamente para proporcionar su función principal de Bloqueo de Aplicaciones (App Shield).
+PureLock utiliza la API de AccessibilityService estrictamente para ofrecer su función principal de Bloqueo de Aplicaciones (App Shield).
 
-• Cómo se utiliza: PureLock monitorea los eventos de cambio de ventana (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar cuándo se abre una aplicación protegida en primer plano y mostrar de inmediato la pantalla de bloqueo seguro (PIN, Patrón o Huella).
-• Privacidad y Seguridad: PureLock NO lee, captura ni accede al contenido de la pantalla, pulsaciones de teclas, contraseñas ni mensajes personales.
-• Cero recolección de datos: PureLock no recopila ni transmite ningún dato. Funciona 100% sin conexión (offline) y sin permiso de Internet."
-pt-BR,Portuguese (Brazil),PureLock: Bloqueio de Apps,"Bloqueio de apps offline e cofre AES-256. Sem anúncios, privacidade total.","PureLock é um pacote de segurança e cofre criptografado 100% offline desenvolvido para proteger seus aplicativos, senhas e anotações confidenciais. Sem nuvem, sem rastreadores e sem permissão de Internet.
+• Cómo se utiliza: PureLock supervisa los eventos de cambio de ventana (TYPE_WINDOW_STATE_CHANGED) únicamente para detectar cuándo se abre una app protegida y mostrar al instante el bloqueo seguro (PIN, Patrón, Knock o Biometría).
+• Privacidad y Seguridad: PureLock NO lee, captura ni accede al contenido de la pantalla, pulsaciones, contraseñas ni mensajes personales.
+• Cero recopilación de datos personales: Tus datos cifrados permanecen exclusivamente en tu dispositivo."
+pt-BR,Portuguese (Brazil),PureLock: Bloqueio de Apps,Bloqueio de apps offline e cofre AES-256 SQLCipher. Sem anúncios e sem nuvem.,"PureLock é um pacote de privacidade sem anúncios e cofre criptografado 100% offline para proteger aplicativos, senhas, códigos 2FA e notas privadas no seu aparelho com SQLCipher AES-256 e Android Keystore.
 
 🔒 RECURSOS PRINCIPAIS:
-• Bloqueio de Apps (App Shield): Proteja qualquer aplicativo com PIN, Padrão ou Biometria.
-• Cofre Criptografado: Guarde senhas e notas com criptografia de padrão militar AES-256-GCM.
-• Foto de Intruso: Tira fotos automáticas após tentativas incorretas de desbloqueio.
-• Cofre Falso (Decoy): Crie um cofre falso com PIN separado para situações de coerção.
-• Agite para Bloquear: Bloqueio instantâneo ao agitar o celular.
-• Gerador de Senhas Offline: Crie senhas fortes e seguras sem internet.
-• Preenchimento Automático: Preencha credenciais com segurança diretamente no sistema.
+• App Shield (Bloqueio de Apps): Proteja qualquer aplicativo com PIN, Padrão (trilha invisível), Knock Code de 4 quadrantes ou Biometria, com teclado embaralhado e tempo de carência.
+• Cofre Criptografado por Hardware: Guarde senhas, notas seguras, cartões e códigos 2FA em SQLCipher AES-256 com lixeira automática e análise de entropia.
+• Camuflagem e Disfarces: Disfarce a tela de bloqueio como Calculadora funcional ou diálogo de falha falsa, além de PIN de coação (Duress).
+• Agite para Bloquear: Bloqueio de emergência instantâneo ao agitar o celular com sensibilidade ajustável.
+• Registro de Intrusos e Auditoria SHA-256: Registra tentativas inválidas localmente e realiza verificação criptográfica de integridade.
+• Limpeza Automática da Área de Transferência e Gerador Offline: Cria senhas fortes e apaga segredos copiados automaticamente.
+• Preenchimento Automático, Blocos Rápidos e Widget: Autofill offline, blocos de Configurações Rápidas, widget na tela inicial, backup cifrado .plk e Android TV.
 
-🛡️ 100% OFFLINE E PRIVADO:
-O PureLock opera sem nenhuma permissão de Internet. Seus dados nunca saem do seu aparelho.
-
-────────────────────────────────────────
-USO E DIVULGAÇÃO DA API ACCESSIBILITYSERVICE
-────────────────────────────────────────
-O PureLock utiliza a API AccessibilityService estritamente para fornecer sua função principal de Bloqueio de Aplicativos (App Shield).
-
-• Como é utilizado: O PureLock monitora eventos de alteração de janela (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar quando um aplicativo protegido é aberto em primeiro plano e exibir imediatamente a tela de bloqueio seguro (PIN, Padrão ou Biometria).
-• Privacidade e Proteção de Dados: O PureLock NÃO lê, captura ou acessa o conteúdo da tela, digitação, senhas ou mensagens pessoais.
-• Zero Coleta de Dados: O PureLock funciona 100% offline, sem nenhuma permissão de Internet."
-pt-PT,Portuguese (Portugal),PureLock: Bloqueio de Apps,"Bloqueio de apps offline e cofre AES-256. Sem anúncios, privacidade total.","PureLock é um pacote de segurança e cofre criptografado 100% offline desenvolvido para proteger as suas aplicações, palavras-passe e notas confidenciais. Sem nuvem, sem rastreadores e sem permissão de Internet.
-
-🔒 PRINCIPAIS FUNCIONALIDADES:
-• Bloqueio de Aplicações: Proteja qualquer aplicação com PIN, Padrão ou Biometria.
-• Cofre Criptografado: Guarde palavras-passe e notas com encriptação militar AES-256-GCM.
-• Foto do Intruso: Fotografa tentativas de desbloqueio falhadas.
-• Cofre Falso: Cofre alternativo para situações de coação.
-• Agitar para Bloquear: Bloqueio de emergência ao abanar o telemóvel.
-• Gerador de Palavras-passe: Crie credenciais de alta segurança offline.
-
-🛡️ 100% OFFLINE:
-O PureLock não possui permissões de Internet. Os seus dados permanecem estritamente no dispositivo.
+🛡️ PRIVACIDADE 100% LOCAL:
+Sem contas na nuvem e sem anúncios. Seus dados criptografados permanecem exclusivamente no seu dispositivo.
 
 ────────────────────────────────────────
 USO E DIVULGAÇÃO DA API ACCESSIBILITYSERVICE
 ────────────────────────────────────────
 O PureLock utiliza a API AccessibilityService estritamente para fornecer sua função principal de Bloqueio de Aplicativos (App Shield).
 
-• Como é utilizado: O PureLock monitora eventos de alteração de janela (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar quando um aplicativo protegido é aberto em primeiro plano e exibir imediatamente a tela de bloqueio seguro (PIN, Padrão ou Biometria).
-• Privacidade e Proteção de Dados: O PureLock NÃO lê, captura ou acessa o conteúdo da tela, digitação, senhas ou mensagens pessoais.
-• Zero Coleta de Dados: O PureLock funciona 100% offline, sem nenhuma permissão de Internet."
-fr-FR,French (France),PureLock: Verrouillage Apps,"Verrouillage d'apps hors ligne et coffre AES-256. Zéro cloud, zéro pub.","PureLock est une suite de sécurité et un coffre-fort chiffré 100% hors ligne conçu pour protéger vos applications, mots de passe et notes privées. Sans synchronisation cloud, sans trackers et sans permission Internet.
+• Como é utilizado: O PureLock monitora eventos de alteração de janela (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar quando um app protegido é aberto em primeiro plano e exibir imediatamente a tela de bloqueio seguro (PIN, Padrão, Knock ou Biometria).
+• Privacidade e Proteção de Dados: O PureLock NÃO lê, captura ou acessa conteúdo da tela, digitação, senhas ou mensagens pessoais.
+• Zero Coleta de Dados Pessoais: Seus segredos permanecem estritamente offline no aparelho."
+pt-PT,Portuguese (Portugal),PureLock: Bloqueio de Apps,Bloqueio de apps offline e cofre AES-256 SQLCipher. Sem anúncios nem nuvem.,"PureLock é uma suite de privacidade sem anúncios e cofre encriptado 100% offline para proteger aplicações, palavras-passe, códigos 2FA e notas privadas com SQLCipher AES-256 e Android Keystore.
 
-🔒 FONCTIONNALITÉS CLÉS:
-• Verrouillage d'Apps (App Shield): Verrouillez vos applications avec PIN, Schéma ou Biométrie.
-• Coffre Sécurisé Chiffré: Stockez mots de passe et notes sous chiffrement militaire AES-256-GCM.
-• Photo d'Intrus: Capture automatique en cas de tentative de déverrouillage erronée.
-• Faux Coffre (Leurre): Coffre secondaire avec code distinct en cas d'urgence.
-• Secouer pour Verrouiller: Verrouillage d'urgence immédiat par simple secousse.
-• Générateur de Mots de Passe: Générez des mots de passe robustes hors ligne.
-• Service de Saisie Automatique: Remplissage sécurisé de vos identifiants.
+🔒 FUNCIONALIDADES PRINCIPAIS:
+• Bloqueio de Aplicações (App Shield): Proteja aplicações com PIN, Padrão invisível, Código Knock de 4 quadrantes ou Biometria, com teclado aleatório e período de tolerância.
+• Cofre Encriptado por Hardware: Guarde palavras-passe, notas, cartões e 2FA em SQLCipher AES-256 com reciclagem automática e estatísticas de entropia.
+• Camuflagem e Disfarces: Disfarce de Calculadora funcional, erro falso e PIN de coação de emergência.
+• Agitar para Bloquear: Bloqueio imediato ao abanar o telemóvel com sensibilidade ajustável.
+• Captura de Intrusos e Auditoria SHA-256: Regista tentativas falhadas localmente e verifica a integridade criptográfica do cofre.
+• Limpeza de Área de Transferência e Gerador Offline: Cria credenciais seguras e limpa automaticamente segredos copiados.
+• Preenchimento Automático, Mosaicos e Widget: Autofill offline, mosaicos rápidos, widget, cópias encriptadas .plk e suporte para Android TV.
 
-🛡️ CONFIDENTIALITÉ 100% HORS LIGNE:
-PureLock ne requiert AUCUNE autorisation Internet. Vos données ne quittent jamais votre appareil.
+🛡️ PRIVACIDADE 100% LOCAL:
+Sem nuvem, sem contas e sem anúncios. Os seus dados permanecem exclusivamente no dispositivo.
+
+────────────────────────────────────────
+USO E DIVULGAÇÃO DA API ACCESSIBILITYSERVICE
+────────────────────────────────────────
+O PureLock utiliza a API AccessibilityService estritamente para fornecer a função principal de Bloqueio de Aplicações (App Shield).
+
+• Como é utilizado: O PureLock monitoriza eventos de mudança de janela (TYPE_WINDOW_STATE_CHANGED) apenas para detetar a abertura de uma aplicação protegida e apresentar de imediato o ecrã de bloqueio seguro.
+• Privacidade: O PureLock NÃO lê, captura ou acede a conteúdo do ecrã, teclas premidas, palavras-passe ou mensagens pessoais."
+fr-FR,French (France),PureLock: Verrouillage Apps,"Verrouillage d'apps hors ligne & coffre AES-256 SQLCipher. Zéro pub, zéro cloud.","PureLock est une suite de confidentialité sans publicité et un coffre-fort chiffré 100% hors ligne conçu pour protéger vos applications, mots de passe, codes 2FA et notes privées via SQLCipher AES-256 et Android Keystore.
+
+🔒 FONCTIONNALITÉS CLÉS :
+• Bouclier d'Apps (App Shield) : Verrouillez toute application par PIN, Schéma (tracé invisible), Code Knock à 4 quadrants ou Biométrie, avec clavier aléatoire et délai de grâce.
+• Coffre Chiffré Matériel : Stockez mots de passe, notes sécurisées, cartes et codes 2FA dans une base SQLCipher AES-256 avec corbeille auto-nettoyante et analyse d'entropie.
+• Camouflage & Leurres : Déguisez l'écran de verrouillage en Calculatrice fonctionnelle ou faux plantage, plus un PIN de contrainte (Duress) d'urgence.
+• Secouer pour Verrouiller : Verrouillage instantané par secousse avec sensibilité réglable (Haute / Moyenne / Basse).
+• Capture d'Intrus & Audit SHA-256 : Enregistre les échecs localement et vérifie l'intégrité cryptographique SHA-256 de votre coffre.
+• Effacement Auto du Presse-papiers & Générateur : Crée des mots de passe robustes hors ligne et purge automatiquement les secrets copiés.
+• Saisie Automatique, Tuiles & Widget : Service Autofill hors ligne, tuiles rapides, widget d'écran d'accueil, sauvegardes chiffrées .plk et Android TV.
+
+🛡️ CONFIDENTIALITÉ 100% LOCALE :
+Sans cloud, sans compte et sans publicité. Vos données chiffrées ne quittent jamais votre appareil.
 
 ────────────────────────────────────────
 UTILISATION DE L'API ACCESSIBILITYSERVICE ET DIVULGATION
 ────────────────────────────────────────
 PureLock utilise l'API AccessibilityService uniquement pour fournir sa fonctionnalité principale de verrouillage d'applications (App Shield).
 
-• Utilisation : PureLock surveille les changements d'état des fenêtres (TYPE_WINDOW_STATE_CHANGED) uniquement pour détecter l'ouverture d'une application protégée au premier plan et afficher instantanément l'écran de verrouillage sécurisé (PIN, Schéma ou Biométrie).
+• Utilisation : PureLock surveille les changements d'état des fenêtres (TYPE_WINDOW_STATE_CHANGED) uniquement pour détecter l'ouverture d'une application protégée au premier plan et afficher instantanément l'écran de verrouillage sécurisé (PIN, Schéma, Knock ou Biométrie).
 • Confidentialité : PureLock NE lit, NE capture et N'accède à aucun contenu d'écran, frappe de clavier, mot de passe ou message privé.
-• Zéro collecte de données : PureLock fonctionne 100% hors ligne sans aucune permission Internet."
-de-DE,German (Germany),PureLock: App Sperre & Tresor,"Offline App-Sperre & AES-256 Tresor. Ohne Cloud & Werbung, volle Privatsphäre.","PureLock ist eine minimalistische Sicherheits-Suite und ein verschlüsselter Tresor für Ihre Apps, Passwörter und privaten Notizen. 100% offline, ohne Cloud-Synchronisation, ohne Tracker und ohne Internetberechtigung.
+• Zéro collecte de données personnelles : Vos secrets restent strictement hors ligne sur votre appareil."
+de-DE,German (Germany),PureLock: App Sperre & Tresor,"Offline App-Sperre & AES-256 SQLCipher Tresor. Ohne Werbung, ohne Cloud.","PureLock ist eine werbefreie Datenschutz-Suite und ein verschlüsselter Offline-Tresor für Apps, Passwörter, 2FA-Codes und private Notizen — geschützt durch SQLCipher AES-256 und Android Keystore.
 
 🔒 HAUPTFUNKTIONEN:
-• App-Sperre (App Shield): Sichern Sie jede App mit PIN, Muster oder Fingerabdruck.
-• Verschlüsselter Tresor: Speichern Sie Passwörter und Notizen mit AES-256-GCM Verschlüsselung.
-• Eindringlings-Foto: Automatische Fotoaufnahme bei falschen Entsperrversuchen.
-• Schein-Tresor (Decoy): Zweiter Tresor mit separater PIN für Notfälle.
-• Schütteln zum Sperren: Sofortige Notfallsperre durch Schüttelbewegung.
-• Offline Passwort-Generator: Sichere Passwörter direkt auf dem Gerät erstellen.
+• App Shield (App-Sperre): Sichern Sie beliebige Apps per PIN, Muster (unsichtbarer Pfad), 4-Quadranten-Knock-Code oder Biometrie — inkl. Zufallstastatur und Kulanzzeit.
+• Hardware-Verschlüsselter Tresor: Speichern Sie Passwörter, Notizen, Karten und 2FA-Codes in einer SQLCipher-AES-256-Datenbank mit Papierkorb und Entropie-Analyse.
+• Tarnung & Köder: Tarnen Sie die Sperre als funktionierenden Taschenrechner oder Absturz-Dialog, plus Notfall-PIN (Duress) für Zwangssituationen.
+• Schütteln zum Sperren: Sofortige Notfallsperre per Schüttelgeste mit einstellbarer Empfindlichkeit.
+• Eindringlings-Schutz & SHA-256-Audit: Protokolliert Fehlversuche lokal und prüft die kryptografische Integrität Ihres Tresors.
+• Zwischenablage-Auto-Löschung & Generator: Erstellt starke Passwörter offline und löscht kopierte Geheimnisse automatisch.
+• Lokales Autofill, Kacheln & Widget: Offline-Autofill-Dienst, Schnelleinstellungen, Startbildschirm-Widget, verschlüsselte .plk-Backups und Android TV.
 
-🛡️ 100% OFFLINE-DATENSCHUTZ:
-PureLock besitzt KEINE Internet-Berechtigung. Ihre Daten verbleiben ausschließlich lokal auf Ihrem Gerät.
+🛡️ 100% LOKALER DATENSCHUTZ:
+Ohne Cloud-Konto und ohne Werbung. Ihre verschlüsselten Daten bleiben ausschließlich auf Ihrem Gerät.
 
 ────────────────────────────────────────
 BARRIEREFREIHEITSDIENST (ACCESSIBILITY API) OFFENLEGUNG
 ────────────────────────────────────────
 PureLock verwendet die AccessibilityService-API ausschließlich zur Bereitstellung der App-Sperrfunktion (App Shield).
 
-• Verwendung: PureLock überwacht Fensterstatusänderungen (TYPE_WINDOW_STATE_CHANGED), um zu erkennen, wenn eine geschützte App im Vordergrund geöffnet wird, und zeigt sofort den sicheren Sperrbildschirm (PIN, Muster oder Biometrie) an.
-• Datenschutz: PureLock liest, erfasst oder speichert KEINE Bildschirminhalte, Tastatureingaben, Passwörter oder persönliche Daten.
-• Keine Datenerfassung: Die App funktioniert 100% offline ohne Internetberechtigung."
-it-IT,Italian (Italy),PureLock: Blocco App e Vault,"Blocco app offline e cassaforte AES-256. Zero cloud, massima privacy.","PureLock è una suite di sicurezza e cassaforte crittografata al 100% offline per proteggere le tue app, password e note private. Nessun cloud, nessun tracciamento e nessuna autorizzazione Internet.
+• Verwendung: PureLock überwacht Fensterstatusänderungen (TYPE_WINDOW_STATE_CHANGED), um zu erkennen, wenn eine geschützte App im Vordergrund geöffnet wird, und zeigt sofort den sicheren Sperrbildschirm (PIN, Muster, Knock-Code oder Biometrie) an.
+• Datenschutz: PureLock liest, erfasst oder speichert KEINE Bildschirminhalte, Tastatureingaben, Passwörter oder persönlichen Nachrichten.
+• Keine Datenerfassung: Ihre Tresordaten bleiben vollständig offline auf Ihrem Gerät."
+it-IT,Italian (Italy),PureLock: Blocco App e Vault,"Blocco app offline e cassaforte AES-256 SQLCipher. Zero pubblicità, zero cloud.","PureLock è una suite di sicurezza senza pubblicità e una cassaforte crittografata 100% offline per proteggere app, password, codici 2FA e note private con SQLCipher AES-256 e Android Keystore.
 
 🔒 FUNZIONALITÀ PRINCIPALI:
-• Blocco App (App Shield): Blocca qualsiasi app con PIN, Sequenza o Biometria.
-• Cassaforte Crittografata: Salva password e note con crittografia AES-256-GCM.
-• Selfie Intruso: Scatta foto in caso di tentativi di sblocco falliti.
-• Cassaforte Civetta (Decoy): Configura una cassaforte secondaria con PIN separato.
-• Scuoti per Bloccare: Blocco immediato di emergenza scuotendo il telefono.
-• Generatore di Password: Crea credenziali complesse offline.
+• App Shield (Blocco App): Proteggi qualsiasi app con PIN, Sequenza (traccia invisibile), Codice Knock a 4 quadranti o Biometria, con tastierino casuale e periodo di grazia.
+• Cassaforte Crittografata Hardware: Salva password, note, carte e codici 2FA in SQLCipher AES-256 con cestino automatico e analisi dell'entropia.
+• Camuffamento e Specchietti: Maschera il blocco come Calcolatrice funzionante o finto arresto anomalo, più PIN di coercizione (Duress).
+• Scuoti per Bloccare: Blocco immediato d'emergenza scuotendo il telefono con sensibilità regolabile.
+• Cattura Intrusi e Audit SHA-256: Registra i tentativi falliti in locale ed esegue verifiche crittografiche SHA-256 con esportazione CSV.
+• Pulizia Appunti e Generatore Offline: Genera password sicure e cancella automaticamente i segreti copiati dagli appunti.
+• Compilazione Automatica, Riquadri e Widget: Autofill locale, riquadri rapidi, widget, backup cifrati .plk e supporto Android TV.
 
-🛡️ PRIVACY AL 100% OFFLINE:
-PureLock non ha autorizzazioni Internet. I tuoi dati rimangono solo sul tuo dispositivo.
+🛡️ PRIVACY 100% LOCALE:
+Nessun account cloud, nessuna pubblicità. Tutti i tuoi dati rimangono esclusivamente sul tuo dispositivo.
 
 ────────────────────────────────────────
 USO E DIVULGAZIONE DELL'API ACCESSIBILITYSERVICE
 ────────────────────────────────────────
 PureLock utilizza l'API AccessibilityService esclusivamente per fornire la sua funzione principale di Blocco App (App Shield).
 
-• Utilizzo: PureLock monitora gli eventi di cambio stato della finestra (TYPE_WINDOW_STATE_CHANGED) unicamente per rilevare quando un'app protetta viene aperta in primo piano e mostrare immediatamente la schermata di blocco sicura (PIN, Sequenza o Biometria).
-• Privacy e Protezione Dati: PureLock NON legge, cattura o accede ai contenuti dello schermo, tasti digitati, password o messaggi personali.
-• Zero Raccolta Dati: PureLock funziona al 100% offline, senza autorizzazioni Internet."
-ru-RU,Russian (Russia),PureLock: Блокировка и Сейф,Офлайн блокировка приложений и сейф AES-256. Без рекламы и облака.,"PureLock — это автономный комплекс безопасности и зашифрованный сейф для защиты приложений, паролей и личных заметок. 100% офлайн, без передачи данных в облако, трекеров и без разрешений на доступ к Интернету.
+• Utilizzo: PureLock monitora gli eventi di cambio stato della finestra (TYPE_WINDOW_STATE_CHANGED) unicamente per rilevare quando un'app protetta viene aperta in primo piano e mostrare immediatamente la schermata di blocco sicura.
+• Privacy e Protezione Dati: PureLock NON legge, cattura o accede ai contenuti dello schermo, tasti digitati, password o messaggi personali."
+ru-RU,Russian (Russia),PureLock: Блокировка и Сейф,Офлайн блокировка и сейф AES-256 SQLCipher. Без рекламы и облака.,"PureLock — автономный комплекс безопасности без рекламы и зашифрованный сейф для защиты приложений, паролей, кодов 2FA и заметок на базе SQLCipher AES-256 и Android Keystore.
 
 🔒 ОСНОВНЫЕ ВОЗМОЖНОСТИ:
-• Блокировка приложений: Защита приложений с помощью PIN-кода, графического ключа или биометрии.
-• Зашифрованный сейф: Хранение паролей и заметок с военным шифрованием AES-256-GCM.
-• Фото взломщика: Автоматический снимок при неверных попытках разблокировки.
-• Ложный сейф (Decoy): Запасной сейф с отдельным PIN-кодом на случай принуждения.
-• Блокировка встряхиванием: Мгновенная блокировка экрана при резком движении.
-• Генератор паролей: Надежные пароли высокой сложности офлайн.
+• Защита приложений (App Shield): Блокировка любых приложений по PIN, графическому ключу (невидимый след), 4-квадрантному Knock-коду или биометрии, со случайной клавиатурой и периодом отсрочки.
+• Аппаратный шифрованный сейф: Хранение паролей, заметок, карт и 2FA в базе SQLCipher AES-256 с корзиной и анализом энтропии паролей.
+• Маскировка и приманки: Режим рабочего Калькулятора, ложный сбой приложения и экстренный PIN-код принуждения (Duress).
+• Блокировка встряхиванием: Мгновенная защита при встряхивании с настройкой чувствительности.
+• Фиксация взломщиков и аудит SHA-256: Локальный журнал безопасности, проверка целостности SHA-256 и экспорт в CSV.
+• Очистка буфера и генератор паролей: Генерация стойких паролей офлайн и автоматическая очистка буфера обмена.
+• Автозаполнение, плитки и виджет: Локальный Autofill, плитки быстрых настроек, виджет, шифрованные резервные копии .plk и поддержка Android TV.
 
-🛡️ 100% КОНФИДЕНЦИАЛЬНОСТЬ ОФЛАЙН:
-У PureLock нет разрешений на доступ к Интернету. Все ваши данные хранятся исключительно на устройстве.
+🛡️ 100% ЛОКАЛЬНАЯ КОНФИДЕНЦИАЛЬНОСТЬ:
+Без облачных аккаунтов и рекламы. Все зашифрованные данные хранятся строго на вашем устройстве.
 
 ────────────────────────────────────────
 ИСПОЛЬЗОВАНИЕ API ACCESSIBILITYSERVICE
 ────────────────────────────────────────
-PureLock использует AccessibilityService API исключительно для обеспечения основной функции блокировки приложений (App Shield).
+PureLock использует AccessibilityService API исключительно для основной функции блокировки приложений (App Shield).
 
-• Назначение: PureLock отслеживает события смены окон (TYPE_WINDOW_STATE_CHANGED) исключительно для определения запуска защищенного приложения на переднем плане и мгновенного отображения защитного экрана блокировки (PIN-код, графический ключ или биометрия).
-• Конфиденциальность: PureLock НЕ читает, НЕ собирает и НЕ перехватывает содержимое экрана, нажатия клавиш, пароли или личные сообщения.
-• Полный офлайн: PureLock работает на 100% автономно без разрешения на доступ к Интернету."
-ja-JP,Japanese (Japan),PureLock: アプリロック＆保管庫,完全オフラインのアプリロック＆暗号化保管庫。広告なし、クラウド通信ゼロ。,"PureLockは、アプリ、パスワード、秘密のメモを保護するために設計された完全オフラインのプライバシー保護＆暗号化保管庫アプリです。クラウド同期、広告、トラッカー、インターネット通信権限は一切ありません。
+• Назначение: Отслеживаются только события смены окна (TYPE_WINDOW_STATE_CHANGED) для определения запуска защищенного приложения и мгновенного показа экрана блокировки.
+• Конфиденциальность: PureLock НЕ читает, НЕ собирает и НЕ перехватывает содержимое экрана, нажатия клавиш, пароли или личные сообщения."
+ja-JP,Japanese (Japan),PureLock: アプリロック＆保管庫,完全オフラインのアプリロック＆AES-256 SQLCipher保管庫。広告なし。,"PureLockは、SQLCipher AES-256とAndroid Keystoreのハードウェア暗号化でアプリ・パスワード・2FAコード・秘密メモを端末内で保護する、広告なしのオフラインセキュリティ＆暗号化保管庫アプリです。
 
 🔒 主な機能:
-• アプリロック（App Shield）: PIN、パターン、生体認証（指紋・顔）でアプリを保護。
-• 暗号化秘密保管庫: 軍用レベルのAES-256-GCM暗号化でパスワードや重要メモを安全に保存。
-• 侵入者撮影機能: ロック解除に失敗した際にインカメラで自動撮影。
-• おとり保管庫（Decoy Vault）: 緊急時・強要時に開くダミー保管庫を設定可能。
-• シェイクでロック: 端末を振るだけで瞬時にロックダウン。
-• オフラインパスワード生成: 高強度のパスワードを端末内で自動生成。
+• アプリロック（App Shield）: PIN、パターン（軌跡非表示）、4分割ノックコード、生体認証で保護。ランダムキーパッドや再ロック猶予時間にも対応。
+• ハードウェア暗号化保管庫: パスワード、メモ、カード、2FAコードをSQLCipher AES-256で保存。ゴミ箱自動削除とエントロピー強度分析を搭載。
+• カモフラージュ＆おとり機能: 電卓ロック、偽クラッシュ画面、緊急用デュレスPINに対応。
+• シェイクでロック: 感度調整可能な加速度センサーによる緊急ロックダウン。
+• 侵入者記録＆SHA-256監査: 解除失敗のローカル記録、SHA-256整合性チェック、CSVエクスポート。
+• クリップボード自動消去＆パスワード生成: 高強度パスワードのローカル生成とコピー後の自動消去。
+• ローカル自動入力・クイックタイル・ウィジェット・Android TV対応。
 
-🛡️ 100%完全オフライン保証:
-PureLockにはインターネット通信権限（INTERNET）が一切ありません。データが外部へ漏洩するリスクはありません。
+🛡️ 100%ローカルプライバシー保証:
+クラウド同期・アカウント・広告は一切なく、すべての暗号化データは端末内にのみ保存されます。
 
 ────────────────────────────────────────
 ユーザー補助（ACCESSIBILITY SERVICE）APIの利用開示
 ────────────────────────────────────────
 PureLockは、コア機能である「アプリロック（App Shield）」を提供するためにのみAccessibilityService APIを使用します。
 
-・使用目的: 保護対象のアプリがフォアグラウンドで起動されたことを検知（TYPE_WINDOW_STATE_CHANGED）し、直ちに安全なロック画面（PIN、パターン、生体認証）を表示して不正アクセスを防ぎます。
-・プライバシー保護: PureLockは、画面上のテキスト、キーストローク、パスワード、個人メッセージなどの内容を閲覧・収集・保存・送信することは一切ありません。
-・完全オフライン: PureLockはインターネット通信権限を一切持たず、完全に端末内で動作します。"
-ko-KR,Korean (South Korea),PureLock: 앱 잠금 및 금고,"오프라인 앱 잠금 및 AES-256 암호화 금고. 무광고, 완벽한 개인정보 보호.","PureLock은 앱, 비밀번호 및 비공개 메모를 안전하게 보호하도록 설계된 100% 오프라인 보안 및 암호화 금고 앱입니다. 클라우드 동기화, 광고, 추적기 및 인터넷 권한이 전혀 없습니다.
+・使用目的: 保護対象アプリがフォアグラウンドで起動されたことを検知（TYPE_WINDOW_STATE_CHANGED）し、直ちに安全なロック画面を表示します。
+・プライバシー保護: 画面上のテキスト、キー入力、パスワード、個人メッセージの閲覧・収集・送信は一切行いません。"
+ko-KR,Korean (South Korea),PureLock: 앱 잠금 및 금고,"오프라인 앱 잠금 및 AES-256 SQLCipher 금고. 광고 없음, 완벽한 프라이버시.","PureLock은 SQLCipher AES-256 및 Android Keystore 하드웨어 암호화로 앱, 비밀번호, 2FA 코드, 비공개 메모를 기기 내부에서만 안전하게 보호하는 무광고 오프라인 보안 앱입니다.
 
 🔒 주요 기능:
-• 앱 잠금 (App Shield): PIN, 패턴, 생체 인식으로 민감한 앱 보호.
-• 암호화된 비밀 금고: 군사 등급 AES-256-GCM 암호화로 비밀번호와 메모 보관.
-• 침입자 사진 캡처: 잠금 해제 실패 시 침입자 자동 촬영.
-• 미끼 금고 (Decoy): 강요 상황에 대비한 가짜 금고 PIN 설정.
-• 흔들어서 즉시 잠금: 폰을 흔들어 즉각적인 보안 잠금 실행.
-• 오프라인 비밀번호 생성기: 안전하고 강력한 비밀번호 즉시 생성.
+• 앱 잠금(App Shield): PIN, 패턴(경로 숨김), 4분할 노크 코드, 생체 인증으로 모든 앱 보호. 랜덤 키패드 및 재잠금 유예 시간 지원.
+• 하드웨어 암호화 금고: 비밀번호, 보안 메모, 카드, 2FA 코드를 SQLCipher AES-256에 저장. 휴지통 자동 삭제 및 엔트로피 분석 제공.
+• 위장 및 미끼 화면: 작동하는 계산기 위장, 가짜 오류 화면, 강요 상황용 비상 Duress PIN 지원.
+• 흔들어서 잠금: 민감도 조절이 가능한 즉시 비상 잠금 제스처.
+• 침입자 기록 및 SHA-256 무결성 감사: 실패 시도 로컬 기록, SHA-256 무결성 검사, CSV 내보내기.
+• 클립보드 자동 삭제 및 비밀번호 생성기: 오프라인 고강도 비밀번호 생성과 복사 후 자동 삭제.
+• 로컬 자동 완성, 빠른 설정 타일, 홈 위젯, 암호화 .plk 백업 및 Android TV 지원.
 
-🛡️ 100% 오프라인 개인정보 보호:
-PureLock은 인터넷 권한을 요청하지 않습니다. 사용자의 모든 데이터는 기기 내부에서만 안전하게 처리됩니다.
+🛡️ 100% 로컬 개인정보 보호:
+클라우드 계정과 광고 없이 모든 암호화 데이터는 사용자 기기 내부에만 보관됩니다.
 
 ────────────────────────────────────────
 접근성(ACCESSIBILITY SERVICE) API 사용 및 고지
 ────────────────────────────────────────
-PureLock은 핵심 기능인 '앱 잠금(App Shield)' 기능을 제공하기 위해서만 AccessibilityService API를 사용합니다.
+PureLock은 핵심 기능인 '앱 잠금(App Shield)' 제공을 위해서만 AccessibilityService API를 사용합니다.
 
-• 사용 목적: 보호하도록 설정된 앱이 포그라운드에서 실행되는 것을 감지(TYPE_WINDOW_STATE_CHANGED)하여 즉시 보안 잠금 화면(PIN, 패턴, 생체 인식)을 표시합니다.
-• 개인정보 보호: PureLock은 화면 콘텐츠, 입력된 텍스트, 비밀번호 또는 개인 메시지를 읽거나 수집, 저장, 전송하지 않습니다.
-• 100% 오프라인: PureLock은 인터넷 권한을 전혀 사용하지 않으며 완전히 오프라인으로 작동합니다."
-zh-CN,Chinese (Simplified),PureLock: 应用锁与隐私保险箱,完全离线的应用锁与AES-256保险箱。无云端、无广告，极致隐私防护。,"PureLock 是一款完全离线运行的应用锁与高强度加密保险箱，旨在保护您的敏感应用、密码和私密便签。零云端同步、零广告、零追踪，且无任何联网权限。
+• 사용 목적: 보호 앱의 포그라운드 실행 감지(TYPE_WINDOW_STATE_CHANGED) 후 즉시 보안 잠금 화면을 표시합니다.
+• 개인정보 보호: 화면 내용, 키 입력, 비밀번호 또는 개인 메시지를 읽거나 수집·전송하지 않습니다."
+zh-CN,Chinese (Simplified),PureLock: 应用锁与隐私保险箱,离线应用锁与 AES-256 SQLCipher 保险箱。无广告、无云端，极致隐私。,"PureLock 是一款无广告、完全离线的隐私应用锁与加密保险箱，依托 SQLCipher AES-256 与 Android Keystore 硬件密钥保护您的应用、密码、2FA 验证码与私密笔记。
 
-🔒 核心安全功能：
-• 应用锁（App Shield）：使用 PIN 码、图案或生物识别（指纹/人脸）锁定任意应用。
-• 加密隐私保险箱：采用军工级 AES-256-GCM 加密存储重要密码与私密笔记。
-• 抓拍入侵者：在尝试解锁失败时自动使用前置摄像头拍摄入侵者照片。
-• 伪装保险箱（Decoy）：设置独立的虚假保险箱密码以应对胁迫场景。
-• 摇一摇锁屏：遇到紧急情况快速摇晃手机立即锁定应用与保险箱。
-• 离线密码生成器：随时本地生成高强度随机密码。
+🔒 核心功能：
+• 应用锁（App Shield）：支持 PIN 码、九宫格图案（隐藏轨迹）、四象限敲击密码与生物识别，支持随机键盘与重新锁定宽限期。
+• 硬件加密保险箱：以 SQLCipher AES-256 本地存储密码、安全笔记、卡片与 2FA，内置回收站自动清理与熵值强度分析。
+• 伪装与诱饵模式：支持可正常运算的计算器伪装、模拟崩溃弹窗以及紧急胁迫 PIN 码。
+• 摇一摇锁屏：灵敏度可调的加速度传感器紧急一键锁定。
+• 入侵记录与 SHA-256 完整性审计：本地记录失败尝试、执行 SHA-256 加密校验并支持 CSV 导出。
+• 剪贴板自动清除与密码生成器：离线生成高强度密码，复制后自动清空剪贴板。
+• 本地自动填充、快捷磁贴、桌面小组件、加密 .plk 备份与 Android TV 支持。
 
-🛡️ 100% 离线隐私保障：
-PureLock 完全没有申请网络权限（android.permission.INTERNET）。所有数据严格保留在您的设备本地。
+🛡️ 100% 本地隐私保障：
+无云端账号、无广告。您的加密数据始终严格保存在设备本地。
 
 ────────────────────────────────────────
 无障碍服务（ACCESSIBILITY SERVICE）API 使用声明
 ────────────────────────────────────────
-PureLock 仅使用 AccessibilityService API 来提供核心的“应用锁（App Shield）”功能。
+PureLock 仅使用 AccessibilityService API 提供核心“应用锁（App Shield）”功能。
 
-• 使用方式：PureLock 仅监听窗口状态更改事件（TYPE_WINDOW_STATE_CHANGED），以便在受保护的应用于前台打开时立即弹出安全锁屏（PIN 码、图案或生物识别），防止未经授权的访问。
-• 隐私保护：PureLock 绝不会读取、捕获或访问屏幕内容、按键记录、密码或个人消息。
-• 零数据收集：PureLock 完全离线运行，没有任何联网权限（未申请 INTERNET 权限）。"
-zh-TW,Chinese (Traditional),PureLock: 應用程式鎖與保險箱,完全離線的應用程式鎖與AES-256加密保險箱。無廣告、無雲端，頂級私隱。,"PureLock 是一款完全離線執行的應用程式鎖與高強度加密保險箱，旨在保護您的敏感應用程式、密碼與私密筆記。零雲端同步、零廣告、零追蹤，且無任何聯網權限。
+• 使用方式：仅监听窗口状态变更事件（TYPE_WINDOW_STATE_CHANGED），在受保护应用进入前台时立即显示安全锁屏。
+• 隐私保护：绝不读取、采集或上传屏幕内容、按键输入、密码或个人消息。"
+zh-TW,Chinese (Traditional),PureLock: 應用程式鎖與保險箱,離線應用程式鎖與 AES-256 SQLCipher 保險箱。無廣告、無雲端，極致隱私。,"PureLock 是一款無廣告、完全離線的隱私應用程式鎖與加密保險箱，採用 SQLCipher AES-256 與 Android Keystore 硬體金鑰保護您的應用程式、密碼、2FA 驗證碼與私密筆記。
 
-🔒 核心安全功能：
-• 應用程式鎖（App Shield）：使用 PIN 碼、圖形或生物識別鎖定任何應用程式。
-• 加密私隱保險箱：採用軍工級 AES-256-GCM 加密儲存重要密碼與私密筆記。
-• 抓拍入侵者：在解鎖失敗時自動拍攝入侵者照片。
-• 偽裝保險箱（Decoy）：設定獨立的虛假保險箱密碼以應對脅迫情況。
-• 搖一搖鎖定：遇到緊急情況快速搖晃手機立即鎖定。
-• 離線密碼產生器：隨時本地產生高強度隨機密碼。
+🔒 核心功能：
+• 應用程式鎖（App Shield）：支援 PIN 碼、圖形（隱藏軌跡）、四象限敲擊密碼與生物辨識，並支援隨機鍵盤與寬限時間。
+• 硬體加密保險箱：使用 SQLCipher AES-256 儲存密碼、筆記、卡片與 2FA，內建垃圾桶自動清除與熵值強度分析。
+• 偽裝與誘餌模式：支援可運作的計算機偽裝、假當機對話框以及緊急脅迫 PIN 碼。
+• 搖一搖鎖定：靈敏度可調的緊急快速鎖定手勢。
+• 入侵紀錄與 SHA-256 稽核：本機記錄解鎖失敗、執行 SHA-256 完整性驗證並支援 CSV 匯出。
+• 剪貼簿自動清除與密碼產生器：離線產生高強度密碼，複製後自動清空剪貼簿。
+• 本機自動填入、快速設定方塊、桌面小工具、加密 .plk 備份與 Android TV 支援。
 
-🛡️ 100% 離線私隱保障：
-PureLock 完全沒有申請網絡權限。所有數據嚴格保留在您的裝置本機。
+🛡️ 100% 本機隱私保障：
+無雲端帳號、無廣告。所有加密資料皆僅保留於您的裝置本機。
 
 ────────────────────────────────────────
 無障礙服務（ACCESSIBILITY SERVICE）API 使用聲明
 ────────────────────────────────────────
-PureLock 僅使用 AccessibilityService API 來提供核心的「應用程式鎖（App Shield）」功能。
+PureLock 僅使用 AccessibilityService API 提供核心「應用程式鎖（App Shield）」功能。
 
-• 使用方式：PureLock 僅監聽視窗狀態變更事件（TYPE_WINDOW_STATE_CHANGED），以便在受保護的應用程式於前景開啟時立即顯示安全鎖定畫面（PIN 碼、圖形或生物識別），防止未授權存取。
-• 隱私保護：PureLock 絕不會讀取、擷取或存取螢幕內容、按鍵輸入、密碼或私人訊息。
-• 零數據收集：PureLock 完全離線運作，無任何網路連線權限。"
-vi,Vietnamese,PureLock: Khóa ứng dụng,"Khóa ứng dụng offline & két bảo mật AES-256. Không quảng cáo, bảo mật tuyệt đối.","PureLock là bộ công cụ bảo mật và két mã hóa 100% offline giúp bảo vệ toàn diện ứng dụng, mật khẩu và ghi chú riêng tư. Hoàn toàn không đồng bộ đám mây, không theo dõi và không yêu cầu quyền Internet.
+• 使用方式：僅監聽視窗狀態變更事件（TYPE_WINDOW_STATE_CHANGED），於受保護應用程式開啟時立即顯示安全鎖定畫面。
+• 隱私保護：絕不讀取、擷取或傳送螢幕內容、按鍵輸入、密碼或私人訊息。"
+vi,Vietnamese,PureLock: Khóa ứng dụng,"Khóa ứng dụng offline & két AES-256 SQLCipher. Không quảng cáo, không đám mây.","PureLock là bộ công cụ bảo mật không quảng cáo và két mã hóa 100% offline giúp bảo vệ ứng dụng, mật khẩu, mã 2FA và ghi chú riêng tư trên thiết bị với SQLCipher AES-256 và Android Keystore.
 
 🔒 TÍNH NĂNG NỔI BẬT:
-• Khóa ứng dụng (App Shield): Khóa ứng dụng bằng Mã PIN, Hình vẽ hoặc Vân tay/Khuôn mặt.
-• Két bảo mật mã hóa: Lưu mật khẩu và thông tin bí mật với chuẩn mã hóa quân đội AES-256-GCM.
-• Chụp ảnh kẻ xâm nhập: Tự động chụp ảnh kẻ mở khóa trái phép khi nhập sai mã.
-• Két ngụy trang (Decoy): Thiết lập két giả với mã PIN riêng cho tình huống khẩn cấp.
-• Lắc máy để khóa: Lắc điện thoại để kích hoạt khóa tức thì.
-• Trình tạo mật khẩu offline: Tạo mật khẩu ngẫu nhiên độ an toàn cao ngoại tuyến.
+• Lá Chắn Ứng Dụng (App Shield): Khóa ứng dụng bằng PIN, Hình vẽ (ẩn đường vẽ), Mã gõ 4 vùng (Knock Code) hoặc Sinh trắc học, kèm bàn phím xáo trộn và thời gian ân hạn khóa lại.
+• Két Mã Hóa Phần Cứng: Lưu mật khẩu, ghi chú, thẻ và mã 2FA trong cơ sở dữ liệu SQLCipher AES-256 với Thùng rác tự dọn và Phân tích độ mạnh mật khẩu.
+• Ngụy Trang & Mồi Nhử: Màn hình Máy tính hoạt động thật, hộp thoại Lỗi ứng dụng giả và mã PIN khẩn cấp (Duress PIN).
+• Lắc Để Khóa: Khóa khẩn cấp tức thì khi lắc điện thoại với 3 mức độ nhạy tùy chỉnh.
+• Ghi Nhận Kẻ Xâm Nhập & Kiểm Toán SHA-256: Lưu lịch sử mở khóa sai cục bộ, kiểm tra toàn vẹn mật mã SHA-256 và xuất nhật ký CSV.
+• Tự Xóa Bộ Nhớ Tạm & Tạo Mật Khẩu Offline: Tạo mật khẩu mạnh và tự động xóa bí mật đã sao chép khỏi clipboard.
+• Tự Điền Cục Bộ, Ô Cài Đặt Nhanh, Widget & Android TV: Hỗ trợ Autofill offline, sao lưu mã hóa .plk và điều khiển TV.
 
-🛡️ CAM KẾT RIÊNG TƯ 100% NGOẠI TUYẾN:
-PureLock KHÔNG có quyền truy cập Internet. Mọi dữ liệu mã hóa và hình ảnh của bạn luôn nằm trọn vẹn trong thiết bị.
+🛡️ CAM KẾT RIÊNG TƯ 100% CỤC BỘ:
+Không tài khoản đám mây, không quảng cáo. Mọi dữ liệu mã hóa luôn nằm trọn trên thiết bị của bạn.
 
 ────────────────────────────────────────
 CÔNG KHAI SỬ DỤNG ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
 PureLock sử dụng AccessibilityService API nghiêm ngặt chỉ nhằm phục vụ tính năng Khóa Ứng Dụng (App Shield).
 
-• Mục đích sử dụng: PureLock theo dõi sự kiện chuyển đổi cửa sổ (TYPE_WINDOW_STATE_CHANGED) trong thời gian thực chỉ để nhận biết khi nào ứng dụng được bảo vệ được mở lên màn hình chính, từ đó hiển thị lớp phủ màn hình khóa (Mã PIN, Hình vẽ hoặc Vân tay) ngay lập tức.
-• Bảo vệ quyền riêng tư: PureLock KHÔNG đọc, chụp hoặc truy cập nội dung màn hình, thao tác bàn phím, mật khẩu hoặc tin nhắn riêng tư.
-• Không thu thập dữ liệu: PureLock hoạt động 100% ngoại tuyến (offline), hoàn toàn không yêu cầu quyền truy cập Internet."
-id,Indonesian,PureLock: Kunci Aplikasi,"Kunci aplikasi offline & brankas AES-256. Tanpa iklan, privasi maksimal.","PureLock adalah aplikasi keamanan dan brankas terenkripsi 100% offline untuk melindungi aplikasi, kata sandi, dan catatan pribadi Anda. Tanpa sinkronisasi cloud, tanpa iklan, dan tanpa izin internet.
+• Mục đích sử dụng: PureLock chỉ theo dõi sự kiện thay đổi cửa sổ (TYPE_WINDOW_STATE_CHANGED) để nhận biết khi ứng dụng được bảo vệ mở lên và hiển thị ngay màn hình khóa an toàn (PIN, Hình vẽ, Knock Code hoặc Sinh trắc học).
+• Bảo vệ quyền riêng tư: PureLock KHÔNG đọc, chụp hoặc truy cập nội dung màn hình, thao tác bàn phím, mật khẩu hoặc tin nhắn cá nhân."
+id,Indonesian,PureLock: Kunci Aplikasi,"Kunci aplikasi offline & brankas AES-256 SQLCipher. Tanpa iklan, tanpa cloud.","PureLock adalah aplikasi keamanan bebas iklan dan brankas terenkripsi 100% offline untuk melindungi aplikasi, kata sandi, kode 2FA, dan catatan pribadi dengan SQLCipher AES-256 dan Android Keystore.
 
 🔒 FITUR UTAMA:
-• Kunci Aplikasi (App Shield): Lindungi aplikasi apa pun dengan PIN, Pola, atau Sidik Jari.
-• Brankas Terenkripsi: Simpan kata sandi dan catatan dengan enkripsi militer AES-256-GCM.
-• Foto Penyusup: Ambil foto otomatis saat ada percobaan buka kunci yang salah.
-• Brankas Palsu (Decoy): Buat brankas tipuan dengan PIN berbeda untuk situasi darurat.
-• Goyangkan untuk Mengunci: Kunci seketika dengan menggoyangkan ponsel.
-• Generator Kata Sandi Offline: Buat kata sandi yang kuat secara lokal.
+• App Shield (Kunci Aplikasi): Lindungi aplikasi dengan PIN, Pola (jejak tak terlihat), Kode Ketuk 4-Kuadran, atau Biometrik, plus keypad acak dan masa tenggang kunci ulang.
+• Brankas Enkripsi Perangkat Keras: Simpan kata sandi, catatan, kartu, dan 2FA di SQLCipher AES-256 dengan tempat sampah otomatis dan wawasan entropi.
+• Penyamaran & Umpan: Samarkan layar kunci sebagai Kalkulator aktif atau dialog Crash Palsu, plus PIN Darurat (Duress).
+• Goyangkan untuk Mengunci: Kunci darurat seketika dengan sensitivitas akselerometer yang dapat diatur.
+• Catatan Penyusup & Audit SHA-256: Merekam percobaan gagal secara lokal dan memverifikasi integritas kriptografi SHA-256.
+• Pembersih Clipboard & Generator Offline: Buat kata sandi kuat dan hapus otomatis rahasia yang disalin.
+• Autofill Lokal, Ubin Cepat, Widget & Android TV: Mendukung cadangan terenkripsi .plk dan navigasi TV.
 
-🛡️ JAMINAN PRIVASI 100% OFFLINE:
-PureLock tidak memiliki izin internet. Semua data Anda tetap berada di perangkat Anda secara eksklusif.
+🛡️ JAMINAN PRIVASI 100% LOKAL:
+Tanpa akun cloud dan tanpa iklan. Semua data terenkripsi tetap berada di perangkat Anda.
 
 ────────────────────────────────────────
 PENGGUNAAN & PENGUNGKAPAN ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
-PureLock menggunakan AccessibilityService API semata-mata untuk menyediakan fitur utama Pengunci Aplikasi (App Shield).
+PureLock menggunakan AccessibilityService API semata-mata untuk fitur utama Pengunci Aplikasi (App Shield).
 
-• Cara Penggunaan: PureLock memantau peristiwa perubahan status jendela (TYPE_WINDOW_STATE_CHANGED) untuk mendeteksi kapan aplikasi yang dilindungi dibuka di latar depan dan segera menampilkan layar kunci aman (PIN, Pola, atau Biometrik).
-• Privasi & Perlindungan Data: PureLock TIDAK membaca, merekam, atau mengakses konten layar, ketikan tombol, kata sandi, atau pesan pribadi.
-• Nol Pengumpulan Data: PureLock beroperasi 100% offline tanpa izin akses Internet."
-hi-IN,Hindi,PureLock: ऐप लॉक और वॉल्ट,"ऑफ़लाइन ऐप लॉक और AES-256 वॉल्ट। कोई विज्ञापन नहीं, पूर्ण गोपनीयता।","PureLock आपके ऐप्स, पासवर्ड और निजी नोट्स को सुरक्षित रखने के लिए बनाया गया 100% ऑफ़लाइन सुरक्षा ऐप और एन्क्रिप्टेड वॉल्ट है। कोई क्लाउड सिंक नहीं, कोई ट्रैकर नहीं और कोई इंटरनेट अनुमति नहीं।
+• Cara Penggunaan: Memantau perubahan status jendela (TYPE_WINDOW_STATE_CHANGED) untuk mendeteksi pembukaan aplikasi terlindungi dan segera menampilkan layar kunci aman.
+• Privasi Data: PureLock TIDAK membaca, merekam, atau mengakses konten layar, ketikan, kata sandi, atau pesan pribadi."
+hi-IN,Hindi,PureLock: ऐप लॉक और वॉल्ट,"ऑफ़लाइन ऐप लॉक व AES-256 SQLCipher वॉल्ट। बिना विज्ञापन, पूर्ण गोपनीयता।","PureLock एक विज्ञापन-मुक्त 100% ऑफ़लाइन सुरक्षा ऐप और एन्क्रिप्टेड वॉल्ट है जो SQLCipher AES-256 और Android Keystore से आपके ऐप्स, पासवर्ड, 2FA कोड और निजी नोट्स की रक्षा करता है।
 
-🔒 मुख्य विशेषताएं:
-• ऐप लॉक (App Shield): पिन, पैटर्न या बायोमेट्रिक्स से किसी भी ऐप को लॉक करें।
-• एन्क्रिप्टेड वॉल्ट: AES-256-GCM एन्क्रिप्शन के साथ पासवर्ड और नोट्स सुरक्षित रखें।
-• घुसपैठिए की फोटो: गलत अनलॉक प्रयासों पर ऑटो सेल्फी कैप्चर।
-• नकली वॉल्ट (Decoy): आपातकालीन स्थिति के लिए एक अलग पिन के साथ डमी वॉल्ट।
-• हिलाकर लॉक करें: फोन को हिलाकर तुरंत सभी ऐप्स को लॉक करें।
-• ऑफ़लाइन पासवर्ड जनरेटर: मजबूत पासवर्ड ऑफ़लाइन बनाएं।
+🔒 मुख्य विशेषताएँ:
+• App Shield (ऐप लॉक): PIN, पैटर्न (अदृश्य रेखा), 4-क्वाड्रंट नॉक कोड या बायोमेट्रिक से ऐप लॉक करें; रैंडम कीपैड और री-लॉक ग्रेस पीरियड सहित।
+• हार्डवेयर-एन्क्रिप्टेड वॉल्ट: SQLCipher AES-256 में पासवर्ड, नोट्स, कार्ड और 2FA सुरक्षित रखें, ऑटो-पर्ज ट्रैश व एन्ट्रॉपी विश्लेषण के साथ।
+• कैमोफ़्लाज व डिकॉय: कैलकुलेटर लॉक, नकली क्रैश डायलॉग और आपातकालीन ड्यूरेस PIN।
+• हिलाकर लॉक करें: एडजस्टेबल सेंसर संवेदनशीलता के साथ तुरंत लॉकडाउन।
+• घुसपैठिया रिकॉर्ड व SHA-256 ऑडिट: असफल प्रयासों का स्थानीय लॉग, SHA-256 अखंडता जाँच और CSV एक्सपोर्ट।
+• क्लिपबोर्ड ऑटो-वाइप व पासवर्ड जनरेटर: मजबूत पासवर्ड बनाएं और कॉपी किए गए सीक्रेट स्वतः साफ करें।
+• लोकल ऑटोफ़िल, क्विक टाइल्स, विजेट और Android TV समर्थन।
 
-🛡️ 100% ऑफ़लाइन गोपनीयता गारंटी:
-PureLock के पास कोई इंटरनेट अनुमति नहीं है। आपका डेटा कभी भी आपके डिवाइस से बाहर नहीं जाता है।
+🛡️ 100% स्थानीय गोपनीयता गारंटी:
+कोई क्लाउड खाता नहीं, कोई विज्ञापन नहीं। आपका डेटा केवल आपके डिवाइस पर रहता है।
 
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API उपयोग और प्रकटीकरण
 ────────────────────────────────────────
-PureLock अपने मुख्य ऐप लॉक (App Shield) फीचर को प्रदान करने के लिए विशेष रूप से AccessibilityService API का उपयोग करता है।
+PureLock केवल अपने मुख्य ऐप लॉक (App Shield) फीचर के लिए AccessibilityService API का उपयोग करता है।
 
-• उपयोग का उद्देश्य: PureLock केवल यह पता लगाने के लिए विंडो स्थिति परिवर्तनों (TYPE_WINDOW_STATE_CHANGED) की निगरानी करता है कि संरक्षित ऐप कब खुला है, ताकि तुरंत सुरक्षित लॉक स्क्रीन (पिन, पैटर्न या बायोमेट्रिक) प्रदर्शित की जा सके।
-• गोपनीयता सुरक्षा: PureLock स्क्रीन सामग्री, कीस्ट्रोक्स, पासवर्ड या व्यक्तिगत संदेशों को कभी नहीं पढ़ता, कैप्चर या एक्सेस नहीं करता है।
-• शून्य डेटा संग्रह: PureLock 100% ऑफ़लाइन काम करता है और इसमें कोई इंटरनेट अनुमति नहीं है।"
-tr-TR,Turkish (Turkey),PureLock: Uygulama Kilidi,"Çevrimdışı uygulama kilidi ve AES-256 kasa. Reklamsız, tam gizlilik.","PureLock, uygulamalarınızı, şifrelerinizi ve özel notlarınızı korumak için tasarlanmış %100 çevrimdışı bir güvenlik paketi ve şifreli kasadır. Bulut senkronizasyonu, reklamlar ve internet izni yoktur.
+• उद्देश्य: सुरक्षित ऐप खुलने का पता लगाने हेतु केवल विंडो परिवर्तन (TYPE_WINDOW_STATE_CHANGED) की निगरानी करता है और तुरंत लॉक स्क्रीन दिखाता है।
+• गोपनीयता: PureLock स्क्रीन सामग्री, कीस्ट्रोक्स, पासवर्ड या निजी संदेशों को कभी नहीं पढ़ता या एकत्र नहीं करता।"
+tr-TR,Turkish (Turkey),PureLock: Uygulama Kilidi,"Çevrimdışı uygulama kilidi ve AES-256 SQLCipher kasa. Reklamsız, tam gizlilik.","PureLock, uygulamalarınızı, şifrelerinizi, 2FA kodlarınızı ve özel notlarınızı SQLCipher AES-256 ve Android Keystore ile cihazınızda koruyan reklamsız, %100 çevrimdışı güvenlik kasasıdır.
 
 🔒 TEMEL ÖZELLİKLER:
-• Uygulama Kilidi (App Shield): PIN, Desen veya Biyometri ile uygulamaları kilitleyin.
-• Şifreli Gizli Kasa: AES-256-GCM şifreleme ile şifre ve notlarınızı güvenle saklayın.
-• Davetsiz Misafir Fotoğrafı: Hatalı kilit açma denemelerinde otomatik fotoğraf çeker.
-• Sahte Kasa (Decoy): Zorunlu durumlar için ayrı PIN'e sahip sahte kasa oluşturun.
-• Kilitlemek İçin Salla: Telefonu sallayarak anında acil kilitleme yapın.
-• Çevrimdışı Şifre Oluşturucu: Güçlü ve güvenli parolalar üretin.
+• App Shield (Uygulama Kilidi): PIN, Desen (görünmez iz), 4 Bölgeli Knock Kodu veya Biyometri ile koruma; rastgele tuş takımı ve yeniden kilitleme gecikmesi.
+• Donanım Şifreli Kasa: Parola, not, kart ve 2FA kodlarını SQLCipher AES-256 ile saklayın; otomatik çöp kutusu ve entropi analizi.
+• Kamuflaj ve Tuzaklar: Çalışan Hesap Makinesi kilidi, Sahte Çökme ekranı ve acil durum Baskı PIN'i (Duress).
+• Kilitlemek İçin Salla: Ayarlanabilir hassasiyetle anında acil kilitleme.
+• İzinsiz Giriş Kaydı ve SHA-256 Denetimi: Başarısız denemeleri yerel kaydeder, SHA-256 bütünlük doğrulaması ve CSV dışa aktarım sunar.
+• Pano Otomatik Temizleme ve Şifre Üretici: Çevrimdışı güçlü parola oluşturur ve kopyalanan sırları panodan otomatik siler.
+• Yerel Otomatik Doldurma, Hızlı Ayarlar, Widget ve Android TV desteği.
 
-🛡️ %100 ÇEVRİMDIŞI GİZLİLİK:
-PureLock internet iznine sahip DEĞİLDİR. Verileriniz tamamen cihazınızda kalır.
+🛡️ %100 YEREL GİZLİLİK:
+Bulut hesabı yok, reklam yok. Şifreli verileriniz yalnızca cihazınızda kalır.
 
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API KULLANIMI VE AÇIKLAMASI
 ────────────────────────────────────────
-PureLock, AccessibilityService API'sini yalnızca temel Uygulama Kilidi (App Shield) özelliğini sağlamak için kullanır.
+PureLock, AccessibilityService API'sini yalnızca temel Uygulama Kilidi (App Shield) özelliği için kullanır.
 
-• Nasıl kullanılır: PureLock, korunan bir uygulamanın ön planda ne zaman açıldığını algılamak ve anında güvenli kilit ekranını (PIN, Desen veya Biyometrik) göstermek için yalnızca pencere durumu değişikliklerini (TYPE_WINDOW_STATE_CHANGED) izler.
-• Gizlilik Koruması: PureLock, ekran içeriğini, tuş vuruşlarını, şifreleri veya kişisel mesajları KESİNLİKLE okumaz, kaydetmez veya erişmez.
-• Sıfır Veri Toplama: PureLock, internet izni olmadan %100 çevrimdışı (offline) çalışır."
-th,Thai,PureLock: ล็อกแอปและตู้เซฟ,ล็อกแอปออฟไลน์และตู้เซฟ AES-256 ไร้โฆษณา ความเป็นส่วนตัวสูงสุด,"PureLock คือแอปความปลอดภัยและตู้เซฟเข้ารหัสแบบออฟไลน์ 100% เพื่อปกป้องแอป รหัสผ่าน และโน้ตส่วนตัวของคุณ ไม่มีการซิงค์บนคลาวด์ ไม่มีโฆษณา และไม่มีการขอสิทธิ์เข้าถึงอินเทอร์เน็ต
+• Kullanım: Korunan bir uygulamanın açıldığını algılamak ve güvenli kilit ekranını göstermek için yalnızca pencere durumu değişikliklerini (TYPE_WINDOW_STATE_CHANGED) izler.
+• Gizlilik: Ekran içeriğini, tuş vuruşlarını, parolaları veya kişisel mesajları ASLA okumaz, kaydetmez veya aktarmaz."
+th,Thai,PureLock: ล็อกแอปและตู้เซฟ,ล็อกแอปออฟไลน์ & ตู้เซฟ AES-256 SQLCipher ไร้โฆษณา ไร้คลาวด์ เป็นส่วนตัวสูงสุด,"PureLock คือชุดความปลอดภัยไร้โฆษณาและตู้เซฟเข้ารหัสออฟไลน์ 100% ปกป้องแอป รหัสผ่าน รหัส 2FA และโน้ตส่วนตัวด้วย SQLCipher AES-256 และ Android Keystore บนเครื่องของคุณ
 
 🔒 ฟีเจอร์หลัก:
-• ล็อกแอป (App Shield): ป้องกันแอปด้วย PIN, รูปแบบ หรือลายนิ้วมือ/ใบหน้า
-• ตู้เซฟเข้ารหัส: จัดเก็บรหัสผ่านและโน้ตด้วยการเข้ารหัสระดับกองทัพ AES-256-GCM
-• ภาพถ่ายผู้บุกรุก: ถ่ายภาพอัตโนมัติเมื่อปลดล็อกผิด
-• ตู้เซฟปลอม (Decoy): ตั้งตู้เซฟลวงด้วยรหัส PIN แยกสำหรับสถานการณ์ฉุกเฉิน
-• เขย่าเพื่อล็อก: เขย่าโทรศัพท์เพื่อล็อกแอปทันที
-• ตัวสร้างรหัสผ่านออฟไลน์: สร้างรหัสผ่านที่รัดกุมแบบออฟไลน์
+• ล็อกแอป (App Shield): ป้องกันแอปด้วย PIN, รูปแบบ (ซ่อนเส้น), รหัสเคาะ 4 ช่อง (Knock Code) หรือไบโอเมตริกซ์ พร้อมแป้นตัวเลขสุ่มและเวลาหน่วงล็อกซ้ำ
+• ตู้เซฟเข้ารหัสฮาร์ดแวร์: เก็บรหัสผ่าน โน้ต บัตร และ 2FA ใน SQLCipher AES-256 พร้อมถังขยะล้างอัตโนมัติและวิเคราะห์ความแข็งแกร่งรหัสผ่าน
+• โหมดพรางตัวและตัวลวง: หน้าจอเครื่องคิดเลขใช้งานได้จริง หน้าต่างแอปหยุดทำงานปลอม และ PIN ฉุกเฉิน (Duress)
+• เขย่าเพื่อล็อก: ล็อกฉุกเฉินทันทีเมื่อเขย่าเครื่อง ปรับความไวได้ 3 ระดับ
+• บันทึกผู้บุกรุกและตรวจสอบ SHA-256: บันทึกการปลดล็อกผิดในเครื่อง ตรวจสอบความสมบูรณ์ SHA-256 และส่งออก CSV
+• ล้างคลิปบอร์ดอัตโนมัติและสร้างรหัสผ่านออฟไลน์: สร้างรหัสผ่านปลอดภัยและลบข้อมูลที่คัดลอกอัตโนมัติ
+• ป้อนอัตโนมัติในเครื่อง ปุ่มตั้งค่าด่วน วิดเจ็ต สำรองข้อมูล .plk เข้ารหัส และรองรับ Android TV
 
-🛡️ ความเป็นส่วนตัวออฟไลน์ 100%:
-PureLock ไม่มีการเชื่อมต่ออินเทอร์เน็ต ข้อมูลของคุณจะอยู่บนอุปกรณ์ของคุณเสมอ
+🛡️ ความเป็นส่วนตัวในเครื่อง 100%:
+ไม่มีบัญชีคลาวด์ ไม่มีโฆษณา ข้อมูลเข้ารหัสทั้งหมดอยู่บนอุปกรณ์ของคุณเท่านั้น
 
 ────────────────────────────────────────
 การเปิดเผยการใช้งาน ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
-PureLock ใช้ AccessibilityService API เพื่อมอบคุณสมบัติหลักในการล็อกแอป (App Shield) เท่านั้น
+PureLock ใช้ AccessibilityService API เพื่อฟีเจอร์ล็อกแอป (App Shield) เท่านั้น
 
-• วัตถุประสงค์: PureLock ตรวจสอบการเปลี่ยนแปลงสถานะหน้าต่าง (TYPE_WINDOW_STATE_CHANGED) เพื่อตรวจจับเมื่อมีการเปิดแอปที่ได้รับการปกป้อง และแสดงหน้าจอล็อกที่ปลอดภัย (PIN, รูปแบบ หรือไบโอเมตริกซ์) ในทันที
-• การปกป้องความเป็นส่วนตัว: PureLock จะไม่เข้าถึง บันทึก หรืออ่านเนื้อหาบนหน้าจอ การกดแป้นพิมพ์ รหัสผ่าน หรือข้อความส่วนตัวใดๆ ทั้งสิ้น
-• ออฟไลน์ 100%: PureLock ทำงานแบบออฟไลน์ทั้งหมดและไม่มีการขอสิทธิ์เข้าถึงอินเทอร์เน็ต"
-ar,Arabic,PureLock: قفل التطبيقات الخزنة,قفل التطبيقات دون إنترنت وخزنة AES-256. بلا إعلانات، خصوصية تامة.,"PureLock هو تطبيق أمان وخزنة مشفرة يعمل بنسبة 100% دون اتصال بالإنترنت لحماية تطبيقاتك وكلمات مرورك وملاحظاتك الخاصة. لا توجد مزامنة سحابية، لا تتبع، ولا أذونات إنترنت.
+• วัตถุประสงค์: ตรวจจับการเปลี่ยนหน้าต่าง (TYPE_WINDOW_STATE_CHANGED) เพื่อรู้เมื่อแอปที่ปกป้องเปิดขึ้นและแสดงหน้าจอล็อกทันที
+• ความเป็นส่วนตัว: ไม่อ่าน บันทึก หรือเข้าถึงเนื้อหาหน้าจอ การพิมพ์ รหัสผ่าน หรือข้อความส่วนตัวใดๆ"
+ar,Arabic,PureLock: قفل التطبيقات وخزنة,قفل تطبيقات دون إنترنت وخزنة AES-256 SQLCipher. بلا إعلانات، خصوصية تامة.,"PureLock هو تطبيق أمان خالٍ من الإعلانات وخزنة مشفرة تعمل بنسبة 100% دون اتصال بالإنترنت لحماية تطبيقاتك وكلمات مرورك ورموز 2FA وملاحظاتك الخاصة باستخدام SQLCipher AES-256 و Android Keystore.
 
 🔒 الميزات الرئيسية:
-• قفل التطبيقات (App Shield): قفل أي تطبيق برمز PIN أو نمط أو بصمة.
-• خزنة سرية مشفرة: حفظ كلمات المرور والملاحظات بتشفير عسكري AES-256-GCM.
-• صورة الدخيل: التقاط صور تلقائية عند محاولات الفتح الخاطئة.
-• خزنة وهمية (Decoy): إنشاء خزنة بديلة برمز PIN مختلف لحالات الطوارئ.
-• الهز للقفل: قفل فوري للطوارئ بمجرد هز الهاتف.
-• مولد كلمات المرور دون إنترنت: إنشاء كلمات مرور قوية ومحمية.
+• درع التطبيقات (App Shield): اقفل أي تطبيق برمز PIN أو نمط (بمسار مخفي) أو رمز النقر الرباعي (Knock Code) أو البصمة، مع لوحة أرقام عشوائية وفترة سماح لإعادة القفل.
+• خزنة مشفرة بالأجهزة: احفظ كلمات المرور والملاحظات والبطاقات ورموز 2FA بقاعدة بيانات SQLCipher AES-256 مع سلة محذوفات تلقائية وتحليل قوة كلمات المرور.
+• التمويه والشاشات الوهمية: تمويه شاشة القفل كآلة حاسبة حقيقية أو تنبيه تعطل وهمي، مع رمز PIN للطوارئ والإكراه (Duress).
+• الهز للقفل: قفل فوري للطوارئ عند هز الجهاز بحساسية قابلة للتعديل.
+• سجل الدخلاء وتدقيق SHA-256: تسجيل المحاولات الفاشلة محلياً مع فحص سلامة الخزنة SHA-256 وتصدير CSV.
+• مسح الحافظة التلقائي ومولد كلمات المرور: إنشاء كلمات مرور قوية محلياً ومسح الأسرار المنسوخة تلقائياً.
+• الملء التلقائي المحلي، مربعات الإعدادات السريعة، ويدجت الشاشة، نسخ احتياطي مشفر .plk ودعم Android TV.
 
-🛡️ خصوصية تامة 100% دون إنترنت:
-لا يمتلك PureLock أي إذن للوصول إلى الإنترنت. تبقى بياناتك محصورة داخل جهازك دائماً.
+🛡️ خصوصية محلية 100%:
+بلا حسابات سحابية وبلا إعلانات. تبقى جميع بياناتك المشفرة حصراً داخل جهازك.
 
 ────────────────────────────────────────
 إفصاح استخدام واجهة ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
-يستخدم PureLock واجهة AccessibilityService API حصرياً لتقديم ميزة قفل التطبيقات الرئيسية (App Shield).
+يستخدم PureLock واجهة AccessibilityService API حصرياً لتوفير ميزة قفل التطبيقات الرئيسية (App Shield).
 
-• آلية الاستخدام: يراقب PureLock أحداث تغيير حالة النوافذ (TYPE_WINDOW_STATE_CHANGED) فقط لاكتشاف فتح أي تطبيق محمي في الواجهة الأمامية، وعرض شاشة القفل الآمنة فوراً (رمز PIN أو النمط أو البصمة).
-• حماية الخصوصية: لا يقوم PureLock بقراءة أو تسجيل أو الوصول إلى أي محتوى من الشاشة أو ضغطات المفاتيح أو كلمات المرور أو الرسائل الشخصية.
-• عدم جمع البيانات: يعمل PureLock بنسبة 100% دون اتصال بالإنترنت (Offline) ولا يطلب أي إذن للوصول للإنترنت."
+• آلية الاستخدام: يراقب PureLock أحداث تغيير حالة النوافذ (TYPE_WINDOW_STATE_CHANGED) فقط لاكتشاف فتح تطبيق محمي وعرض شاشة القفل الآمنة فوراً.
+• حماية الخصوصية: لا يقرأ PureLock أو يسجل أو يصل إلى محتوى الشاشة أو ضغطات المفاتيح أو كلمات المرور أو الرسائل الشخصية."
+nl-NL,Dutch (Netherlands),PureLock: App-vergrendeling,"Offline app-slot & AES-256 SQLCipher-kluis. Geen advertenties, geen cloud.","PureLock is een advertentievrije privacysuite en 100% offline versleutelde kluis voor je apps, wachtwoorden, 2FA-codes en privénotities — beveiligd met SQLCipher AES-256 en Android Keystore.
+
+🔒 BELANGRIJKSTE FUNCTIES:
+• App Shield: Vergrendel elke app met PIN, Patroon (onzichtbaar spoor), 4-kwadrant Knock Code of Biometrie, inclusief willekeurig toetsenbord en hervergrendel-pauze.
+• Hardware-versleutelde Kluis: Bewaar wachtwoorden, notities, kaarten en 2FA in SQLCipher AES-256 met prullenbak en entropie-inzichten.
+• Camouflage & Lokschermen: Werkende Rekenmachine-vermomming, nep-crashdialoog en een nood-PIN (Duress).
+• Schudden om te Vergrendelen: Directe noodvergrendeling met instelbare gevoeligheid.
+• Indringersregistratie & SHA-256-audit: Lokale beveiligingslogs, SHA-256 integriteitscontrole en CSV-export.
+• Klembord Auto-Wissen & Wachtwoordgenerator: Genereer sterke wachtwoorden offline en wis gekopieerde geheimen automatisch.
+• Lokaal Automatisch Invullen, Snelle Tegels, Widget, versleutelde .plk-back-ups en Android TV-ondersteuning.
+
+🛡️ 100% LOKALE PRIVACY:
+Geen cloudaccounts en geen advertenties. Je versleutelde gegevens verlaten nooit je apparaat.
+
+────────────────────────────────────────
+TOELICHTING ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock gebruikt de AccessibilityService API uitsluitend voor de kernfunctie App-vergrendeling (App Shield).
+
+• Gebruik: PureLock controleert vensterstatuswijzigingen (TYPE_WINDOW_STATE_CHANGED) uitsluitend om te detecteren wanneer een beveiligde app wordt geopend en direct het vergrendelscherm te tonen.
+• Privacy: PureLock leest, registreert of opent NOOIT scherminhoud, toetsaanslagen, wachtwoorden of persoonlijke berichten."
+pl-PL,Polish (Poland),PureLock: Blokada Aplikacji,Blokada aplikacji offline i sejf AES-256 SQLCipher. Bez reklam i chmury.,"PureLock to wolny od reklam, w 100% offline pakiet prywatności i zaszyfrowany sejf chroniący aplikacje, hasła, kody 2FA i notatki za pomocą SQLCipher AES-256 i Android Keystore.
+
+🔒 GŁÓWNE FUNKCJE:
+• App Shield (Blokada Aplikacji): Zabezpiecz aplikacje kodem PIN, Wzorem (niewidoczna ścieżka), Kodem Knock (4 ćwiartki) lub Biometrią, z losową klawiaturą i czasem karencji.
+• Sejf Szyfrowany Sprzętowo: Przechowuj hasła, notatki, karty i kody 2FA w bazie SQLCipher AES-256 z automatycznym koszem i analizą entropii.
+• Kamuflaż i Przynęty: Działający Kalkulator, fałszywy błąd aplikacji oraz awaryjny PIN przymusu (Duress).
+• Potrząśnij, aby Zablokować: Natychmiastowa blokada awaryjna z regulacją czułości akcelerometru.
+• Rejestr Intruzów i Audyt SHA-256: Lokalne logi bezpieczeństwa, kryptograficzny audyt integralności SHA-256 i eksport CSV.
+• Auto-czyszczenie Schowka i Generator Haseł: Twórz silne hasła offline i automatycznie usuwaj skopiowane sekrety ze schowka.
+• Lokalne Autouzupełnianie, Szybkie Kafelki, Widżet, szyfrowane kopie .plk i obsługa Android TV.
+
+🛡️ 100% LOKALNEJ PRYWATNOŚCI:
+Bez kont w chmurze i bez reklam. Twoje dane pozostają wyłącznie na Twoim urządzeniu.
+
+────────────────────────────────────────
+UJAWNIENIE UŻYCIA ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock korzysta z AccessibilityService API wyłącznie w celu zapewnienia głównej funkcji Blokady Aplikacji (App Shield).
+
+• Zastosowanie: Monitoruje zdarzenia zmiany okna (TYPE_WINDOW_STATE_CHANGED) wyłącznie w celu wykrycia uruchomienia chronionej aplikacji i natychmiastowego wyświetlenia ekranu blokady.
+• Prywatność: PureLock NIE odczytuje, NIE przechwytuje i NIE uzyskuje dostępu do zawartości ekranu, naciśnięć klawiszy, haseł ani prywatnych wiadomości."
+uk,Ukrainian,PureLock: Блокування і Сейф,Офлайн-блокування додатків і сейф AES-256 SQLCipher. Без реклами та хмари.,"PureLock — це автономний комплекс приватності без реклами та зашифрований сейф для захисту додатків, паролів, кодів 2FA і нотаток на базі SQLCipher AES-256 та Android Keystore.
+
+🔒 ОСНОВНІ МОЖЛИВОСТІ:
+• App Shield (Блокування додатків): Захист додатків PIN-кодом, графічним ключем (невидимий слід), 4-квадрантним Knock-кодом або біометрією, з випадковою клавіатурою та періодом відтермінування.
+• Апаратно зашифрований сейф: Зберігання паролів, нотаток, карток і 2FA у базі SQLCipher AES-256 з кошиком і аналізом ентропії.
+• Маскування та приманки: Режим робочого Калькулятора, фальшивий збій додатку та екстрений PIN примусу (Duress).
+• Струснути для блокування: Миттєве аварійне блокування з налаштуванням чутливості.
+• Фіксація зловмисників і аудит SHA-256: Локальний журнал безпеки, перевірка цілісності SHA-256 та експорт CSV.
+• Автоочищення буфера і генератор паролів: Створення надійних паролів офлайн та автоматичне очищення буфера обміну.
+• Локальне автозаповнення, швидкі плитки, віджет, шифровані бекапи .plk і підтримка Android TV.
+
+🛡️ 100% ЛОКАЛЬНА ПРИВАТНІСТЬ:
+Без хмарних акаунтів і реклами. Усі зашифровані дані залишаються виключно на вашому пристрої.
+
+────────────────────────────────────────
+РОЗКРИТТЯ ВИКОРИСТАННЯ ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock використовує AccessibilityService API виключно для основної функції блокування додатків (App Shield).
+
+• Призначення: Відстежує лише події зміни вікна (TYPE_WINDOW_STATE_CHANGED) для виявлення запуску захищеного додатку та миттєвого показу екрана блокування.
+• Приватність: PureLock НЕ читає, НЕ перехоплює та НЕ збирає вміст екрана, натискання клавіш, паролі чи особисті повідомлення."
+sv-SE,Swedish (Sweden),PureLock: Applås & Valv,"Offline applås & AES-256 SQLCipher-valv. Ingen reklam, inget moln.","PureLock är en reklamfri integritetssvit och ett 100% offline krypterat valv för appar, lösenord, 2FA-koder och anteckningar — skyddat med SQLCipher AES-256 och Android Keystore.
+
+🔒 HUVUDFUNKTIONER:
+• App Shield (Applås): Lås appar med PIN, Mönster (osynligt spår), 4-kvadrant Knock-kod eller Biometri, med slumpad knappsats och nådatid.
+• Hårdvarukrypterat Valv: Lagra lösenord, anteckningar, kort och 2FA i SQLCipher AES-256 med papperskorg och entropianalys.
+• Kamouflage & Lockbeten: Fungerande Miniräknare, falsk kraschdialog och nöd-PIN (Duress).
+• Skaka för att Låsa: Omedelbar nödlåsning med justerbar känslighet.
+• Inkräktarlogg & SHA-256-granskning: Lokala säkerhetsloggar, SHA-256 integritetskontroll och CSV-export.
+• Auto-rensning av Urklipp & Lösenordsgenerator: Skapa starka lösenord offline och rensa kopierade hemligheter automatiskt.
+• Lokal Autofyll, Snabbpaneler, Widget, krypterade .plk-säkerhetskopior och Android TV.
+
+🛡️ 100% LOKAL INTEGRITET:
+Inga molnkonton och ingen reklam. All krypterad data stannar på din enhet.
+
+────────────────────────────────────────
+ANVÄNDNING AV ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock använder AccessibilityService API enbart för kärnfunktionen Applås (App Shield).
+
+• Användning: Övervakar fönsterändringar (TYPE_WINDOW_STATE_CHANGED) enbart för att upptäcka när en skyddad app öppnas och direkt visa låsskärmen.
+• Integritet: PureLock läser, sparar eller överför ALDRIG skärminnehåll, tangenttryckningar, lösenord eller privata meddelanden."
+da-DK,Danish (Denmark),PureLock: Applås & Boks,"Offline applås & AES-256 SQLCipher-boks. Ingen reklamer, ingen sky.","PureLock er en reklamefri privatlivssuite og 100% offline krypteret boks til apps, adgangskoder, 2FA-koder og private noter — beskyttet med SQLCipher AES-256 og Android Keystore.
+
+🔒 NØGLEFUNKTIONER:
+• App Shield (Applås): Lås apps med PIN, Mønster (usynligt spor), 4-kvadrant Knock-kode eller Biometri, med tilfældigt tastatur og henstandstid.
+• Hardwarekrypteret Boks: Gem adgangskoder, noter, kort og 2FA i SQLCipher AES-256 med papirkurv og entropianalyse.
+• Camouflage & Lokkeskærme: Fungerende Lommeregner, falsk nedbrudsdialog og nød-PIN (Duress).
+• Ryst for at Låse: Øjeblikkelig nødlåsning med justerbar følsomhed.
+• Ubuden Gæst-log & SHA-256-revision: Lokale sikkerhedslogs, SHA-256 integritetstjek og CSV-eksport.
+• Auto-ryd Udklipsholder & Adgangskodegenerator: Opret stærke koder offline og ryd kopierede hemmeligheder automatisk.
+• Lokal Autofyld, Hurtigfelter, Widget, krypterede .plk-backups og Android TV.
+
+🛡️ 100% LOKALT PRIVATLIV:
+Ingen skykonti og ingen reklamer. Dine krypterede data forbliver udelukkende på din enhed.
+
+────────────────────────────────────────
+OPLYSNING OM ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock bruger udelukkende AccessibilityService API til kernefunktionen Applås (App Shield).
+
+• Brug: Overvåger vinduesændringer (TYPE_WINDOW_STATE_CHANGED) udelukkende for at opdage, når en beskyttet app åbnes, og straks vise låseskærmen.
+• Privatliv: PureLock læser, gemmer eller tilgår ALDRIG skærmindhold, tastetryk, adgangskoder eller private beskeder."
+fi-FI,Finnish (Finland),PureLock: Sovelluslukko,"Offline-sovelluslukko & AES-256 SQLCipher-holvi. Ei mainoksia, ei pilveä.","PureLock on mainokseton 100% offline-tietosuojapaketti ja salattu holvi sovelluksille, salasanoille, 2FA-koodeille ja muistiinpanoille — suojattu SQLCipher AES-256:lla ja Android Keystorella.
+
+🔒 PÄÄOMINAISUUDET:
+• App Shield (Sovelluslukko): Suojaa sovellukset PIN-koodilla, kuviolla (näkymätön viiva), 4-alueisella Knock-koodilla tai biometriikalla; satunnainen näppäimistö ja viiveaika.
+• Laitteistosalattu Holvi: Tallenna salasanat, muistiinpanot, kortit ja 2FA SQLCipher AES-256 -tietokantaan roskakorilla ja entropia-analyysilla.
+• Naamiointi & Harhautukset: Toimiva Laskin-lukitus, valekaatumisikkuna ja hätä-PIN (Duress).
+• Ravista Lukitaksesi: Välitön hätälukitus säädettävällä herkkyydellä.
+• Tunkeilijaloki & SHA-256-tarkastus: Paikalliset lokit, SHA-256-eheystarkistus ja CSV-vienti.
+• Leikepöydän Automaattityhjennys & Salasanageneraattori: Luo vahvoja salasanoja offline-tilassa ja tyhjennä kopioidut salaisuudet automaattisesti.
+• Paikallinen Automaattitäyttö, Pikaruudut, Widget, salatut .plk-varmuuskopiot ja Android TV.
+
+🛡️ 100% PAIKALLINEN TIETOSUOJA:
+Ei pilvitilejä eikä mainoksia. Salatut tietosi pysyvät yksinomaan laitteellasi.
+
+────────────────────────────────────────
+ACCESSIBILITY SERVICE API -TIEDONANTO
+────────────────────────────────────────
+PureLock käyttää AccessibilityService API -rajapintaa ainoastaan ydintoimintoonsa Sovelluslukkoon (App Shield).
+
+• Käyttö: Seuraa ikkunan tilan muutoksia (TYPE_WINDOW_STATE_CHANGED) vain havaitakseen suojatun sovelluksen avaamisen ja näyttääkseen lukitusnäytön heti.
+• Tietosuoja: PureLock EI KOSKAAN lue, tallenna tai lähetä näytön sisältöä, näppäinpainalluksia, salasanoja tai yksityisviestejä."
+no-NO,Norwegian (Norway),PureLock: Applås og Hvelv,"Offline applås & AES-256 SQLCipher-hvelv. Ingen reklame, ingen sky.","PureLock er en reklamefri personvernpakke og 100% offline kryptert hvelv for apper, passord, 2FA-koder og private notater — beskyttet med SQLCipher AES-256 og Android Keystore.
+
+🔒 HOVEDFUNKSJONER:
+• App Shield (Applås): Lås apper med PIN, Mønster (usynlig spor), 4-kvadrant Knock-kode eller Biometri, med tilfeldig tastatur og utsettelsestid.
+• Maskinvarekryptert Hvelv: Lagre passord, notater, kort og 2FA i SQLCipher AES-256 med papirkurv og entropianalyse.
+• Kamuflasje & Lokkeskjermer: Fungerende Kalkulator, falsk krasjdialog og nød-PIN (Duress).
+• Rist for å Låse: Umiddelbar nødlåsing med justerbar følsomhet.
+• Inntrengerlogg & SHA-256-revisjon: Lokale sikkerhetslogger, SHA-256 integritetssjekk og CSV-eksport.
+• Auto-tømming av Utklippstavle & Passordgenerator: Lag sterke passord offline og slett kopierte hemmeligheter automatisk.
+• Lokal Autofyll, Hurtigfliser, Widget, krypterte .plk-sikkerhetskopier og Android TV.
+
+🛡️ 100% LOKALT PERSONVERN:
+Ingen skykontoer og ingen reklame. Krypterte data forblir utelukkende på enheten din.
+
+────────────────────────────────────────
+OPPLYSNING OM ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock bruker AccessibilityService API utelukkende til kjernefunksjonen Applås (App Shield).
+
+• Bruk: Overvåker vindusendringer (TYPE_WINDOW_STATE_CHANGED) kun for å oppdage når en beskyttet app åpnes og vise låseskjermen umiddelbart.
+• Personvern: PureLock leser, lagrer eller sender ALDRI skjerminnhold, tastetrykk, passord eller private meldinger."
+cs-CZ,Czech (Czechia),PureLock: Zámek Aplikací,Offline zámek aplikací a trezor AES-256 SQLCipher. Bez reklam a bez cloudu.,"PureLock je bezpečnostní sada bez reklam a 100% offline šifrovaný trezor pro vaše aplikace, hesla, 2FA kódy a soukromé poznámky — chráněný pomocí SQLCipher AES-256 a Android Keystore.
+
+🔒 HLAVNÍ FUNKCE:
+• App Shield (Zámek aplikací): Zamkněte aplikace pomocí PIN, Vzoru (neviditelná stopa), 4-kvadrantového Knock kódu nebo Biometrie, včetně náhodné klávesnice a doby odkladu.
+• Hardwarově šifrovaný trezor: Ukládejte hesla, poznámky, karty a 2FA v databázi SQLCipher AES-256 s košem a analýzou entropie.
+• Kamufláž a návnady: Funkční Kalkulačka, falešný pád aplikace a nouzový nátlakový PIN (Duress).
+• Zatřesení pro zamknutí: Okamžité nouzové uzamčení s nastavitelnou citlivostí.
+• Záznam narušitelů a SHA-256 audit: Lokální bezpečnostní protokoly, kryptografické ověření integrity SHA-256 a export CSV.
+• Automatické mazání schránky a generátor hesel: Generujte silná hesla offline a automaticky mazejte zkopírovaná tajemství.
+• Lokální automatické vyplňování, rychlé dlaždice, widget, šifrované zálohy .plk a Android TV.
+
+🛡️ 100% LOKÁLNÍ SOUKROMÍ:
+Žádné cloudové účty ani reklamy. Vaše šifrovaná data zůstávají výhradně v zařízení.
+
+────────────────────────────────────────
+PROHLÁŠENÍ K ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock používá AccessibilityService API výhradně pro hlavní funkci Zámek aplikací (App Shield).
+
+• Použití: Sleduje události změny okna (TYPE_WINDOW_STATE_CHANGED) pouze za účelem zjištění otevření chráněné aplikace a okamžitého zobrazení zamykací obrazovky.
+• Soukromí: PureLock NIKDY nečte, neshromažďuje ani nepřenáší obsah obrazovky, stisky kláves, hesla ani osobní zprávy."
+hu-HU,Hungarian (Hungary),PureLock: Alkalmazászár,Offline alkalmazászár és AES-256 SQLCipher széf. Reklám és felhő nélkül.,"A PureLock egy reklámmentes, 100%-ban offline adatvédelmi csomag és titkosított széf alkalmazásai, jelszavai, 2FA kódjai és jegyzetei védelmére SQLCipher AES-256 és Android Keystore segítségével.
+
+🔒 FŐBB FUNKCIÓK:
+• App Shield (Alkalmazászár): Zároljon bármely appot PIN-kóddal, Mintával (láthatatlan útvonal), 4-negyedes Knock kóddal vagy Biometriával, véletlen billentyűzettel és türelmi idővel.
+• Hardveresen Titkosított Széf: Tároljon jelszavakat, jegyzeteket, kártyákat és 2FA kódokat SQLCipher AES-256 adatbázisban, lomttárral és entrópia-elemzéssel.
+• Álcázás és Csalik: Működő Számológép álca, hamis összeomlás párbeszéd és kényszerített vész-PIN (Duress).
+• Rázásra Zárolás: Azonnali vészzárolás állítható érzékenységgel.
+• Behatoló Napló és SHA-256 Audit: Helyi biztonsági naplók, SHA-256 integritás-ellenőrzés és CSV export.
+• Vágólap Auto-törlés és Jelszógenerátor: Erős jelszavak generálása offline és a másolt adatok automatikus törlése.
+• Helyi Automatikus Kitöltés, Gyorsbeállítások, Widget, titkosított .plk mentések és Android TV.
+
+🛡️ 100% HELYI ADATVÉDELEM:
+Nincs felhőfiók, nincs reklám. Titkosított adatai kizárólag az eszközén maradnak.
+
+────────────────────────────────────────
+ACCESSIBILITY SERVICE API NYILATKOZAT
+────────────────────────────────────────
+A PureLock kizárólag az Alkalmazászár (App Shield) fő funkcióhoz használja az AccessibilityService API-t.
+
+• Használat: Kizárólag az ablakállapot-változásokat (TYPE_WINDOW_STATE_CHANGED) figyeli a védett appok megnyitásának észleléséhez és a zárolási képernyő azonnali megjelenítéséhez.
+• Adatvédelem: A PureLock SOHA nem olvas, rögzít vagy továbbít képernyőtartalmat, billentyűleütéseket, jelszavakat vagy személyes üzeneteket."
+ro,Romanian,PureLock: Blocare Aplicații,"Blocare aplicații offline și seif AES-256 SQLCipher. Fără reclame, fără cloud.","PureLock este o suită de confidențialitate fără reclame și un seif criptat 100% offline pentru aplicații, parole, coduri 2FA și notițe private — protejat cu SQLCipher AES-256 și Android Keystore.
+
+🔒 FUNCȚII PRINCIPALE:
+• App Shield (Blocare Aplicații): Protejează orice aplicație cu PIN, Model (traseu invizibil), Cod Knock în 4 cadrane sau Biometrie, cu tastatură aleatorie și perioadă de grație.
+• Seif Criptat Hardware: Salvează parole, notițe, carduri și 2FA în SQLCipher AES-256, cu coș de gunoi automat și analiză a entropiei.
+• Camuflaj și Momeli: Calculator funcțional, dialog fals de eroare și PIN de urgență sub constrângere (Duress).
+• Scutură pentru Blocare: Blocare de urgență instantanee cu sensibilitate reglabilă.
+• Jurnal Intruși și Audit SHA-256: Înregistrează încercările eșuate local, verifică integritatea criptografică SHA-256 și exportă CSV.
+• Curățare Clipboard și Generator Offline: Creează parole puternice și șterge automat secretele copiate.
+• Completare Automată Locală, Dale Rapide, Widget, backup-uri criptate .plk și Android TV.
+
+🛡️ CONFIDENȚIALITATE 100% LOCALĂ:
+Fără conturi în cloud și fără reclame. Datele tale criptate rămân exclusiv pe dispozitiv.
+
+────────────────────────────────────────
+UTILIZAREA ȘI DIVULGAREA ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+PureLock folosește AccessibilityService API strict pentru funcția principală de Blocare Aplicații (App Shield).
+
+• Cum se utilizează: Monitorizează evenimentele de schimbare a ferestrei (TYPE_WINDOW_STATE_CHANGED) doar pentru a detecta deschiderea unei aplicații protejate și a afișa imediat ecranul de blocare.
+• Confidențialitate: PureLock NU citește, NU colectează și NU accesează conținutul ecranului, tastele apăsate, parolele sau mesajele personale."
+el-GR,Greek (Greece),PureLock: Κλείδωμα Εφαρμογών,Κλείδωμα εφαρμογών offline & AES-256 SQLCipher θησαυροφυλάκιο. Χωρίς διαφημίσεις,"Το PureLock είναι μια σουίτα απορρήτου χωρίς διαφημίσεις και ένα 100% offline κρυπτογραφημένο θησαυροφυλάκιο για εφαρμογές, κωδικούς, 2FA και σημειώσεις με SQLCipher AES-256 και Android Keystore.
+
+🔒 ΚΥΡΙΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ:
+• App Shield (Κλείδωμα Εφαρμογών): Κλειδώστε εφαρμογές με PIN, Μοτίβο (αόρατη διαδρομή), Κωδικό Knock 4 τεταρτημορίων ή Βιομετρικά, με τυχαίο πληκτρολόγιο και περίοδο χάριτος.
+• Κρυπτογραφημένο Θησαυροφυλάκιο: Αποθηκεύστε κωδικούς, σημειώσεις, κάρτες και 2FA σε SQLCipher AES-256 με κάδο ανακύκλωσης και ανάλυση εντροπίας.
+• Καμουφλάζ & Δολώματα: Λειτουργική Αριθμομηχανή, ψεύτικο σφάλμα εφαρμογής και PIN έκτακτης ανάγκης (Duress).
+• Κούνημα για Κλείδωμα: Άμεσο κλείδωμα έκτακτης ανάγκης με ρυθμιζόμενη ευαισθησία.
+• Καταγραφή Εισβολέων & Έλεγχος SHA-256: Τοπικά αρχεία ασφαλείας, κρυπτογραφικός έλεγχος ακεραιότητας SHA-256 και εξαγωγή CSV.
+• Αυτόματος Καθαρισμός Προχείρου & Γεννήτρια Κωδικών: Δημιουργεί ισχυρούς κωδικούς offline και διαγράφει αυτόματα τα αντιγραμμένα μυστικά.
+• Τοπική Αυτόματη Συμπλήρωση, Πλακίδια, Widget, κρυπτογραφημένα αντίγραφα .plk και Android TV.
+
+🛡️ 100% ΤΟΠΙΚΟ ΑΠΟΡΡΗΤΟ:
+Χωρίς λογαριασμούς cloud και χωρίς διαφημίσεις. Τα κρυπτογραφημένα δεδομένα σας παραμένουν αποκλειστικά στη συσκευή σας.
+
+────────────────────────────────────────
+ΓΝΩΣΤΟΠΟΙΗΣΗ ΧΡΗΣΗΣ ACCESSIBILITY SERVICE API
+────────────────────────────────────────
+Το PureLock χρησιμοποιεί το AccessibilityService API αποκλειστικά για τη βασική λειτουργία Κλειδώματος Εφαρμογών (App Shield).
+
+• Χρήση: Παρακολουθεί αλλαγές παραθύρων (TYPE_WINDOW_STATE_CHANGED) μόνο για να εντοπίζει πότε ανοίγει μια προστατευμένη εφαρμογή και να εμφανίζει άμεσα την οθόνη κλειδώματος.
+• Απόρρητο: Το PureLock ΔΕΝ διαβάζει, ΔΕΝ καταγράφει και ΔΕΝ αποκτά πρόσβαση σε περιεχόμενο οθόνης, πληκτρολογήσεις, κωδικούς ή προσωπικά μηνύματα."

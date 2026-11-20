@@ -519,7 +519,7 @@ fun IntruderVaultScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { selectedSelfie = null }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { selectedSelfie = null }) { Text(stringResource(R.string.btn_close)) }
             },
             dismissButton = {
                 TextButton(
@@ -589,7 +589,7 @@ fun IntruderVaultScreen(
                             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = null
+                                    contentDescription = stringResource(R.string.cd_toggle_visibility)
                                 )
                             }
                         },

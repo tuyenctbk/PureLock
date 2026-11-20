@@ -212,7 +212,7 @@ fun InvisibleSuiteScreen(
                                 showChangeKnockDialog = true
                             }
                             else -> {
-                                newPinInput = masterPin
+                                newPinInput = ""
                                 showChangePinDialog = true
                             }
                         }
@@ -318,7 +318,7 @@ fun InvisibleSuiteScreen(
                     title = duressTitle,
                     subtitle = if (duressPin.isNotBlank()) stringResource(R.string.suite_pin_current_subtitle) else stringResource(R.string.perm_status_inactive),
                     onClick = {
-                        newDuressPinInput = duressPin
+                        newDuressPinInput = ""
                         duressPinError = null
                         showDuressPinDialog = true
                     },
@@ -487,8 +487,9 @@ fun InvisibleSuiteScreen(
                                     onClick = { viewModel.setShakeSensitivity(preset.key) },
                                     label = {
                                         Text(
-                                            text = preset.badgeLabel,
+                                            text = stringResource(preset.labelRes),
                                             fontSize = 11.sp,
+                                            maxLines = 1,
                                             fontWeight = if (activeSensitivity == preset) FontWeight.Bold else FontWeight.Medium
                                         )
                                     },
@@ -843,6 +844,7 @@ fun InvisibleSuiteScreen(
                     OutlinedTextField(
                         value = newPinInput,
                         onValueChange = { if (it.length <= 8 && it.all { char -> char.isDigit() }) newPinInput = it },
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
                         ),
@@ -1014,7 +1016,10 @@ fun InvisibleSuiteScreen(
 
                     if (newKnockList.isNotEmpty()) {
                         TextButton(onClick = { newKnockList = emptyList() }) {
-                            Text("${stringResource(R.string.clear)} (${newKnockList.joinToString("→")})", fontSize = 12.sp)
+                            Text(
+                                text = stringResource(R.string.suite_knock_clear_sequence_format, newKnockList.joinToString("→")),
+                                fontSize = 12.sp
+                            )
                         }
                     }
                 }
@@ -1064,6 +1069,7 @@ fun InvisibleSuiteScreen(
                                 duressPinError = null
                             }
                         },
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
                         ),
@@ -1088,12 +1094,17 @@ fun InvisibleSuiteScreen(
                                 duressPinError = context.getString(R.string.onboarding_pin_min_length_error)
                             }
                             newDuressPinInput.isNotEmpty() && newDuressPinInput == masterPin -> {
-                                duressPinError = context.getString(R.string.suite_set_duress_pin_desc)
+                                duressPinError = context.getString(R.string.suite_duress_same_as_master_error)
                             }
                             else -> {
                                 viewModel.setDuressPin(newDuressPinInput)
                                 showDuressPinDialog = false
-                                Toast.makeText(context, context.getString(R.string.suite_duress_pin_configured_toast), Toast.LENGTH_SHORT).show()
+                                val toastRes = if (newDuressPinInput.isEmpty()) {
+                                    R.string.suite_duress_pin_cleared_toast
+                                } else {
+                                    R.string.suite_duress_pin_configured_toast
+                                }
+                                Toast.makeText(context, context.getString(toastRes), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

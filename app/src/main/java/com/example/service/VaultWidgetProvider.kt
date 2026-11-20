@@ -97,7 +97,7 @@ class VaultWidgetProvider : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.vault_widget)
 
         val db = PureLockDatabase.getDatabase(context)
-        val lockedCount = db.appLockDao().getAllLockedApps().first().count { it.isLocked }
+        val lockedCount = db.appLockDao().getActiveLockedAppsCount().first()
         val vaultCount = db.encryptedVaultDao().getActiveVaultItems().first().size
         val totalProtected = lockedCount + vaultCount
 

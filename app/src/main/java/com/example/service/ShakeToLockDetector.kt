@@ -10,6 +10,8 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
+import androidx.annotation.StringRes
+import com.example.R
 import kotlin.math.sqrt
 
 /**
@@ -20,11 +22,12 @@ enum class ShakeSensitivity(
     val key: String,
     val gThreshold: Float,
     val minShakeCount: Int,
-    val badgeLabel: String
+    val badgeLabel: String,
+    @param:StringRes val labelRes: Int
 ) {
-    HIGH(key = "HIGH", gThreshold = 1.7f, minShakeCount = 2, badgeLabel = "1.7G"),
-    MEDIUM(key = "MEDIUM", gThreshold = 2.2f, minShakeCount = 2, badgeLabel = "2.2G"),
-    LOW(key = "LOW", gThreshold = 2.8f, minShakeCount = 2, badgeLabel = "2.8G");
+    HIGH(key = "HIGH", gThreshold = 1.7f, minShakeCount = 2, badgeLabel = "1.7G", labelRes = R.string.shake_sensitivity_high),
+    MEDIUM(key = "MEDIUM", gThreshold = 2.2f, minShakeCount = 2, badgeLabel = "2.2G", labelRes = R.string.shake_sensitivity_medium),
+    LOW(key = "LOW", gThreshold = 2.8f, minShakeCount = 2, badgeLabel = "2.8G", labelRes = R.string.shake_sensitivity_low);
 
     companion object {
         fun fromKey(key: String?): ShakeSensitivity {

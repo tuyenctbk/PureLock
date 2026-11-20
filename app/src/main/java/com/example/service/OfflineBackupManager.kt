@@ -23,7 +23,8 @@ import javax.crypto.spec.SecretKeySpec
 class OfflineBackupManager(private val context: Context) {
 
     companion object {
-        private const val ITERATIONS = 10000
+        private const val LEGACY_ITERATIONS = 10000
+        private const val ITERATIONS = 120000
         private const val KEY_LENGTH = 256
         private const val GCM_TAG_LENGTH = 128
         private const val IV_LENGTH = 12
@@ -120,8 +121,9 @@ class OfflineBackupManager(private val context: Context) {
         val ciphertext = cipher.doFinal(plainBytes)
 
         val encryptedPackage = JSONObject().apply {
-            put("version", 1)
+            put("version", 2)
             put("algorithm", "AES-256-GCM")
+            put("iterations", ITERATIONS)
             put("salt", Base64.encodeToString(salt, Base64.NO_WRAP))
             put("iv", Base64.encodeToString(iv, Base64.NO_WRAP))
             put("ciphertext", Base64.encodeToString(ciphertext, Base64.NO_WRAP))
@@ -175,9 +177,10 @@ class OfflineBackupManager(private val context: Context) {
         val ciphertext = cipher.doFinal(plainBytes)
 
         val encryptedPackage = JSONObject().apply {
-            put("version", 1)
+            put("version", 2)
             put("type", "PURELOCK_ENCRYPTED_NOTES")
             put("algorithm", "AES-256-GCM")
+            put("iterations", ITERATIONS)
             put("salt", Base64.encodeToString(salt, Base64.NO_WRAP))
             put("iv", Base64.encodeToString(iv, Base64.NO_WRAP))
             put("ciphertext", Base64.encodeToString(ciphertext, Base64.NO_WRAP))
@@ -213,11 +216,12 @@ class OfflineBackupManager(private val context: Context) {
     suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val packageObj = JSONObject(jsonPackageStr)
+            val iterations = packageObj.optInt("iterations", LEGACY_ITERATIONS).coerceAtLeast(1000)
             val salt = Base64.decode(packageObj.getString("salt"), Base64.NO_WRAP)
             val iv = Base64.decode(packageObj.getString("iv"), Base64.NO_WRAP)
             val ciphertext = Base64.decode(packageObj.getString("ciphertext"), Base64.NO_WRAP)
 
-            val secretKey = deriveKey(passphrase, salt)
+            val secretKey = deriveKey(passphrase, salt, iterations)
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             val gcmSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec)
@@ -281,11 +285,12 @@ class OfflineBackupManager(private val context: Context) {
     suspend fun importEncryptedBackup(jsonPackageStr: String, passphrase: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val packageObj = JSONObject(jsonPackageStr)
+            val iterations = packageObj.optInt("iterations", LEGACY_ITERATIONS).coerceAtLeast(1000)
             val salt = Base64.decode(packageObj.getString("salt"), Base64.NO_WRAP)
             val iv = Base64.decode(packageObj.getString("iv"), Base64.NO_WRAP)
             val ciphertext = Base64.decode(packageObj.getString("ciphertext"), Base64.NO_WRAP)
 
-            val secretKey = deriveKey(passphrase, salt)
+            val secretKey = deriveKey(passphrase, salt, iterations)
 
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             val gcmSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
@@ -377,9 +382,9 @@ class OfflineBackupManager(private val context: Context) {
         }
     }
 
-    private fun deriveKey(passphrase: String, salt: ByteArray): SecretKeySpec {
+    private fun deriveKey(passphrase: String, salt: ByteArray, iterations: Int = ITERATIONS): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val spec = PBEKeySpec(passphrase.toCharArray(), salt, ITERATIONS, KEY_LENGTH)
+        val spec = PBEKeySpec(passphrase.toCharArray(), salt, iterations, KEY_LENGTH)
         val secretKey = factory.generateSecret(spec)
         return SecretKeySpec(secretKey.encoded, "AES")
     }

@@ -27,7 +27,7 @@ class LockOverlayActivity : FragmentActivity() {
     }
 
     private lateinit var repository: PureLockRepository
-    private var lockedPackageState = mutableStateOf("com.android.settings")
+    private var lockedPackageState = mutableStateOf("")
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -60,7 +60,7 @@ class LockOverlayActivity : FragmentActivity() {
         val prefs = PureLockPreferences(this)
         repository = PureLockRepository(this, db.appLockDao(), db.intruderDao(), db.logDao(), db.scheduleRuleDao(), db.encryptedVaultDao(), db.userSettingDao(), prefs)
 
-        lockedPackageState.value = intent.getStringExtra(EXTRA_LOCKED_PACKAGE) ?: "com.android.settings"
+        lockedPackageState.value = intent.getStringExtra(EXTRA_LOCKED_PACKAGE)?.takeIf { it.isNotBlank() } ?: packageName
 
         setContent {
             val lockedPackage by lockedPackageState

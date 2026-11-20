@@ -192,7 +192,10 @@ fun PrivacyShieldScreen(
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Text(
-                                        text = if (isAccessibilityGranted) "(${stringResource(R.string.perm_status_active)})" else "(${stringResource(R.string.perm_status_inactive)})",
+                                        text = stringResource(
+                                            R.string.status_parenthesized_format,
+                                            stringResource(if (isAccessibilityGranted) R.string.perm_status_active else R.string.perm_status_inactive)
+                                        ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = if (isAccessibilityGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                                         fontWeight = FontWeight.Medium
@@ -258,7 +261,10 @@ fun PrivacyShieldScreen(
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Text(
-                                        text = if (isOverlayGranted) "(${stringResource(R.string.perm_status_granted)})" else "(${stringResource(R.string.perm_status_required)})",
+                                        text = stringResource(
+                                            R.string.status_parenthesized_format,
+                                            stringResource(if (isOverlayGranted) R.string.perm_status_granted else R.string.perm_status_required)
+                                        ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = if (isOverlayGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                                         fontWeight = FontWeight.Medium
@@ -288,8 +294,8 @@ fun PrivacyShieldScreen(
             val dbEncryptionStatus by produceState(
                 initialValue = DatabaseEncryptionStatus(
                     databaseName = PureLockDatabase.DATABASE_NAME,
-                    isSqlCipherLoaded = true,
-                    isEncryptedOnDisk = true,
+                    isSqlCipherLoaded = PureLockDatabase.isSqlCipherNativeLoaded(),
+                    isEncryptedOnDisk = false,
                     isKeyHardwareWrapped = false
                 ),
                 key1 = context

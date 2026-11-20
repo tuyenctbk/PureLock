@@ -106,4 +106,16 @@ class PureLockSecurityLogicTest {
         assertEquals("0.5", evaluateCalculatorExpression("50%"))
         assertEquals("1", evaluateCalculatorExpression("10%3"))
     }
+
+    @Test
+    fun testCalculatorExpression_consistentAcrossCommaDecimalLocales() {
+        val prevLocale = java.util.Locale.getDefault()
+        try {
+            java.util.Locale.setDefault(java.util.Locale.FRANCE)
+            assertEquals("0.5", evaluateCalculatorExpression("50%"))
+            assertEquals("2.50", evaluateCalculatorExpression("5÷2"))
+        } finally {
+            java.util.Locale.setDefault(prevLocale)
+        }
+    }
 }

@@ -315,9 +315,9 @@ fun PermissionApproveGuideContent(
             title = { Text(stringResource(R.string.perm_guide_device_tips_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    DeviceTipRow("Samsung One UI", stringResource(R.string.perm_guide_tip_samsung))
-                    DeviceTipRow("Xiaomi / MIUI", stringResource(R.string.perm_guide_tip_xiaomi))
-                    DeviceTipRow("Google Pixel", stringResource(R.string.perm_guide_tip_pixel))
+                    DeviceTipRow(stringResource(R.string.perm_guide_brand_samsung), stringResource(R.string.perm_guide_tip_samsung))
+                    DeviceTipRow(stringResource(R.string.perm_guide_brand_xiaomi), stringResource(R.string.perm_guide_tip_xiaomi))
+                    DeviceTipRow(stringResource(R.string.perm_guide_brand_pixel), stringResource(R.string.perm_guide_tip_pixel))
                 }
             },
             confirmButton = {

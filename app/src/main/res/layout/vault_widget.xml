@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:padding="16.dp">
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,8 +13,8 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24.dp"
-            android:layout_height="24.dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:contentDescription="@string/widget_shield_cd"
             android:src="@drawable/splash_logo" />
 
@@ -31,7 +31,7 @@
         <Button
             android:id="@+id/btn_lock_widget"
             android:layout_width="wrap_content"
-            android:layout_height="36.dp"
+            android:layout_height="36dp"
             android:backgroundTint="#EF4444"
             android:text="@string/widget_btn_lock"
             android:textColor="#FFFFFF"

@@ -621,7 +621,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                             Text(stringResource(R.string.onboarding_perm_acc_title), fontWeight = FontWeight.Bold, color = Color.White)
                             if (isAccessibilityGranted) {
                                 Text(
-                                    text = "(${stringResource(R.string.perm_status_active)})",
+                                    text = stringResource(R.string.status_parenthesized_format, stringResource(R.string.perm_status_active)),
                                     fontSize = 12.sp,
                                     color = Color(0xFF4ADE80),
                                     fontWeight = FontWeight.SemiBold
@@ -677,7 +677,7 @@ private fun OnboardingStepPermissions(context: android.content.Context) {
                             Text(stringResource(R.string.onboarding_perm_overlay_title), fontWeight = FontWeight.Bold, color = Color.White)
                             if (isOverlayGranted) {
                                 Text(
-                                    text = "(${stringResource(R.string.perm_status_granted)})",
+                                    text = stringResource(R.string.status_parenthesized_format, stringResource(R.string.perm_status_granted)),
                                     fontSize = 12.sp,
                                     color = Color(0xFF4ADE80),
                                     fontWeight = FontWeight.SemiBold

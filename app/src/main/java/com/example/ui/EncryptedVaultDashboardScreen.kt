@@ -54,6 +54,8 @@ enum class VaultFilterCategory(val labelRes: Int, val categoryKey: String, val i
 @Composable
 fun EncryptedVaultDashboardScreen(
     viewModel: PureLockViewModel,
+    openGeneratorOnLaunch: Boolean = false,
+    onGeneratorLaunchConsumed: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -87,7 +89,17 @@ fun EncryptedVaultDashboardScreen(
     }
 
     var showAddEditDialog by remember { mutableStateOf(false) }
+    var expandGeneratorOnOpen by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
+
+    LaunchedEffect(openGeneratorOnLaunch) {
+        if (openGeneratorOnLaunch) {
+            editingItem = null
+            expandGeneratorOnOpen = true
+            showAddEditDialog = true
+            onGeneratorLaunchConsumed()
+        }
+    }
     var itemToDelete by remember { mutableStateOf<EncryptedVaultEntity?>(null) }
     var showEmptyTrashDialog by remember { mutableStateOf(false) }
     var showInsightsDialog by remember { mutableStateOf(false) }
@@ -473,13 +485,14 @@ fun EncryptedVaultDashboardScreen(
                                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 },
                                 label = {
+                                    val count = when (cat) {
+                                        VaultFilterCategory.ALL -> encryptedVaultItems.size
+                                        VaultFilterCategory.TRASH -> trashVaultItems.size
+                                        VaultFilterCategory.FAVORITES -> encryptedVaultItems.count { it.isFavorite }
+                                        else -> encryptedVaultItems.count { it.category.equals(cat.categoryKey, ignoreCase = true) }
+                                    }
                                     Text(
-                                        text = when (cat) {
-                                            VaultFilterCategory.ALL -> "$labelText (${encryptedVaultItems.size})"
-                                            VaultFilterCategory.TRASH -> "$labelText (${trashVaultItems.size})"
-                                            VaultFilterCategory.FAVORITES -> "$labelText (${encryptedVaultItems.count { it.isFavorite }})"
-                                            else -> "$labelText (${encryptedVaultItems.count { it.category.equals(cat.categoryKey, ignoreCase = true) }})"
-                                        },
+                                        text = stringResource(R.string.label_with_count_format, labelText, count),
                                         fontSize = 12.sp
                                     )
                                 },
@@ -600,11 +613,11 @@ fun EncryptedVaultDashboardScreen(
                                     revealedItemIds = revealedItemIds - item.id
                                     if (editingItem?.id == item.id) editingItem = null
                                     viewModel.moveVaultItemToTrash(item.id)
-                                    Toast.makeText(context, context.getString(R.string.vault_moved_to_trash, item.title), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.vault_item_moved_to_trash, item.title), Toast.LENGTH_SHORT).show()
                                 },
                                 onRestore = {
                                     viewModel.restoreVaultItemFromTrash(item.id)
-                                    Toast.makeText(context, context.getString(R.string.vault_restored_from_trash, item.title), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.vault_item_restored, item.title), Toast.LENGTH_SHORT).show()
                                 },
                                 onPermanentDelete = {
                                     itemToDelete = item
@@ -627,8 +640,13 @@ fun EncryptedVaultDashboardScreen(
         val savedToast = stringResource(R.string.vault_item_saved_securely)
         AddEditVaultEntryDialog(
             initialItem = editingItem,
-            onDismiss = { showAddEditDialog = false },
+            initialShowPasswordGenerator = expandGeneratorOnOpen,
+            onDismiss = {
+                expandGeneratorOnOpen = false
+                showAddEditDialog = false
+            },
             onSave = { title, secret, category, username, website, notes, isPinned, isFavorite ->
+                expandGeneratorOnOpen = false
                 val currentItem = editingItem
                 if (currentItem != null) {
                     viewModel.updateEncryptedVaultItem(
@@ -1052,6 +1070,7 @@ fun VaultItemCard(
 @Composable
 fun AddEditVaultEntryDialog(
     initialItem: EncryptedVaultEntity?,
+    initialShowPasswordGenerator: Boolean = false,
     onDismiss: () -> Unit,
     onSave: (
         title: String,
@@ -1074,7 +1093,7 @@ fun AddEditVaultEntryDialog(
     var isFavorite by remember(initialItem?.id) { mutableStateOf(initialItem?.isFavorite ?: false) }
 
     var isSecretVisible by remember { mutableStateOf(false) }
-    var showPasswordGenerator by remember { mutableStateOf(false) }
+    var showPasswordGenerator by remember(initialShowPasswordGenerator) { mutableStateOf(initialShowPasswordGenerator) }
 
     val categories = listOf(
         Pair("PASSWORD", stringResource(R.string.category_password)),

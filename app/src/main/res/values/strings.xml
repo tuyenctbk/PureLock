@@ -420,7 +420,7 @@
     <string name="suite_language_title">Application Language</string>
     <string name="suite_language_desc">Choose user interface language</string>
     <string name="suite_about_title">About PureLock</string>
-    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.5</string>
+    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version %1$s</string>
     <string name="suite_hardware_keystore">Android Keystore Backed (AES-GCM-256)</string>
 
     <!-- Intruder Vault Additional Strings -->
@@ -553,7 +553,7 @@
     <string name="field_title">Title</string>
     <string name="field_secret_content">Secret Content</string>
     <string name="delete_secret_dialog_title">Delete Secret?</string>
-    <string name="delete_secret_dialog_message">Permanently delete \&quot;%1$s\&quot;?</string>
+    <string name="delete_secret_dialog_message">Permanently delete \"%1$s\"?</string>
 
     <!-- Invisible Suite Master Credential & Settings -->
     <string name="lock_mode_knock">Knock</string>
@@ -874,5 +874,47 @@
     <string name="share_app_subject">PureLock Zero-Knowledge Privacy</string>
     <string name="share_app_text_format">Protect your personal privacy with PureLock! Zero-cloud offline app lock &amp; encrypted vault. Download now: https://play.google.com/store/apps/details?id=%1$s</string>
     <string name="share_app_chooser_title">Share PureLock via</string>
+
+    <!-- Refactored UI Labels, Sensitivities & Audit Action Titles -->
+    <string name="perm_guide_brand_samsung">Samsung One UI</string>
+    <string name="perm_guide_brand_xiaomi">Xiaomi / MIUI</string>
+    <string name="perm_guide_brand_pixel">Google Pixel</string>
+    <string name="shake_sensitivity_high">High (1.7G)</string>
+    <string name="shake_sensitivity_medium">Medium (2.2G)</string>
+    <string name="shake_sensitivity_low">Low (2.8G)</string>
+    <string name="suite_duress_same_as_master_error">Duress PIN must be different from your Master PIN.</string>
+    <string name="suite_duress_pin_cleared_toast">Duress PIN removed</string>
+    <string name="shield_filter_locked_count">Locked (%1$d)</string>
+    <string name="shield_filter_unlocked_count">Unlocked (%1$d)</string>
+    <string name="label_with_count_format">%1$s (%2$d)</string>
+    <string name="status_parenthesized_format">(%1$s)</string>
+    <string name="lock_calc_error">Error</string>
+    <string name="copied_item_clipboard_countdown">\"%1$s\" — Copied! Clipboard clears in %2$ds</string>
+    <string name="copied_item_toast">\"%1$s\" copied to clipboard</string>
+    <string name="badge_sqlcipher_pending">Verifying Encryption</string>
+    <string name="language_system_default">System Default</string>
+    <string name="suite_knock_clear_sequence_format">Clear (%1$s)</string>
+    <string name="log_action_app_locked">App Locked</string>
+    <string name="log_action_app_unlocked">App Unlocked</string>
+    <string name="log_action_vault_item_added">Secret Added</string>
+    <string name="log_action_vault_item_updated">Secret Updated</string>
+    <string name="log_action_vault_item_trashed">Moved to Trash</string>
+    <string name="log_action_vault_item_restored">Restored from Trash</string>
+    <string name="log_action_vault_item_deleted">Secret Deleted</string>
+    <string name="log_action_intruder_detected">Intruder Detected</string>
+    <string name="log_action_panic_mode_activated">Panic Mode Activated</string>
+    <string name="log_action_shake_to_lock">Shake to Lock</string>
+    <string name="log_action_background_auto_lock">Background Auto-Lock</string>
+    <string name="log_action_auto_lock_triggered">Auto-Lock Triggered</string>
+    <string name="log_action_vault_integrity_check">Vault Integrity Check</string>
+    <string name="log_action_vault_lockdown">Vault Lockdown</string>
+    <string name="log_action_quick_lockdown_tile">Quick Lockdown Tile</string>
+    <string name="log_action_settings_changed">Settings Updated</string>
+    <string name="log_action_shield_initialized">Shield Initialized</string>
+    <string name="log_action_sensitive_state_cleared">Sensitive State Cleared</string>
+    <string name="log_action_autofill_request">Autofill Suggestion</string>
+    <string name="log_action_new_package_detected">New App Detected</string>
+    <string name="log_action_package_uninstalled">App Uninstalled</string>
+    <string name="log_action_apps_synced">Apps Synchronized</string>
 </resources>
 

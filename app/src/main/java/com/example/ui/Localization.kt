@@ -69,6 +69,13 @@ object L10n {
         "ro" to "Română (Romanian)"
     )
 
+    fun getDisplayName(context: Context, languageCode: String): String {
+        if (languageCode == "SYSTEM") {
+            return context.getString(com.example.R.string.language_system_default)
+        }
+        return supportedLanguages[languageCode] ?: languageCode
+    }
+
     fun getString(context: Context, key: String): String {
         val resId = context.resources.getIdentifier(key, "string", context.packageName)
         return if (resId != 0) {

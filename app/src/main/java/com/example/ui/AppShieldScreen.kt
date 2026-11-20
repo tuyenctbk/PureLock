@@ -296,14 +296,14 @@ fun AppShieldScreen(
                 FilterChip(
                     selected = selectedStatusFilter == "LOCKED",
                     onClick = { selectedStatusFilter = "LOCKED" },
-                    label = { Text("${stringResource(R.string.shield_filter_locked)} ($activeCount)", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                    label = { Text(stringResource(R.string.shield_filter_locked_count, activeCount), fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(12.dp)) },
                     modifier = Modifier.weight(1.15f).testTag("chip_status_locked")
                 )
                 FilterChip(
                     selected = selectedStatusFilter == "UNLOCKED",
                     onClick = { selectedStatusFilter = "UNLOCKED" },
-                    label = { Text("${stringResource(R.string.shield_filter_unlocked)} (${allApps.size - activeCount})", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                    label = { Text(stringResource(R.string.shield_filter_unlocked_count, allApps.size - activeCount), fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
                     leadingIcon = { Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(12.dp)) },
                     modifier = Modifier.weight(1.25f).testTag("chip_status_unlocked")
                 )

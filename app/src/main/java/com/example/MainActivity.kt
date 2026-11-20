@@ -287,6 +287,7 @@ class MainActivity : FragmentActivity() {
                                     "VIEW_SHIELD" -> "shield"
                                     "VIEW_INTRUDER" -> "intruder"
                                     "VIEW_AUDIT" -> "audit"
+                                    "VIEW_VAULT", "GENERATE_PASSWORD" -> "vault"
                                     else -> null
                                 }
                                 if (targetRoute != null && targetRoute != currentRoute) {
@@ -297,6 +298,8 @@ class MainActivity : FragmentActivity() {
                                         launchSingleTop = true
                                         restoreState = true
                                     }
+                                }
+                                if (shortcutAction != null && shortcutAction != "GENERATE_PASSWORD") {
                                     shortcutActionState.value = null
                                 }
                             }
@@ -485,6 +488,12 @@ class MainActivity : FragmentActivity() {
                                         composable("vault") {
                                             EncryptedVaultDashboardScreen(
                                                 viewModel = viewModel,
+                                                openGeneratorOnLaunch = shortcutAction == "GENERATE_PASSWORD",
+                                                onGeneratorLaunchConsumed = {
+                                                    if (shortcutActionState.value == "GENERATE_PASSWORD") {
+                                                        shortcutActionState.value = null
+                                                    }
+                                                },
                                                 onNavigateToSettings = {
                                                     navController.navigate("suite") {
                                                         popUpTo(navController.graph.findStartDestination().id) {

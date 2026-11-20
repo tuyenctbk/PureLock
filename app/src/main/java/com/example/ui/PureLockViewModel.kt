@@ -198,10 +198,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun clearSensitiveState() {
-        // Purge clipboard data and in-memory sensitive cached buffers
-        clearClipboardNow()
-        viewModelScope.launch {
-            repository.logSecurityEvent("SENSITIVE_STATE_CLEARED", "Screen lock / app background transition executed: sensitive state and clipboard purged.")
+        // Only purge system clipboard when PureLock holds an active sensitive clip
+        if (isSensitiveClipActive.value) {
+            clearClipboardNow()
+            viewModelScope.launch {
+                repository.logSecurityEvent("SENSITIVE_STATE_CLEARED", "Screen lock / app background transition executed: sensitive state and clipboard purged.")
+            }
         }
     }
 
@@ -730,6 +732,40 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         return sb.toString()
     }
 
+    private fun parseCsvRow(line: String): List<String> {
+        val result = mutableListOf<String>()
+        val current = StringBuilder()
+        var inQuotes = false
+        var i = 0
+        while (i < line.length) {
+            val ch = line[i]
+            if (inQuotes) {
+                if (ch == '"') {
+                    if (i + 1 < line.length && line[i + 1] == '"') {
+                        current.append('"')
+                        i++
+                    } else {
+                        inQuotes = false
+                    }
+                } else {
+                    current.append(ch)
+                }
+            } else {
+                when (ch) {
+                    '"' -> inQuotes = true
+                    ',' -> {
+                        result.add(current.toString().trim())
+                        current.clear()
+                    }
+                    else -> current.append(ch)
+                }
+            }
+            i++
+        }
+        result.add(current.toString().trim())
+        return result
+    }
+
     fun importConfigFromCsv(csvData: String): Boolean {
         return try {
             val lines = csvData.lines().filter { it.isNotBlank() }
@@ -739,10 +775,10 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                 if (header.startsWith("RecordType")) {
                     // Full Human-Readable CSV format
                     lines.drop(1).forEach { line ->
-                        val parts = line.split(",")
-                        if (parts.size >= 5 && parts[0].trim() == "APP") {
-                            val pkg = parts[3].trim()
-                            val lockedPart = parts[4].trim()
+                        val parts = parseCsvRow(line)
+                        if (parts.size >= 5 && parts[0] == "APP") {
+                            val pkg = parts[3]
+                            val lockedPart = parts[4]
                             val isLocked = lockedPart.contains("true", ignoreCase = true)
                             repository.setAppLockState(pkg, isLocked)
                         }
@@ -750,10 +786,10 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                 } else {
                     // Standard config CSV format
                     lines.drop(1).forEach { line ->
-                        val parts = line.split(",")
+                        val parts = parseCsvRow(line)
                         if (parts.size >= 4) {
-                            val pkg = parts[0].trim()
-                            val isLocked = parts[3].trim().toBooleanStrictOrNull() ?: false
+                            val pkg = parts[0]
+                            val isLocked = parts[3].toBooleanStrictOrNull() ?: false
                             repository.setAppLockState(pkg, isLocked)
                         }
                     }
