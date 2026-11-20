@@ -515,12 +515,14 @@ private fun PayPalQrDonationTabContent(context: Context) {
         val shareChooserTitle = stringResource(R.string.donation_paypal_share_chooser)
         val shareBody = stringResource(R.string.donation_paypal_share_body)
 
+        val paypalClipboardLabel = stringResource(R.string.donation_paypal_clipboard_label)
+
         Button(
             onClick = {
                 val result = DonationChannelsHelper.openUrlOrCopyFallback(
                     context = context,
                     url = paypalUrl,
-                    clipboardLabel = "PayPal Support Link"
+                    clipboardLabel = paypalClipboardLabel
                 )
                 if (result == ExternalDonationResult.CopiedToClipboardFallback) {
                     Toast.makeText(context, browserFallbackMsg, Toast.LENGTH_SHORT).show()
@@ -543,7 +545,7 @@ private fun PayPalQrDonationTabContent(context: Context) {
         ) {
             OutlinedButton(
                 onClick = {
-                    if (DonationChannelsHelper.copyLinkToClipboard(context, "PayPal Support Link", paypalUrl)) {
+                    if (DonationChannelsHelper.copyLinkToClipboard(context, paypalClipboardLabel, paypalUrl)) {
                         Toast.makeText(context, linkCopiedMsg, Toast.LENGTH_SHORT).show()
                     }
                 },
@@ -629,12 +631,14 @@ private fun KofiDonationTabContent(context: Context) {
             }
         }
 
+        val kofiClipboardLabel = stringResource(R.string.donation_kofi_clipboard_label)
+
         Button(
             onClick = {
                 val result = DonationChannelsHelper.openUrlOrCopyFallback(
                     context = context,
                     url = kofiUrl,
-                    clipboardLabel = "Ko-fi Support Link"
+                    clipboardLabel = kofiClipboardLabel
                 )
                 if (result == ExternalDonationResult.CopiedToClipboardFallback) {
                     Toast.makeText(context, browserFallbackMsg, Toast.LENGTH_SHORT).show()
@@ -653,7 +657,7 @@ private fun KofiDonationTabContent(context: Context) {
 
         OutlinedButton(
             onClick = {
-                if (DonationChannelsHelper.copyLinkToClipboard(context, "Ko-fi Support Link", kofiUrl)) {
+                if (DonationChannelsHelper.copyLinkToClipboard(context, kofiClipboardLabel, kofiUrl)) {
                     Toast.makeText(context, linkCopiedMsg, Toast.LENGTH_SHORT).show()
                 }
             },

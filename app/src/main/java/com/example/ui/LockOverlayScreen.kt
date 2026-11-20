@@ -83,10 +83,10 @@ fun LockOverlayScreen(
     var isConfigLoaded by remember { mutableStateOf(false) }
     var appName by remember { mutableStateOf(packageName) }
     var appIconBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var masterPin by remember { mutableStateOf("1234") }
+    var masterPin by remember { mutableStateOf("") }
     var duressPin by remember { mutableStateOf("") }
-    var masterPattern by remember { mutableStateOf("1,2,5,8,9") }
-    var masterKnock by remember { mutableStateOf("1,2,4,3") }
+    var masterPattern by remember { mutableStateOf("") }
+    var masterKnock by remember { mutableStateOf("") }
     var securityType by remember { mutableStateOf("PIN") }
     var isBiometricEnabled by remember { mutableStateOf(true) }
     var isRandomKeyboard by remember { mutableStateOf(false) }
@@ -175,13 +175,13 @@ fun LockOverlayScreen(
             intruderCapturedBanner = true
             if (isIntruderCapture) {
                 scope.launch {
-                    val sampleSnapshot = withContext(Dispatchers.IO) {
-                        createIntruderSnapshotBitmap(appName)
+                    val intruderSnapshotData = withContext(Dispatchers.IO) {
+                        createIntruderSnapshotBitmap(context, appName)
                     }
                     repository.recordIntruderSelfie(
                         packageName = packageName,
                         appName = appName,
-                        photoData = sampleSnapshot,
+                        photoData = intruderSnapshotData,
                         attempts = failedAttempts
                     )
                 }
@@ -306,6 +306,10 @@ fun LockOverlayScreen(
                     }
                 }
             }
+        } else if (securityType == "PATTERN" && masterPattern.isBlank()) {
+            securityType = "PIN"
+        } else if (securityType == "KNOCK" && masterKnock.isBlank()) {
+            securityType = "PIN"
         }
         isConfigLoaded = true
     }
@@ -1066,7 +1070,7 @@ private fun getNodeAtOffset(offset: Offset, width: Int, height: Int): Int? {
     return row * 3 + col + 1
 }
 
-private fun createIntruderSnapshotBitmap(appName: String): String {
+private fun createIntruderSnapshotBitmap(context: android.content.Context, appName: String): String {
     val bitmap = Bitmap.createBitmap(240, 240, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     canvas.drawColor(Color.DKGRAY)
@@ -1077,11 +1081,11 @@ private fun createIntruderSnapshotBitmap(appName: String): String {
         isAntiAlias = true
         textAlign = Paint.Align.CENTER
     }
-    canvas.drawText("INTRUDER CAPTURE", 120f, 100f, paint)
+    canvas.drawText(context.getString(R.string.intruder_capture_badge), 120f, 100f, paint)
 
     paint.color = Color.WHITE
     paint.textSize = 14f
-    canvas.drawText("App: $appName", 120f, 140f, paint)
+    canvas.drawText(context.getString(R.string.intruder_capture_app_format, appName), 120f, 140f, paint)
 
     val outputStream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)
@@ -1091,8 +1095,8 @@ private fun createIntruderSnapshotBitmap(appName: String): String {
 
 fun launchBiometricPrompt(
     context: android.content.Context,
-    title: String = "PureLock Biometric Security",
-    subtitle: String = "Scan Fingerprint or Face ID to Unlock",
+    title: String = context.getString(R.string.biometric_prompt_title),
+    subtitle: String = context.getString(R.string.lock_biometric_subtitle),
     onSuccess: () -> Unit,
     onError: (String) -> Unit,
     onDismiss: () -> Unit = {}
@@ -1102,7 +1106,7 @@ fun launchBiometricPrompt(
         context = context,
         title = title,
         subtitle = subtitle,
-        negativeButtonText = "Use PIN / Pattern",
+        negativeButtonText = context.getString(R.string.biometric_prompt_negative_btn),
         onSuccess = onSuccess,
         onError = onError,
         onDismiss = onDismiss

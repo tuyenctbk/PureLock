@@ -3,6 +3,7 @@ package com.example.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.example.R
 
 object SmartPromptsManager {
 
@@ -52,15 +53,15 @@ object SmartPromptsManager {
             type = "text/plain"
             putExtra(
                 Intent.EXTRA_SUBJECT,
-                "PureLock Zero-Knowledge Privacy"
+                context.getString(R.string.share_app_subject)
             )
             putExtra(
                 Intent.EXTRA_TEXT,
-                "Protect your personal privacy with PureLock! Zero-cloud offline app lock & encrypted vault. Download now: https://play.google.com/store/apps/details?id=$packageName"
+                context.getString(R.string.share_app_text_format, packageName)
             )
         }
         try {
-            val chooser = Intent.createChooser(shareIntent, "Share PureLock via").apply {
+            val chooser = Intent.createChooser(shareIntent, context.getString(R.string.share_app_chooser_title)).apply {
                 if (context !is android.app.Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }

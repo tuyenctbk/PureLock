@@ -1,0 +1,512 @@
+0	PureLock używa tej lekkiej usługi wyłącznie do wykrywania otwarcia chronionych aplikacji i wyświetlania bezpiecznego ekranu blokady. PureLock nie ma uprawnień do internetu i nigdy nie wysyła ani nie udostępnia danych.
+1	Zobacz sejf
+2	Otwórz zaszyfrowany tajny sejf
+3	Generator haseł
+4	Wygeneruj silne hasło
+5	Uruchamia awaryjną blokadę po wykryciu gwałtownego potrząśnięcia.
+6	Zdjęcia
+7	Usuń
+8	Anuluj
+9	Szukaj notatek, haseł i sekretów…
+10	Wyczyść wyszukiwanie
+11	Brak pasujących sekretów
+12	Brak elementów pasujących do „%1$s”. Spróbuj innego słowa kluczowego.
+13	Zapisz pierwszą tajną notatkę
+14	Hasło
+15	Tajna notatka
+16	PIN bankowy
+17	Skopiowano! Schowek zostanie wyczyszczony za %1$d s
+18	Wyczyść teraz
+19	Opóźnienie automatycznego czyszczenia schowka
+20	Automatycznie usuwa skopiowane sekrety ze schowka, aby zapobiec podsłuchiwaniu w tle.
+21	Nigdy (czyszczenie ręczne)
+22	Praca
+23	Osobiste
+24	Finanse
+25	Hasła
+26	Kody PIN
+27	Dostęp przyznany
+28	Tarcza bezpieczeństwa PureLock
+29	Uwierzytelniono pomyślnie. Otwieranie %1$s…
+30	Wymagane uwierzytelnienie dla %1$s
+31	Nie wykryto sprzętowego czujnika biometrii. Używanie zapasowego kodu PIN lub wzoru.
+32	Brak zarejestrowanej biometrii na urządzeniu. Używanie zapasowego kodu PIN lub wzoru.
+33	%1$d nieudane próby! Zdjęcie intruza zapisano lokalnie.
+34	Klawiatura PIN
+35	Wzór
+36	Biometria
+37	Nieprawidłowy kod PIN. Spróbuj ponownie.
+38	Nieprawidłowy wzór. Spróbuj ponownie.
+39	Narysuj wzór, aby odblokować
+40	Narysuj wzór (niewidoczna ścieżka)
+41	Resetuj wzór
+42	Dotknij czytnika linii papilarnych lub użyj Face ID, aby odblokować %1$s
+43	Anuluj i zamknij tarczę
+44	Wyczyść
+45	Kopiuj wygenerowane
+46	Statystyki sejfu
+47	Statystyki kryptograficzne i telemetria siły haseł
+48	Rozkład siły haseł
+49	Rozkład kategorii
+50	Częstotliwość użycia i zapisu
+51	Twój sejf jest pusty
+52	Chroń swoje hasła, prywatne notatki, kody PIN do banku i poufne dane lokalnie dzięki szyfrowaniu sprzętowemu AES-256-GCM.
+53	Nie znaleziono elementów %1$s
+54	Nie masz zaszyfrowanych elementów w kategorii „%1$s”. Dodaj swój pierwszy sekret lub notatkę teraz.
+55	Sejf bezpieczny — zero prób włamania
+56	Jeśli nieuprawniona osoba spróbuje otworzyć zablokowaną aplikację błędnymi danymi, jej zdjęcie zostanie zrobione i wyświetlone tutaj.
+57	Kosz jest pusty
+58	Usunięte notatki i sekrety pozostają w koszu przez %1$d dni przed trwałym usunięciem.
+59	Zapisz sekret w %1$s
+60	Zaszyfrowany Sejf
+61	AES-256 SQLCipher • Zero-Knowledge
+62	Schowek chroniony
+63	Czyszczenie poufnych danych za %1$d s
+64	Schowek wyczyszczony natychmiast
+65	Szukaj zaszyfrowanych elementów…
+66	Opróżnij
+67	Brak zaszyfrowanych elementów pasujących do „%1$s”
+68	Zaktualizowano zaszyfrowany wpis
+69	Bezpiecznie zapisano z szyfrowaniem AES-256
+70	Sekret trwale usunięty
+71	Kosz opróżniony
+72	Opróżnić kosz?
+73	Wszystkie %1$d elementy w koszu zostaną trwale usunięte.
+74	Opróżnij kosz
+75	Trwale usunąć sekret?
+76	Czy na pewno chcesz usunąć „%1$s”? Tego zaszyfrowanego wpisu nie można przywrócić.
+77	Usuń trwale
+78	Nowy zaszyfrowany sekret
+79	Edytuj zaszyfrowany element
+80	Kategoria
+81	Tytuł / Nazwa usługi *
+82	np. ProtonMail, GitHub, Tajna notatka
+83	Hasło / Sekret *
+84	Tajna treść *
+85	Nazwa użytkownika / E-mail
+86	Strona WWW lub aplikacja
+87	Zaszyfrowane notatki (opcjonalnie)
+88	Przypnij na górze
+89	Ulubione
+90	Zapisz zaszyfrowane
+91	Generuj
+92	Automatycznie wygeneruj 20-znakowy klucz o wysokiej entropii
+93	Wszystkie
+94	Hasła
+95	Notatki
+96	Karty
+97	2FA / Kody
+98	PIN-y
+99	Ulubione
+100	Kosz
+101	Sejf
+102	Tarcza aplikacji
+103	Intruz
+104	Ustawienia
+105	Audyt
+106	Bezpieczeństwo offline Zero-Knowledge
+107	Inicjalizowanie sejfu AES-256…
+108	100% Offline • Zero telemetrii
+109	Zablokowano %1$d/%2$d
+110	Zablokuj wszystkie
+111	Odblokuj wszystkie
+112	Szczegóły ochrony
+113	Witamy w PureLock
+114	Silnik bezpieczeństwa offline bez chmury.\nChroń aplikacje, zdjęcia i sekrety lokalnym szyfrowaniem klasy wojskowej.
+115	Skonfiguruj główny klucz bezpieczeństwa
+116	Narysuj główny wzór (min. 4 punkty) i skonfiguruj zapasowy PIN.
+117	Utwórz główny kod PIN, aby odblokować PureLock i chronione aplikacje.
+118	Kontynuuj
+119	Wejdź do PureLock
+120	Wstecz
+121	Główny kod PIN musi mieć co najmniej 4 cyfry.
+122	Potwierdzenie głównego kodu PIN nie pasuje.
+123	Wzór musi łączyć co najmniej 4 punkty.
+124	Informacja o usłudze ułatwień dostępu
+125	Dlaczego PureLock wymaga uprawnień ułatwień dostępu:
+126	PureLock korzysta z API AccessibilityService wyłącznie do wykrywania otwarcia chronionych aplikacji na pierwszym planie i natychmiastowego wyświetlenia ekranu blokady.
+127	Gwarancja prywatności i gromadzenia danych:
+128	PureLock NIE śledzi, NIE przechowuje ani NIE przesyła żadnych poufnych danych użytkownika, wpisywanego tekstu, haseł ani treści prywatnych. PureLock działa w 100% offline bez uprawnień internetowych.
+129	Zgadzam się i włącz
+130	Odrzuć
+131	Włącz tarczę prywatności
+132	Przyznaj uprawnienia, aby PureLock mógł natychmiast wykrywać uruchamianie aplikacji.
+133	Usługa ułatwień dostępu
+134	Natychmiastowe wykrywanie aplikacji na pierwszym planie.
+135	Przyznaj uprawnienia ułatwień dostępu
+136	Wyświetlaj nad innymi aplikacjami
+137	Pozwala PureLock bezpiecznie wyświetlać ekran blokady po otwarciu chronionej aplikacji.
+138	Przyznaj uprawnienia nakładki
+139	Aktywne
+140	Nieaktywne
+141	Przyznano
+142	Wymagane
+143	Włącz
+144	Pomoc: Ustawienia z ograniczeniami Android 13+
+145	Ustawienia z ograniczeniami Android 13+
+146	Jeśli Android wyłączył ułatwienia dostępu z ostrzeżeniem „Ustawienia z ograniczeniami”, wykonaj te 4 szybkie kroki:
+147	1. Stuknij poniżej, aby otworzyć informacje o aplikacji PureLock w ustawieniach systemu.
+148	2. W prawym górnym rogu stuknij trzy pionowe kropki (⋮).
+149	3. Stuknij „Zezwól na ustawienia z ograniczeniami” i potwierdź PIN-em lub biometrią.
+150	4. Wróć tutaj i stuknij „Przyznaj uprawnienia ułatwień dostępu”, aby dokończyć.
+151	Otwórz informacje o PureLock
+152	Opóźnienie ponownej blokady aplikacji
+153	Określ, jak długo odblokowana aplikacja pozostaje dostępna po jej opuszczeniu.
+154	Do wyłączenia ekranu
+155	Ochrona aktywna!
+156	Twój sejf prywatności Zero-Knowledge jest gotowy.\nWszystkie klucze główne i zaszyfrowane elementy są chronione wyłącznie na tym urządzeniu.
+157	Główny kod PIN
+158	Zapasowy główny kod PIN
+159	Potwierdź główny kod PIN
+160	Biometria włączona
+161	Odcisk palca lub rozpoznawanie twarzy natychmiast odblokuje PureLock. Wpisz poniżej główny PIN na potrzeby ponownego uruchomienia systemu.
+162	Narysuj główny wzór poniżej
+163	Wybrane punkty: %1$s
+164	Resetuj wzór
+165	Podziel się prywatnością Zero-Knowledge
+166	Podoba Ci się PureLock? Udostępnij maksymalną ochronę prywatności znajomym i rodzinie!
+167	Później
+168	Udostępnij
+169	Podoba Ci się PureLock?
+170	Twoja 5-gwiazdkowa ocena pomaga nam utrzymać PureLock w 100% darmowym i prywatnym bez chmury dla każdego!
+171	Nie teraz
+172	Oceń nas
+173	Szukaj zainstalowanych aplikacji…
+174	Nie znaleziono zainstalowanych aplikacji
+175	Odblokowana
+176	Zablokowana
+177	Niewidoczna ścieżka wzoru
+178	Losowe tasowanie klawiatury
+179	Zdjęcie intruza
+180	%1$d sekund
+181	Zaszyfrowana kopia AES-256
+182	Sejf zdjęć intruzów
+183	Próba: %1$s
+184	Cel: %1$s
+185	Brak jeszcze danych o kategoriach.
+186	Ochrona sprzętowa bez chmury
+187	Wszystkie statystyki sejfu są obliczane na urządzeniu bez żadnej telemetrii sieciowej ani śledzenia.
+188	bitów śr.
+189	Bardzo silne
+190	Silne
+191	Średnie
+192	Słabe
+193	Silne (75+ bitów)
+194	Dobre (55-74 bitów)
+195	Średnie (35-54 bitów)
+196	Słabe (<35 bitów)
+197	Starsze (>30d)
+198	Wyjdź
+199	Alert systemowy
+200	Niestety aplikacja %1$s została zatrzymana.
+201	Aplikacja napotkała nieobsłużony wyjątek i została zamknięta przez system.
+202	Dziennik awarii wysłano do dewelopera.
+203	Prześlij opinię
+204	Zamknij aplikację
+205	Wystukaj tajny rytm w 4 ćwiartkach (%1$d stuknięć)
+206	Nieprawidłowy wzór stuknięć. Spróbuj ponownie.
+207	Wyczyść stuknięcia
+208	OK
+209	Zapisz
+210	Wyczyść
+211	Maskowanie, przynęty i uwierzytelnianie
+212	Poświadczenia i typ blokady
+213	Metoda blokady
+214	Kamuflaż i tajne przynęty
+215	Przynęta ekranu blokady
+216	Myli podglądających, pokazując fałszywy ekran przed monitem blokady.
+217	Brak
+218	Kalkulator
+219	Fałszywa awaria
+220	PIN przymusu (Duress)
+221	Motyw wizualny i paleta bezpieczeństwa
+222	Paleta kolorów
+223	Wyzwalacze i limit czasu
+224	Potrząśnij, aby zablokować
+225	Limit czasu autoblokady
+226	Zdjęcia intruzów (%1$d)
+227	Tajny sejf (%1$d)
+228	Szczegóły bezpieczeństwa sejfu
+229	• Przechwytywanie intruzów automatycznie robi zdjęcie przednią kamerą po 1-3 nieudanych próbach.
+230	• Tajne notatki i hasła są w spoczynku szyfrowane przez AES-256 SQLCipher.
+231	• Skopiowane hasła automatycznie znikają ze schowka po 30 sekundach.
+232	Usuń zdjęcie
+233	Wyczyścić wszystkie zdjęcia?
+234	Spowoduje to trwałe usunięcie wszystkich zdjęć intruzów.
+235	Edytuj sekret
+236	Nowy sekret
+237	Tytuł
+238	Tajna treść
+239	Usunąć sekret?
+240	Usunąć trwale „%1$s”?
+241	Kod stuknięć
+242	Zmień główny wzór
+243	Skonfiguruj kod stuknięć (4 ćwiartki)
+244	Zmień główny PIN
+245	Wzór ustawiony (%1$d pkt)
+246	Rytm stuknięć (%1$d stuknięć)
+247	Obecny: ••••
+248	Tasuje położenie cyfr przy każdej próbie odblokowania, chroniąc przed podglądaniem i śladami na ekranie.
+249	Ukrywa linię łączącą podczas rysowania wzoru, aby osoby postronne nie zobaczyły gestu odblokowania.
+250	Pod presją wpisanie PIN-u przymusu udaje zwykłe odblokowanie, po cichu blokując wrażliwe dane i zapisując alert.
+251	Po cichu robi zdjęcie przednią kamerą przy błędnym PIN-ie lub wzorze i zapisuje je w zaszyfrowanym sejfie.
+252	Natychmiast blokuje PureLock i czyści aktywne sesje po wykryciu gwałtownego potrząśnięcia.
+253	Określa, jak długo odblokowana aplikacja jest dostępna po wyjściu. „0s” blokuje natychmiast. „Wył. ekranu” utrzymuje sesję do wygaszenia ekranu.
+254	Ustaw główny PIN
+255	Wprowadź 4-8 cyfrowy główny kod PIN bezpieczeństwa:
+256	Zaktualizowano główny kod PIN
+257	Zapisz PIN
+258	Ustaw główny wzór
+259	Zaktualizowano główny wzór
+260	Zapisz wzór
+261	Skonfiguruj kod stuknięć
+262	Stuknij obszar 4 ćwiartek, aby nagrać rytm (min. 3 stuknięcia). Nagrano: %1$d stuknięć
+263	Stuknij co najmniej 3 ćwiartki, aby utworzyć wzór
+264	Skonfigurowano kod stuknięć
+265	Zapisz kod stuknięć
+266	Ustaw PIN przymusu
+267	Wpisz fałszywy kod PIN inny niż główny:
+268	Skonfigurowano PIN przymusu
+269	Odblokuj biometrią
+270	• PureLock nie ma ŻADNYCH uprawnień internetowych („android.permission.INTERNET” pominięto).
+271	• Wszystkie dzienniki, zdjęcia, kody PIN i wzory są szyfrowane przez SQLCipher AES-256.
+272	• Statystyki blokowania aplikacji nigdy nie opuszczają urządzenia.
+273	Kopiuj historię dziennika audytu w formacie CSV (%1$d wpisów):
+274	Dzienniki audytu skopiowano do schowka (CSV)
+275	Filtruj dzienniki audytu…
+276	Ocena ochrony
+277	• Wynik zależy od pokrycia chronionych aplikacji i aktywnych warstw obrony.
+278	• Próg autoblokady 0s-30s minimalizuje czas narażenia.
+279	• SQLCipher AES-256 zabezpiecza wszystkie bazy danych lokalnie bez telemetrii.
+280	Rozumiem
+281	Kopiuj
+282	Zamknij
+283	Łącznie notatek
+284	Zaszyfrowane lokalnie
+285	Indeks zdrowia
+286	Szczegóły
+287	Autoblokada %1$d s
+288	Poufny schowek wyczyszczono automatycznie.
+289	Brak zaszyfrowanej kopii od ponad 30 dni! Stuknij, aby utworzyć teraz.
+290	Ostrzeżenie stanu kopii zapasowej
+291	Ostrzeżenia o kopiach zapasowych
+292	Powiadamia, gdy od ponad 30 dni nie wykonano zaszyfrowanej kopii zapasowej.
+293	Zsynchronizowano: usunięto %1$d odinstalowanych aplikacji z tarczy.
+294	Zainstalowane aplikacje pomyślnie zsynchronizowane.
+295	Synchronizuj aplikacje
+296	Wszystkie
+297	Zablokowane
+298	Odblokowane
+299	Natychmiastowa weryfikacja blokady przez Usługę ułatwień dostępu
+300	Zero uprawnień sieciowych i brak telemetrii
+301	Ukryty kalkulator lub fałszywa awaria
+302	Przeniesiono do kosza
+303	Przywrócono z kosza
+304	Zamknij
+305	Eksportuj
+306	Zweryfikowano Android Keystore
+307	Zamontowano bazę SQLCipher AES-256
+308	Aktywna obrona uzbrojona
+309	Pomiń
+310	Przewodnik uprawnień i konfiguracji
+311	Przyznaj wymagane uprawnienia urządzenia, aby włączyć tarczę aplikacji
+312	Diagnostyka i przewodnik uprawnień
+313	Uprawnienia główne aktywne
+314	Wymagane uprawnienia główne
+315	Wszystkie uprawnienia bezpieczeństwa są włączone. Twoje aplikacje i dane są bezpiecznie chronione!
+316	Instrukcje konfiguracji
+317	Porady dla urządzeń
+318	Porady konfiguracji urządzenia
+319	Na urządzeniach Samsung otwórz Ustawienia > Aplikacje > PureLock > Bateria > Bez ograniczeń, aby uniknąć zamykania w tle.
+320	W MIUI/HyperOS włącz Autostart dla PureLock i ustaw Oszczędzanie baterii na Brak ograniczeń.
+321	Na urządzeniach Google Pixel upewnij się, że Ułatwienia dostępu > Pobrane aplikacje > PureLock są WŁĄCZONE.
+322	WYMAGANE
+323	ZALECANE
+324	OPCJONALNE
+325	AKTYWNE
+326	KONFIGURUJ
+327	Otwórz ustawienia
+328	Testuj nakładkę blokady
+329	Uruchamianie testowego ekranu blokady…
+330	Tarcza aplikacji nieaktywna
+331	Do wykrywania i blokowania aplikacji wymagane są uprawnienia ułatwień dostępu i nakładki.
+332	Włącz teraz
+333	Usługa ułatwień dostępu
+334	Wykrywanie uruchomienia chronionych aplikacji w czasie rzeczywistym.
+335	1. Stuknij „Otwórz ustawienia” poniżej, aby przejść do Ułatwień dostępu.
+336	2. Znajdź „PureLock” na liście Pobranych aplikacji lub Zainstalowanych usług.
+337	3. Włącz przełącznik i potwierdź systemowy monit bezpieczeństwa.
+338	4. Wróć do PureLock, aby zweryfikować aktywny status.
+339	Wyświetlaj nad innymi aplikacjami
+340	Umożliwia natychmiastowe pokazanie blokady PIN/wzorcem nad chronionymi aplikacjami.
+341	1. Stuknij „Otwórz ustawienia”, aby przejść do uprawnień nakładki.
+342	2. Znajdź „PureLock” na liście.
+343	3. Włącz „Zezwalaj na wyświetlanie nad innymi aplikacjami”.
+344	Dostęp do użycia (Zalecane)
+345	Zapasowe wykrywanie dla Android TV i systemów agresywnie oszczędzających energię.
+346	1. Stuknij „Otwórz ustawienia”, aby przejść do Dostępu do użycia.
+347	2. Znajdź i wybierz „PureLock”.
+348	3. Włącz „Zezwól na dostęp do użycia”.
+349	Uprawnienie aparatu (Opcjonalne)
+350	Umożliwia dyskretne wykonywanie zdjęć przednim aparatem po nieudanych próbach odblokowania.
+351	Uprawnienia powiadomień (Opcjonalne)
+352	Pozwala na wyświetlanie powiadomień bezpieczeństwa i stałego statusu ochrony.
+353	Brak zapisanych zdarzeń
+354	Wykryto %1$d alertów
+355	Status ochrony
+356	Zapisane zagrożenia
+357	Aktywna obrona
+358	Znacznik czasu
+359	Szczegóły
+360	Średnia siła i entropia haseł
+361	Średnia entropia wynosi %1$.1f bitów na sekret. Twoje dane mają wysoką odporność kryptograficzną na ataki siłowe.
+362	Średnia entropia wynosi %1$.1f bitów na sekret. Rozważ użycie dłuższych haseł ze znakami specjalnymi.
+363	Dodaj zaszyfrowane notatki i dane logowania, aby zobaczyć metryki entropii na żywo.
+364	Elementy
+365	Ostatnie 24h
+366	Ostatnie 7d
+367	Ostatnie 30d
+368	Północ
+369	Czerń OLED
+370	Szmaragd
+371	Szafir
+372	Monet
+373	Minimalistyczny
+374	Natychmiast (Zawsze)
+375	%1$d s bezczynności
+376	Architektura bezpieczeństwa PureLock
+377	Wersja %1$s • Sprzętowy Keystore i SQLCipher AES-256
+378	100% Offline • Zero telemetrii • Izolowany silnik prywatności
+379	Szybka blokada
+380	Ponowna weryfikacja sejfu
+381	Autouzupełnianie offline PureLock
+382	Wesprzyj PureLock
+383	100% Offline • Zero reklam • Niezależne oprogramowanie prywatnościowe
+384	Google Play
+385	PayPal i QR
+386	Ko-fi
+387	Napiwek na espresso
+388	Wesprzyj sesję naprawy błędów
+389	Kawa i bezpieczeństwo
+390	Wesprzyj ciągłe aktualizacje SQLCipher i OS
+391	Patron prywatności
+392	Pomóż utrzymać PureLock bez reklam dla wszystkich
+393	Mistrz Strażnik
+394	Zasponsoruj nowe główne moduły bezpieczeństwa offline
+395	Wesprzyj przez Google Play (%1$s)
+396	Łączenie z Google Play…
+397	Zakup anulowany. Dziękujemy za rozważenie wsparcia PureLock!
+398	Twój poziom wsparcia jest już zweryfikowany w Google Play. Przywracanie odznaki…
+399	Płatności Google Play są niedostępne na tym urządzeniu lub w tej sesji. Wypróbuj PayPal lub Ko-fi.
+400	Informacja Google Play Billing: %1$s
+401	Nie można dołączyć arkusza płatności do aktywnego ekranu. Otwórz Wsparcie z poziomu Ustawień.
+402	Poziomy wsparcia Google Play nie są jeszcze opublikowane dla tej wersji. Użyj PayPal lub Ko-fi.
+403	Dziękujemy! Twoja odznaka Aktywnego Wspierającego została odblokowana.
+404	Płatność oczekuje na potwierdzenie w Google Play. Odznaka odblokuje się automatycznie po zatwierdzeniu.
+405	Wybierz kwotę (USD)
+406	Dowolna kwota
+407	Własna kwota USD (np. 7.50)
+408	Zeskanuj kod QR innym telefonem lub aplikacją bankową
+409	Otwórz PayPal
+410	Kopiuj link
+411	Udostępnij
+412	Udostępnij link wsparcia PureLock
+413	Wesprzyj PureLock — w 100% offline sejf prywatności dla Androida bez telemetrii:
+414	Link wsparcia skopiowany do schowka
+415	Nie znaleziono przeglądarki — link skopiowano do schowka
+416	Postaw niezależnemu twórcy kawę
+417	PureLock działa w pełni offline bez reklam, trackerów i subskrypcji chmurowych. Każdy napiwek Ko-fi bezpośrednio wspiera niezależne utrzymanie bezpieczeństwa.
+418	Wesprzyj na Ko-fi
+419	Wspierający
+420	Aktywny Wspierający zweryfikowany
+421	Dziękujemy za wsparcie niezależnego oprogramowania dla prywatności! Wszystkie prośby o wsparcie zostały trwale ukryte.
+422	Podoba Ci się prywatność offline?
+423	W 100% bez reklam i niezależny. Stuknij, aby wesprzeć.
+424	Wesprzyj
+425	Zamknij baner wsparcia
+426	WESPRZYJ ROZWÓJ
+427	Wesprzyj PureLock
+428	100% Offline i bez reklam • Zero telemetrii. Dobrowolne wsparcie przez Google Play, PayPal QR lub Ko-fi pomaga w dalszym rozwoju.
+429	Otwórz opcje wsparcia
+430	Kamień milowy: Zabezpieczono %1$d działań
+431	PureLock właśnie znów ochronił Twoją prywatność — w 100% offline bez reklam ani śledzenia. Jeśli przyniosło Ci to spokój lub oszczędziło czas, rozważ wsparcie twórcy.
+432	Wesprzyj rozwój
+433	Nie teraz
+434	Kryptograficzny audyt integralności
+435	Oblicz na żywo sumę kontrolną SHA-256 dla wszystkich zaszyfrowanych wpisów sejfu, chronionych aplikacji i reguł harmonogramu.
+436	Uruchom audyt integralności
+437	Weryfikowanie sumy SHA-256…
+438	Zaliczony • Zweryfikowano %1$d obiektów
+439	Sejf zweryfikowany jako nienaruszony! Wesprzyj niezależny rozwój offline.
+440	Tarcza PureLock
+441	Sejf PureLock
+442	BLOKUJ
+443	Chronione elementy: 0
+444	Chronione elementy: %1$d (Aplikacje: %2$d, Sejf: %3$d)
+445	Sejf zabezpieczony i zablokowany! (%1$d el.)
+446	Odblokowanie biometrią
+447	Blokada AKTYWNA
+448	Wszystkie aplikacje chronione
+449	Stuknij, aby zablokować wszystkie
+450	Wykrywacz nowych instalacji aplikacji
+451	Powiadamia po zainstalowaniu nowej aplikacji, aby zaproponować ochronę PureLock.
+452	Zainstalowano nową aplikację: %1$s
+453	PureLock automatycznie zabezpieczył aplikację %1$s zgodnie z wysokim poziomem prywatności.
+454	Czy chcesz zablokować %1$s, aby chronić swoją prywatność?
+455	PureLock: %1$s (%2$s)
+456	Bezpieczeństwo biometryczne PureLock
+457	Zweryfikuj odcisk palca lub twarz, aby kontynuować
+458	Użyj PIN / Wzoru
+459	Nie rozpoznano skanu biometrycznego. Spróbuj ponownie.
+460	Nie można uruchomić monitu biometrycznego: %1$s
+461	Brak zarejestrowanej biometrii na urządzeniu. Użyj PIN lub wzoru.
+462	Czujnik biometryczny niedostępny. Użyj PIN lub wzoru.
+463	Kontekst aktywności niedostępny dla monitu biometrycznego.
+464	Zeskanuj odcisk lub Face ID, aby odblokować
+465	ZDJĘCIE INTRUZÓW
+466	Aplikacja: %1$s
+467	Finanse
+468	Społecznościowe
+469	Systemowe
+470	Media
+471	Gry
+472	Inne
+473	24h
+474	7d
+475	30d
+476	Wszystkie
+477	Wszystkie
+478	Zagrożenia
+479	Panika
+480	Odblokowania
+481	Limity czasu
+482	System
+483	Poświadczenia
+484	Klucze API
+485	Klucze odzyskiwania
+486	%1$d s
+487	%1$d m
+488	Dodaj zaszyfrowany wpis
+489	Szukaj
+490	Wyczyść wyszukiwanie
+491	Przypięte
+492	Ulubione
+493	Edytuj
+494	Kosz
+495	Przywróć
+496	Usuń trwale
+497	Ukryj sekret
+498	Pokaż sekret
+499	Kopiuj do schowka
+500	Przełącz widoczność
+501	Generuj hasło
+502	Wyczyść wszystko
+503	Dodaj sekret
+504	Info o sejfie
+505	Kopiuj sekret
+506	Usuń
+507	Link wsparcia PayPal
+508	Link wsparcia Ko-fi
+509	Prywatność Zero-Knowledge PureLock
+510	Chroń swoją prywatność z PureLock! Blokada aplikacji offline bez chmury i zaszyfrowany sejf. Pobierz teraz: https://play.google.com/store/apps/details?id=%1$s
+511	Udostępnij PureLock przez

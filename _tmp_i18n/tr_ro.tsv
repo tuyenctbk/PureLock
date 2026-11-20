@@ -1,0 +1,512 @@
+0	PureLock folosește acest serviciu ușor strict pentru a detecta când sunt deschise aplicațiile protejate și pentru a afișa ecranul sigur de blocare. PureLock are zero permisiuni de internet și nu trimite ori partajează niciodată datele dvs.
+1	Vezi Seiful
+2	Deschide Seiful Secret Criptat
+3	Generator Parole
+4	Generează parolă sigură
+5	Declanșează blocarea de urgență la detectarea unei scuturări bruște.
+6	Capturi
+7	Șterge
+8	Anulează
+9	Caută notițe, parole și secrete…
+10	Șterge căutarea
+11	Nu s-au găsit secrete potrivite
+12	Niciun element nu se potrivește cu „%1$s”. Încercați alt cuvânt cheie.
+13	Salvează prima notiță secretă
+14	Parolă
+15	Notiță secretă
+16	PIN bancar
+17	Copiat! Clipboardul se golește în %1$ds
+18	Golește acum
+19	Întârziere curățare automată clipboard
+20	Șterge automat secretele copiate din memoria clipboard pentru a preveni interceptarea în fundal.
+21	Niciodată (ștergere manuală)
+22	Serviciu
+23	Personal
+24	Finanțe
+25	Parole
+26	Coduri PIN
+27	Acces permis
+28	Scutul de securitate PureLock
+29	Autentificare reușită. Se deschide %1$s…
+30	Autentificare necesară pentru %1$s
+31	Nu s-a detectat senzor biometric hardware. Se folosește PIN-ul sau modelul secundar.
+32	Nicio biometrie înregistrată pe dispozitiv. Se folosește PIN-ul sau modelul secundar.
+33	%1$d încercări eșuate! Selfie cu intrusul capturat local.
+34	Tastatură PIN
+35	Model
+36	Biometrie
+37	PIN incorect. Încercați din nou.
+38	Model incorect. Încercați din nou.
+39	Desenați modelul pentru deblocare
+40	Desenați modelul (urmă invizibilă)
+41	Resetează modelul
+42	Atingeți senzorul de amprentă sau folosiți Face ID pentru a debloca %1$s
+43	Anulează și ieși din scut
+44	Șterge
+45	Copiază generat
+46	Statistici Seif
+47	Statistici criptografice și telemetrie de putere
+48	Distribuția puterii parolelor
+49	Distribuția pe categorii
+50	Frecvența utilizării și stocării
+51	Seiful dvs. este gol
+52	Protejați parolele, notițele private, codurile PIN bancare și datele sensibile local cu protecție hardware AES-256-GCM.
+53	Nu s-au găsit elemente %1$s
+54	Nu aveți elemente criptate salvate în categoria „%1$s”. Adăugați acum primul secret sau notiță.
+55	Seif securizat — zero încercări de intruziune
+56	Dacă o persoană neautorizată încearcă să deschidă o aplicație blocată cu date greșite, fotografia ei va fi capturată și afișată aici.
+57	Coșul de gunoi este gol
+58	Notițele și secretele șterse rămân în coșul de gunoi %1$d zile înainte de ștergerea hardware permanentă.
+59	Salvează secret în %1$s
+60	Seif Criptat
+61	AES-256 SQLCipher • Zero-Knowledge
+62	Clipboard protejat
+63	Se șterge clipul sensibil în %1$ds
+64	Clipboard șters imediat
+65	Caută elemente criptate…
+66	Golește
+67	Niciun element criptat nu se potrivește cu „%1$s”
+68	Intrare criptată actualizată
+69	Salvat în siguranță cu criptare AES-256
+70	Secret șters permanent
+71	Coș de gunoi golit
+72	Goliți coșul de gunoi?
+73	Toate cele %1$d elemente din coș vor fi șterse definitiv.
+74	Golește coșul
+75	Ștergeți secretul permanent?
+76	Sigur doriți să ștergeți „%1$s”? Această intrare criptată nu poate fi recuperată.
+77	Șterge permanent
+78	Secret criptat nou
+79	Editează element criptat
+80	Categorie
+81	Titlu / Nume serviciu *
+82	ex. ProtonMail, GitHub, Notiță sigură
+83	Parolă / Secret *
+84	Conținut secret *
+85	Nume utilizator / E-mail
+86	Site web sau aplicație
+87	Notițe criptate (opțional)
+88	Fixează sus
+89	Favorit
+90	Salvează criptat
+91	Generează
+92	Generează automat cheie de 20 caractere cu entropie ridicată
+93	Toate
+94	Parole
+95	Notițe
+96	Carduri
+97	2FA / Coduri
+98	PIN-uri
+99	Favorite
+100	Coș
+101	Seif
+102	Scut Aplicații
+103	Intrus
+104	Setări
+105	Audit
+106	Securitate offline Zero-Knowledge
+107	Se inițializează seiful AES-256…
+108	100% Offline • Zero telemetrie
+109	%1$d/%2$d Blocate
+110	Blochează tot
+111	Deblochează tot
+112	Detalii protecție
+113	Bun venit la PureLock
+114	Motor de securitate offline fără cloud.\nProtejați aplicațiile, fotografiile și secretele cu criptare locală de grad militar.
+115	Configurați cheia principală de securitate
+116	Desenați modelul principal (minim 4 puncte) și configurați PIN-ul de rezervă.
+117	Creați PIN-ul principal pentru a debloca PureLock și aplicațiile protejate.
+118	Continuă
+119	Intră în PureLock
+120	Înapoi
+121	PIN-ul principal trebuie să aibă cel puțin 4 cifre.
+122	Confirmarea PIN-ului principal nu se potrivește.
+123	Modelul trebuie să conecteze cel puțin 4 puncte.
+124	Informare Serviciu de Accesibilitate
+125	De ce PureLock are nevoie de permisiunea de Accesibilitate:
+126	PureLock folosește API-ul AccessibilityService strict pentru a detecta când aplicațiile protejate sunt deschise în prim-plan și a afișa imediat ecranul de blocare.
+127	Garanția privind colectarea datelor și confidențialitatea:
+128	PureLock NU urmărește, NU stochează și NU transmite date sensibile ale utilizatorului, text tastat, parole sau conținut personal. PureLock este 100% offline fără permisiuni de internet.
+129	Acceptă și activează
+130	Refuză
+131	Activează Scutul de Confidențialitate
+132	Acordați permisiunile pentru ca PureLock să detecteze lansările de aplicații instantaneu.
+133	Serviciu de Accesibilitate
+134	Detectează instant aplicațiile din prim-plan.
+135	Acordă permisiunea de Accesibilitate
+136	Afișare peste alte aplicații
+137	Permite PureLock să afișeze în siguranță ecranul de blocare la deschiderea unei aplicații protejate.
+138	Acordă permisiunea de suprapunere
+139	Activ
+140	Inactiv
+141	Acordat
+142	Necesar
+143	Activează
+144	Ajutor Setări Restricționate Android 13+
+145	Setări Restricționate Android 13+
+146	Dacă Android a dezactivat Accesibilitatea cu avertismentul „Setare restricționată”, urmați acești 4 pași rapizi:
+147	1. Atingeți mai jos pentru a deschide Informații aplicație PureLock în setările sistemului.
+148	2. În colțul din dreapta sus, atingeți cele trei puncte verticale (⋮).
+149	3. Atingeți „Permiteți setările restricționate” și confirmați cu PIN-ul sau biometria.
+150	4. Reveniți aici și atingeți „Acordă permisiunea de Accesibilitate” pentru finalizare.
+151	Deschide Info aplicație PureLock
+152	Perioadă de grație pentru reblocare
+153	Configurați cât timp rămâne accesibilă o aplicație deblocată după ce ieșiți din ea.
+154	Până la oprirea ecranului
+155	Protecție activă!
+156	Seiful dvs. de confidențialitate zero-knowledge este gata.\nToate cheile principale și elementele criptate sunt securizate strict pe dispozitiv.
+157	PIN Principal
+158	PIN Principal de Rezervă
+159	Confirmă PIN Principal
+160	Biometrie activată
+161	Autentificarea cu amprentă sau față va debloca PureLock instantaneu. Introduceți un PIN Principal mai jos pentru repornirile sistemului.
+162	Desenați modelul principal mai jos
+163	Puncte selectate: %1$s
+164	Resetează modelul
+165	Împărtășiți confidențialitatea Zero-Knowledge
+166	Vă place PureLock? Împărtășiți protecția maximă a confidențialității cu prietenii și familia!
+167	Mai târziu
+168	Distribuie
+169	Vă place PureLock?
+170	Recenzia dvs. de 5 stele ne ajută să menținem PureLock 100% gratuit și privat fără cloud pentru toată lumea!
+171	Nu acum
+172	Evaluează-ne
+173	Caută aplicații instalate…
+174	Nicio aplicație instalată sau găsită
+175	Deblocată
+176	Blocată
+177	Traseu model invizibil
+178	Amestecare aleatorie tastatură
+179	Captură selfie intrus
+180	%1$d secunde
+181	Backup criptat AES-256
+182	Seif Capturi Intrus
+183	Încercare: %1$s
+184	Țintă: %1$s
+185	Nu există încă date pe categorii.
+186	Protecție hardware fără cloud
+187	Toate statisticile seifului sunt calculate pe dispozitiv fără telemetrie de rețea sau urmărire.
+188	biți medie
+189	Foarte puternică
+190	Puternică
+191	Medie
+192	Slabă
+193	Puternică (75+ biți)
+194	Bună (55-74 biți)
+195	Medie (35-54 biți)
+196	Slabă (<35 biți)
+197	Mai vechi (>30z)
+198	Ieșire
+199	Alertă sistem
+200	Din păcate, %1$s s-a oprit.
+201	Aplicația a întâlnit o excepție netratată și a fost închisă de sistem.
+202	Jurnalul de erori a fost trimis dezvoltatorului.
+203	Trimite feedback
+204	Închide aplicația
+205	Atingeți ritmul secret în 4 cadrane (%1$d atingeri)
+206	Model de bătăi incorect. Încercați din nou.
+207	Șterge bătăile
+208	OK
+209	Salvează
+210	Șterge
+211	Camuflaj, momeli și autentificare
+212	Date de acces și tip blocare
+213	Metodă de blocare
+214	Camuflaj și momeli ascunse
+215	Momeală ecran blocare
+216	Păcălește curioșii afișând un ecran fals înainte de ecranul de blocare.
+217	Niciuna
+218	Calculator
+219	Eroare falsă
+220	PIN de constrângere (Duress)
+221	Temă vizuală și paletă securitate
+222	Paletă de culori
+223	Declanșatori și expirare
+224	Scutură pentru blocare
+225	Timp autoblocare
+226	Fotografii intrus (%1$d)
+227	Seif secret (%1$d)
+228	Detalii securitate seif
+229	• Captura intrusului folosește camera frontală automat după 1-3 încercări eșuate.
+230	• Notițele secrete și parolele sunt criptate în repaus cu AES-256 SQLCipher.
+231	• Parolele copiate se șterg automat din clipboard după 30 de secunde.
+232	Șterge captura
+233	Ștergeți toate capturile?
+234	Aceasta va șterge definitiv toate fotografiile cu intruși.
+235	Editează secretul
+236	Secret nou
+237	Titlu
+238	Conținut secret
+239	Ștergeți secretul?
+240	Ștergeți definitiv „%1$s”?
+241	Cod Knock
+242	Schimbă modelul principal
+243	Configurează Cod Knock (4 cadrane)
+244	Schimbă PIN-ul principal
+245	Model setat (%1$d puncte)
+246	Ritm Knock (%1$d atingeri)
+247	Actual: ••••
+248	Amestecă pozițiile cifrelor la fiecare încercare de deblocare pentru a preveni privitul peste umăr și urmele de pe ecran.
+249	Ascunde linia de legătură la desenarea modelului pentru ca privitorii să nu vă vadă gestul.
+250	Sub presiune, introducerea PIN-ului de constrângere pare o deblocare normală, dar blochează în secret datele sensibile și înregistrează alerta.
+251	Face silențios o fotografie cu camera frontală când cineva introduce un PIN sau model greșit, salvând-o în Seiful criptat.
+252	Blochează instant PureLock și șterge sesiunile active la detectarea unei scuturări fizice.
+253	Configurează cât timp rămâne accesibilă o aplicație deblocată după părăsire. „0s” reblochează imediat. „Ecran oprit” păstrează sesiunea până la stingerea ecranului.
+254	Setează PIN Principal
+255	Introduceți PIN-ul principal de securitate de 4-8 cifre:
+256	PIN Principal actualizat
+257	Salvează PIN
+258	Setează Model Principal
+259	Model principal actualizat
+260	Salvează Model
+261	Configurează Cod Knock
+262	Atingeți zona cu 4 cadrane pentru a înregistra un ritm (minim 3 atingeri). Înregistrate: %1$d bătăi
+263	Atingeți cel puțin 3 cadrane pentru a forma un model
+264	Cod Knock configurat
+265	Salvează Cod Knock
+266	Setează PIN de constrângere
+267	Introduceți un PIN momeală diferit de PIN-ul principal:
+268	PIN de constrângere configurat
+269	Deblochează cu Biometrie
+270	• PureLock conține ZERO permisiuni de internet („android.permission.INTERNET” este omisă).
+271	• Toate jurnalele, capturile, PIN-urile și modelele sunt criptate cu SQLCipher AES-256.
+272	• Statisticile de blocare nu părăsesc niciodată dispozitivul dvs.
+273	Copiază istoricul jurnalului de audit format CSV (%1$d înregistrări):
+274	Jurnale de audit copiate în clipboard (format CSV)
+275	Filtrează jurnale de audit…
+276	Evaluare protecție
+277	• Scorul se bazează pe acoperirea aplicațiilor protejate și straturile de apărare active.
+278	• Pragul de autoblocare 0s-30s minimizează expunerea.
+279	• SQLCipher AES-256 securizează toate bazele de date local fără telemetrie.
+280	Am înțeles
+281	Copiază
+282	Închide
+283	Total notițe
+284	Criptat în repaus
+285	Indice sănătate
+286	Detalii
+287	Autoblocare %1$ds
+288	Clipboardul sensibil a fost curățat automat.
+289	Niciun backup criptat realizat de peste 30 de zile! Atingeți pentru backup acum.
+290	Avertisment sănătate backup
+291	Alerte stare backup
+292	Alertează când nu s-a efectuat niciun backup criptat de peste 30 de zile.
+293	Sincronizat: %1$d aplicații dezinstalate eliminate din scut.
+294	Aplicațiile instalate au fost sincronizate cu succes.
+295	Sincronizează aplicațiile
+296	Toate
+297	Blocate
+298	Deblocate
+299	Verificare instantanee a blocării prin Serviciul de Accesibilitate
+300	Zero permisiuni de rețea și fără telemetrie
+301	Camuflaj cu calculator sau eroare falsă
+302	Mutat în Coșul de gunoi
+303	Restaurat din Coșul de gunoi
+304	Închide
+305	Exportă
+306	Android Keystore verificat
+307	Bază SQLCipher AES-256 montată
+308	Apărare activă pregătită
+309	Omite
+310	Ghid Permisiuni și Configurare
+311	Acordați privilegiile necesare ale dispozitivului pentru a activa scutul aplicațiilor
+312	Ghid Diagnostic și Permisiuni
+313	Privilegii de bază active
+314	Privilegii de bază necesare
+315	Toate privilegiile de securitate sunt activate. Aplicațiile și datele dvs. sunt protejate în siguranță!
+316	Instrucțiuni de configurare
+317	Sfaturi dispozitiv
+318	Sfaturi configurare dispozitiv
+319	Pe dispozitivele Samsung, mergeți la Setări > Aplicații > PureLock > Baterie > Nerestricționată pentru a preveni oprirea în fundal.
+320	Pe MIUI/HyperOS, activați Pornire automată pentru PureLock și setați Economisire baterie la Fără restricții.
+321	Pe dispozitivele Google Pixel, asigurați-vă că Accesibilitate > Aplicații descărcate > PureLock este PORNIT.
+322	NECESAR
+323	RECOMANDAT
+324	OPȚIONAL
+325	ACTIV
+326	CONFIGURAȚI
+327	Deschide Setările
+328	Testează suprapunerea blocării
+329	Se lansează ecranul de blocare de test…
+330	Scut Aplicații Inactiv
+331	Permisiunile de Accesibilitate și Suprapunere sunt necesare pentru detectarea și blocarea aplicațiilor.
+332	Activează acum
+333	Serviciu de Accesibilitate
+334	Detectare în timp real la deschiderea aplicațiilor protejate.
+335	1. Atingeți „Deschide Setările” mai jos pentru a naviga la Accesibilitate.
+336	2. Găsiți „PureLock” la Aplicații descărcate sau Servicii instalate.
+337	3. Activați comutatorul și confirmați mesajul de securitate al sistemului.
+338	4. Reveniți în PureLock pentru a verifica starea activă.
+339	Afișare peste alte aplicații
+340	Permite afișarea imediată a blocării PIN/model peste aplicațiile protejate.
+341	1. Atingeți „Deschide Setările” pentru permisiunea de suprapunere.
+342	2. Localizați „PureLock” în listă.
+343	3. Activați „Permiteți afișarea peste alte aplicații”.
+344	Acces la utilizare (Recomandat)
+345	Detectare secundară de rezervă pentru Android TV și sisteme cu gestionare agresivă a bateriei.
+346	1. Atingeți „Deschide Setările” pentru Acces la utilizare.
+347	2. Găsiți și selectați „PureLock”.
+348	3. Activați „Permiteți accesul la datele de utilizare”.
+349	Permisiune Cameră (Opțional)
+350	Activează captura silențioasă cu camera frontală la încercări eșuate de deblocare.
+351	Permisiuni Notificări (Opțional)
+352	Permite afișarea notificărilor de securitate și a stării persistente a scutului.
+353	Niciun eveniment înregistrat
+354	%1$d alerte detectate
+355	Stare protecție
+356	Amenințări înregistrate
+357	Apărare activă
+358	Marcaj temporal
+359	Detalii
+360	Putere medie și entropie parole
+361	Entropia medie este de %1$.1f biți per secret. Datele dvs. au rezistență criptografică ridicată împotriva atacurilor brute-force.
+362	Entropia medie este de %1$.1f biți per secret. Luați în considerare parole mai lungi cu caractere speciale.
+363	Adăugați notițele și datele criptate pentru a vedea metricile de entropie în timp real.
+364	Elemente
+365	Ultimele 24h
+366	Ultimele 7z
+367	Ultimele 30z
+368	Miezul nopții
+369	Negru OLED
+370	Smarald
+371	Safir
+372	Monet
+373	Minimal
+374	Imediat (Întotdeauna)
+375	%1$ds inactivitate
+376	Arhitectura de securitate PureLock
+377	Versiunea %1$s • Hardware Keystore & SQLCipher AES-256
+378	100% Offline • Zero telemetrie • Motor de confidențialitate izolat
+379	Blocare rapidă
+380	Reautentificare Seif
+381	Completare automată offline PureLock
+382	Susține PureLock
+383	100% Offline • Fără reclame • Software independent de confidențialitate
+384	Google Play
+385	PayPal și QR
+386	Ko-fi
+387	Bacșiș Espresso
+388	Susține o sesiune dedicată de rezolvare erori
+389	Cafea și Securitate
+390	Susține actualizări continue SQLCipher și OS
+391	Mecena al Confidențialității
+392	Ajută la păstrarea PureLock fără reclame pentru toți
+393	Campion Gardian
+394	Sponsorizează noi module majore de securitate offline
+395	Susține prin Google Play (%1$s)
+396	Se conectează la Google Play…
+397	Achiziție anulată. Vă mulțumim că ați luat în considerare PureLock!
+398	Nivelul dvs. de susținător este deja verificat pe Google Play. Se restaurează insigna…
+399	Facturarea Google Play nu este disponibilă pe acest dispozitiv sau în această sesiune. Încercați filele PayPal sau Ko-fi.
+400	Notificare Google Play Billing: %1$s
+401	Nu s-a putut atașa fereastra de plată la ecranul activ. Redeschideți Susținere din Setări.
+402	Nivelurile de susținător Google Play nu sunt publicate încă pentru această versiune. Folosiți PayPal sau Ko-fi.
+403	Mulțumim! Insigna dvs. de Susținător Activ este acum deblocată.
+404	Plata așteaptă confirmarea pe Google Play. Insigna se deblochează automat după finalizare.
+405	Alegeți suma (USD)
+406	Orice sumă
+407	USD personalizat (ex. 7.50)
+408	Scanați codul QR cu alt telefon sau aplicație bancară
+409	Deschide PayPal
+410	Copiază linkul
+411	Distribuie
+412	Distribuie linkul de susținere PureLock
+413	Susține PureLock — seif de confidențialitate Android 100% offline, zero telemetrie:
+414	Linkul de susținere a fost copiat în clipboard
+415	Nicio aplicație de browser găsită — link copiat în clipboard
+416	Oferă o cafea dezvoltatorului independent
+417	PureLock funcționează complet offline fără reclame, trackere sau abonamente cloud. Fiecare contribuție Ko-fi finanțează direct întreținerea independentă a securității.
+418	Susține pe Ko-fi
+419	Susținător
+420	Susținător Activ Verificat
+421	Vă mulțumim că susțineți software-ul independent de confidențialitate! Toate solicitările de donație sunt ascunse permanent.
+422	Vă place confidențialitatea offline?
+423	100% fără reclame și independent. Atingeți pentru susținere.
+424	Susține
+425	Închide bannerul de susținere
+426	SUSȚINE DEZVOLTAREA
+427	Susține PureLock
+428	100% Offline și Fără Reclame • Zero telemetrie. Contribuțiile voluntare prin Google Play, PayPal QR sau Ko-fi susțin dezvoltarea.
+429	Deschide opțiunile de susținere
+430	Reper: %1$d acțiuni protejate
+431	PureLock tocmai v-a protejat din nou confidențialitatea — 100% offline fără reclame sau urmărire. Dacă v-a economisit timp sau v-a oferit liniște, luați în considerare susținerea dezvoltării independente.
+432	Susține dezvoltarea
+433	Nu acum
+434	Audit criptografic de integritate
+435	Calculați un rezumat SHA-256 live pentru toate înregistrările criptate din seif, aplicațiile protejate și regulile de programare.
+436	Rulează auditul de integritate
+437	Se verifică rezumatul SHA-256…
+438	Trecut • %1$d entități verificate
+439	Seif verificat intact! Susțineți dezvoltarea offline independentă.
+440	Scut PureLock
+441	Seif PureLock
+442	BLOCARE
+443	Elemente protejate: 0
+444	Elemente protejate: %1$d (Aplicații: %2$d, Seif: %3$d)
+445	Seif securizat și blocat! (%1$d el.)
+446	Deblocare biometrică
+447	Blocare ACTIVĂ
+448	Toate aplicațiile protejate
+449	Atingeți pentru a bloca tot
+450	Detector instalare aplicații noi
+451	Notifică la instalarea de aplicații noi pentru a oferi protecția PureLock.
+452	Aplicație nouă instalată: %1$s
+453	PureLock a protejat automat %1$s conform setărilor de confidențialitate ridicată.
+454	Doriți să blocați %1$s pentru a vă proteja confidențialitatea?
+455	PureLock: %1$s (%2$s)
+456	Securitate biometrică PureLock
+457	Verificați amprenta sau fața pentru a continua
+458	Folosește PIN / Model
+459	Scanarea biometrică nu a fost recunoscută. Încercați din nou.
+460	Nu se poate lansa solicitarea biometrică: %1$s
+461	Nicio biometrie înregistrată pe dispozitiv. Folosiți PIN sau Model.
+462	Senzor biometric indisponibil. Folosiți PIN sau Model.
+463	Contextul activității nu este disponibil pentru solicitarea biometrică.
+464	Scanați amprenta sau Face ID pentru deblocare
+465	CAPTURĂ INTRUS
+466	Aplicație: %1$s
+467	Finanțe
+468	Social
+469	Sistem
+470	Media
+471	Jocuri
+472	Altele
+473	24h
+474	7z
+475	30z
+476	Toate
+477	Toate
+478	Amenințări
+479	Panică
+480	Deblocări
+481	Expirări
+482	Sistem
+483	Date acces
+484	Chei API
+485	Chei recuperare
+486	%1$ds
+487	%1$dm
+488	Adaugă intrare criptată
+489	Caută
+490	Șterge căutarea
+491	Fixat
+492	Favorit
+493	Editează
+494	Coș
+495	Restaurează
+496	Șterge permanent
+497	Ascunde secretul
+498	Arată secretul
+499	Copiază în clipboard
+500	Comută vizibilitatea
+501	Generează parolă
+502	Șterge tot
+503	Adaugă secret
+504	Info seif
+505	Copiază secretul
+506	Șterge
+507	Link susținere PayPal
+508	Link susținere Ko-fi
+509	Confidențialitate Zero-Knowledge PureLock
+510	Protejați-vă confidențialitatea personală cu PureLock! Blocare aplicații offline fără cloud și seif criptat. Descărcați acum: https://play.google.com/store/apps/details?id=%1$s
+511	Distribuie PureLock prin

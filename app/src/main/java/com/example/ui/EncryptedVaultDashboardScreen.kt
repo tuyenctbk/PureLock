@@ -137,7 +137,7 @@ fun EncryptedVaultDashboardScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.testTag("fab_add_vault_entry")
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Encrypted Entry")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add_encrypted_entry))
                 }
             }
         }
@@ -436,14 +436,14 @@ fun EncryptedVaultDashboardScreen(
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Search,
-                                contentDescription = "Search",
+                                contentDescription = stringResource(R.string.cd_search),
                                 tint = MaterialTheme.colorScheme.outline
                             )
                         },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(Icons.Default.Clear, contentDescription = "Clear search")
+                                    Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cd_clear_search))
                                 }
                             }
                         },
@@ -868,7 +868,7 @@ fun VaultItemCard(
                             if (item.isPinned) {
                                 Icon(
                                     Icons.Default.PushPin,
-                                    contentDescription = "Pinned",
+                                    contentDescription = stringResource(R.string.cd_pinned),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(14.dp)
                                 )
@@ -907,7 +907,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = if (item.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
-                                contentDescription = "Favorite",
+                                contentDescription = stringResource(R.string.cd_favorite),
                                 tint = if (item.isFavorite) Color(0xFFF59E0B) else MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -919,7 +919,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit",
+                                contentDescription = stringResource(R.string.cd_edit),
                                 tint = MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -931,7 +931,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DeleteOutline,
-                                contentDescription = "Trash",
+                                contentDescription = stringResource(R.string.cd_trash),
                                 tint = MaterialTheme.colorScheme.outline,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -948,7 +948,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.RestoreFromTrash,
-                                contentDescription = "Restore",
+                                contentDescription = stringResource(R.string.cd_restore),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -959,7 +959,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DeleteForever,
-                                contentDescription = "Delete Permanently",
+                                contentDescription = stringResource(R.string.cd_delete_permanently),
                                 tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1006,7 +1006,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = if (isRevealed) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (isRevealed) "Mask secret" else "Reveal secret",
+                                contentDescription = stringResource(if (isRevealed) R.string.cd_mask_secret else R.string.cd_reveal_secret),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1023,7 +1023,7 @@ fun VaultItemCard(
                         ) {
                             Icon(
                                 imageVector = if (isRecentlyCopied) Icons.Default.Check else Icons.Default.ContentCopy,
-                                contentDescription = "Copy to clipboard",
+                                contentDescription = stringResource(R.string.cd_copy_to_clipboard),
                                 tint = if (isRecentlyCopied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(17.dp)
                             )
@@ -1141,7 +1141,7 @@ fun AddEditVaultEntryDialog(
                             IconButton(onClick = { isSecretVisible = !isSecretVisible }) {
                                 Icon(
                                     imageVector = if (isSecretVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = "Toggle visibility",
+                                    contentDescription = stringResource(R.string.cd_toggle_visibility),
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -1149,7 +1149,7 @@ fun AddEditVaultEntryDialog(
                                 IconButton(onClick = { showPasswordGenerator = !showPasswordGenerator }) {
                                     Icon(
                                         imageVector = Icons.Default.AutoFixHigh,
-                                        contentDescription = "Generate Password",
+                                        contentDescription = stringResource(R.string.cd_generate_password),
                                         tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(18.dp)
                                     )

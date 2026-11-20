@@ -251,9 +251,9 @@
     <string name="vault_field_secret_label">Password / Secret *</string>
     <string name="vault_field_note_content_label">Secret Content *</string>
     <string name="vault_field_username_label">Username / Email</string>
-    <string name="vault_field_username_placeholder">user@example.com</string>
+    <string name="vault_field_username_placeholder">name@domain.com</string>
     <string name="vault_field_website_label">Website or App</string>
-    <string name="vault_field_website_placeholder">https://example.com</string>
+    <string name="vault_field_website_placeholder">https://domain.com</string>
     <string name="vault_field_notes_label">Encrypted Notes (Optional)</string>
     <string name="vault_field_pin_top">Pin to Top</string>
     <string name="vault_field_favorite">Favorite</string>
@@ -420,7 +420,7 @@
     <string name="suite_language_title">Application Language</string>
     <string name="suite_language_desc">Choose user interface language</string>
     <string name="suite_about_title">About PureLock</string>
-    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.2</string>
+    <string name="suite_about_desc">Zero-Knowledge Offline Security • Version 2.5</string>
     <string name="suite_hardware_keystore">Android Keystore Backed (AES-GCM-256)</string>
 
     <!-- Intruder Vault Additional Strings -->
@@ -794,5 +794,85 @@
     <string name="audit_integrity_running">Verifying SHA-256 Digest…</string>
     <string name="audit_integrity_passed_format">Passed • %1$d entities verified</string>
     <string name="audit_integrity_support_strip">Vault verified intact! Support independent offline development.</string>
+
+    <!-- Widgets, Quick Tiles, Autofill & Notifications -->
+    <string name="widget_shield_cd">PureLock Shield</string>
+    <string name="widget_title">PureLock Vault</string>
+    <string name="widget_btn_lock">LOCK</string>
+    <string name="widget_protected_items_initial">Protected Items: 0</string>
+    <string name="widget_protected_items_format">Protected Items: %1$d (Apps: %2$d, Vault: %3$d)</string>
+    <string name="widget_vault_secured_format">Vault Secured &amp; Locked! (%1$d items)</string>
+    <string name="tile_vault_reauth_subtitle">Biometric Unlock</string>
+    <string name="tile_quick_lockdown_active">Lockdown ACTIVE</string>
+    <string name="tile_quick_lockdown_active_subtitle">All Apps Secured</string>
+    <string name="tile_quick_lockdown_subtitle">Tap to Lock All</string>
+    <string name="new_app_channel_name">New App Installation Detector</string>
+    <string name="new_app_channel_desc">Notifies when new applications are installed to offer PureLock protection.</string>
+    <string name="new_app_notif_title">New App Installed: %1$s</string>
+    <string name="new_app_notif_locked_text">PureLock automatically protected %1$s based on high-privacy settings.</string>
+    <string name="new_app_notif_prompt_text">Would you like to lock %1$s to secure your privacy?</string>
+    <string name="autofill_dataset_label">PureLock: %1$s (%2$s)</string>
+
+    <!-- Biometric Prompts & Intruder Capture -->
+    <string name="biometric_prompt_title">PureLock Biometric Security</string>
+    <string name="biometric_prompt_subtitle">Verify your fingerprint or face to proceed</string>
+    <string name="biometric_prompt_negative_btn">Use PIN / Pattern</string>
+    <string name="biometric_scan_not_recognized">Biometric scan not recognized. Try again.</string>
+    <string name="biometric_launch_error">Unable to launch biometric prompt: %1$s</string>
+    <string name="biometric_not_enrolled_error">No biometrics enrolled on device. Please use PIN or Pattern.</string>
+    <string name="biometric_unavailable_error">Biometric sensor unavailable. Please use PIN or Pattern.</string>
+    <string name="biometric_no_activity_error">Activity context not available for biometric prompt.</string>
+    <string name="lock_biometric_subtitle">Scan Fingerprint or Face ID to Unlock</string>
+    <string name="intruder_capture_badge">INTRUDER CAPTURE</string>
+    <string name="intruder_capture_app_format">App: %1$s</string>
+
+    <!-- App Categories, Analytics Filters & Duration Chips -->
+    <string name="app_cat_financial">Financial</string>
+    <string name="app_cat_social">Social</string>
+    <string name="app_cat_system">System</string>
+    <string name="app_cat_media">Media</string>
+    <string name="app_cat_games">Games</string>
+    <string name="app_cat_other">Other</string>
+    <string name="audit_range_24h">24h</string>
+    <string name="audit_range_7d">7d</string>
+    <string name="audit_range_30d">30d</string>
+    <string name="audit_range_all">All</string>
+    <string name="audit_cat_all">All</string>
+    <string name="audit_cat_threats">Threats</string>
+    <string name="audit_cat_panic">Panic</string>
+    <string name="audit_cat_unlocks">Unlocks</string>
+    <string name="audit_cat_timeouts">Timeouts</string>
+    <string name="audit_cat_system">System</string>
+    <string name="category_credentials">Credentials</string>
+    <string name="category_api_keys">API Keys</string>
+    <string name="category_recovery_keys">Recovery Keys</string>
+    <string name="duration_sec_short">%1$ds</string>
+    <string name="duration_min_short">%1$dm</string>
+
+    <!-- Accessibility Content Descriptions & Share Labels -->
+    <string name="cd_add_encrypted_entry">Add Encrypted Entry</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_pinned">Pinned</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_trash">Trash</string>
+    <string name="cd_restore">Restore</string>
+    <string name="cd_delete_permanently">Delete Permanently</string>
+    <string name="cd_mask_secret">Mask secret</string>
+    <string name="cd_reveal_secret">Reveal secret</string>
+    <string name="cd_copy_to_clipboard">Copy to clipboard</string>
+    <string name="cd_toggle_visibility">Toggle visibility</string>
+    <string name="cd_generate_password">Generate Password</string>
+    <string name="cd_clear_all">Clear All</string>
+    <string name="cd_add_secret">Add Secret</string>
+    <string name="cd_vault_info">Vault Info</string>
+    <string name="cd_copy_secret">Copy Secret</string>
+    <string name="cd_delete">Delete</string>
+    <string name="donation_paypal_clipboard_label">PayPal Support Link</string>
+    <string name="donation_kofi_clipboard_label">Ko-fi Support Link</string>
+    <string name="share_app_subject">PureLock Zero-Knowledge Privacy</string>
+    <string name="share_app_text_format">Protect your personal privacy with PureLock! Zero-cloud offline app lock &amp; encrypted vault. Download now: https://play.google.com/store/apps/details?id=%1$s</string>
+    <string name="share_app_chooser_title">Share PureLock via</string>
 </resources>
 

@@ -4,6 +4,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import com.example.R
 import com.example.data.PureLockDatabase
 import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
@@ -50,9 +51,9 @@ class QuickLockdownTileService : TileService() {
                 try {
                     val activeTile = qsTile ?: tile ?: return@withContext
                     activeTile.state = Tile.STATE_ACTIVE
-                    activeTile.label = "Lockdown ACTIVE"
+                    activeTile.label = getString(R.string.tile_quick_lockdown_active)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        activeTile.subtitle = "All Apps Secured"
+                        activeTile.subtitle = getString(R.string.tile_quick_lockdown_active_subtitle)
                     }
                     activeTile.updateTile()
                 } catch (_: Exception) {
@@ -65,9 +66,9 @@ class QuickLockdownTileService : TileService() {
         super.onStartListening()
         val tile = qsTile ?: return
         tile.state = Tile.STATE_INACTIVE
-        tile.label = "Quick Lockdown"
+        tile.label = getString(R.string.tile_quick_lockdown_label)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tile.subtitle = "Tap to Lock All"
+            tile.subtitle = getString(R.string.tile_quick_lockdown_subtitle)
         }
         try {
             tile.updateTile()

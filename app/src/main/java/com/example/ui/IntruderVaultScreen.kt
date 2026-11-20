@@ -128,7 +128,7 @@ fun IntruderVaultScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DeleteSweep,
-                                contentDescription = "Clear All",
+                                contentDescription = stringResource(R.string.cd_clear_all),
                                 tint = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -146,7 +146,7 @@ fun IntruderVaultScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Add Secret",
+                                contentDescription = stringResource(R.string.cd_add_secret),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -163,7 +163,7 @@ fun IntruderVaultScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Vault Info",
+                            contentDescription = stringResource(R.string.cd_vault_info),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -420,7 +420,7 @@ fun IntruderVaultScreen(
                                         ) {
                                             Icon(
                                                 imageVector = if (activeCopiedItemId == item.id) Icons.Default.Check else Icons.Default.ContentCopy,
-                                                contentDescription = "Copy Secret",
+                                                contentDescription = stringResource(R.string.cd_copy_secret),
                                                 tint = if (activeCopiedItemId == item.id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.size(18.dp)
                                             )
@@ -432,7 +432,7 @@ fun IntruderVaultScreen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.DeleteOutline,
-                                                contentDescription = "Delete",
+                                                contentDescription = stringResource(R.string.cd_delete),
                                                 tint = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.size(18.dp)
                                             )

@@ -96,11 +96,11 @@ class UserSettingsManager(private val context: Context) {
     }
 
     val masterPin: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_MASTER_PIN] ?: "1234"
+        prefs[KEY_MASTER_PIN] ?: ""
     }
 
     val masterPattern: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_MASTER_PATTERN] ?: "1,2,5,8,9"
+        prefs[KEY_MASTER_PATTERN] ?: ""
     }
 
     val duressPin: Flow<String> = safeData.map { prefs ->
@@ -147,7 +147,7 @@ class UserSettingsManager(private val context: Context) {
     }
 
     val masterKnock: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_MASTER_KNOCK] ?: "1,2,4,3"
+        prefs[KEY_MASTER_KNOCK] ?: ""
     }
 
     val stealthModeActive: Flow<Boolean> = safeData.map { prefs ->

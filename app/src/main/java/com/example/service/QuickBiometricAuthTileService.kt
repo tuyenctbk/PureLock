@@ -6,6 +6,7 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import com.example.MainActivity
+import com.example.R
 import com.example.data.PureLockDatabase
 import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
@@ -73,9 +74,9 @@ class QuickBiometricAuthTileService : TileService() {
         super.onStartListening()
         val tile = qsTile ?: return
         tile.state = Tile.STATE_INACTIVE
-        tile.label = "Vault Re-Auth"
+        tile.label = getString(R.string.tile_vault_reauth_label)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tile.subtitle = "Biometric Unlock"
+            tile.subtitle = getString(R.string.tile_vault_reauth_subtitle)
         }
         try {
             tile.updateTile()

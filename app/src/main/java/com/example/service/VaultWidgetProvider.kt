@@ -77,7 +77,10 @@ class VaultWidgetProvider : AppWidgetProvider() {
                     )
                     for (appWidgetId in appWidgetIds) {
                         val views = RemoteViews(appContext.packageName, R.layout.vault_widget)
-                        views.setTextViewText(R.id.tv_protected_count, "Vault Secured & Locked! ($totalProtected items)")
+                        views.setTextViewText(
+                            R.id.tv_protected_count,
+                            appContext.getString(R.string.widget_vault_secured_format, totalProtected)
+                        )
                         views.setOnClickPendingIntent(R.id.btn_lock_widget, pendingIntent)
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
@@ -98,7 +101,10 @@ class VaultWidgetProvider : AppWidgetProvider() {
         val vaultCount = db.encryptedVaultDao().getActiveVaultItems().first().size
         val totalProtected = lockedCount + vaultCount
 
-        views.setTextViewText(R.id.tv_protected_count, "Protected Items: $totalProtected (Apps: $lockedCount, Vault: $vaultCount)")
+        views.setTextViewText(
+            R.id.tv_protected_count,
+            context.getString(R.string.widget_protected_items_format, totalProtected, lockedCount, vaultCount)
+        )
 
         val intent = Intent(context, VaultWidgetProvider::class.java).apply {
             action = ACTION_LOCK_VAULT

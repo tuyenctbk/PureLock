@@ -320,10 +320,11 @@ class OfflineBackupManager(private val context: Context) {
                 val rulesArray = backupDataObj.getJSONArray("scheduleRules")
                 for (i in 0 until rulesArray.length()) {
                     val ruleObj = rulesArray.getJSONObject(i)
+                    val pkgName = ruleObj.getString("packageName")
                     val entity = ScheduleRuleEntity(
                         id = 0L,
-                        packageName = ruleObj.getString("packageName"),
-                        appName = ruleObj.optString("appName", "App"),
+                        packageName = pkgName,
+                        appName = ruleObj.optString("appName", pkgName),
                         startHour = ruleObj.optInt("startHour", 18),
                         startMinute = ruleObj.optInt("startMinute", 0),
                         endHour = ruleObj.optInt("endHour", 23),

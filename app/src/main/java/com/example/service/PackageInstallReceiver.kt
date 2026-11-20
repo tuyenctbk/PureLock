@@ -9,6 +9,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.MainActivity
+import com.example.R
 import com.example.data.PureLockDatabase
 import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
@@ -110,10 +111,10 @@ class PackageInstallReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "New App Installation Detector",
+                context.getString(R.string.new_app_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifies when new applications are installed to offer PureLock protection."
+                description = context.getString(R.string.new_app_channel_desc)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -128,15 +129,15 @@ class PackageInstallReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val title = "New App Installed: $appName"
+        val title = context.getString(R.string.new_app_notif_title, appName)
         val text = if (isAlreadyLocked) {
-            "PureLock automatically protected $appName based on high-privacy settings."
+            context.getString(R.string.new_app_notif_locked_text, appName)
         } else {
-            "Would you like to lock $appName to secure your privacy?"
+            context.getString(R.string.new_app_notif_prompt_text, appName)
         }
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(com.example.R.drawable.ic_launcher_monochrome)
+            .setSmallIcon(R.drawable.ic_launcher_monochrome)
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)

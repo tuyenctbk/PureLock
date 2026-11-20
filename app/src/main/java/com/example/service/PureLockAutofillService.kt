@@ -107,9 +107,26 @@ class PureLockAutofillService : AutofillService() {
                 val fillResponseBuilder = FillResponse.Builder()
 
                 rankedItems.take(5).forEach { item ->
+                    val localizedCategory = when (item.category.uppercase()) {
+                        "PASSWORD" -> getString(R.string.vault_filter_passwords)
+                        "PIN", "BANK_PIN" -> getString(R.string.vault_filter_pins)
+                        "CODE_2FA" -> getString(R.string.vault_filter_2fa)
+                        "CARD" -> getString(R.string.vault_filter_cards)
+                        "NOTE" -> getString(R.string.vault_filter_notes)
+                        "WORK" -> getString(R.string.category_work)
+                        "PERSONAL" -> getString(R.string.category_personal)
+                        "FINANCE" -> getString(R.string.category_finance)
+                        "CREDENTIAL" -> getString(R.string.category_credentials)
+                        "API_KEY" -> getString(R.string.category_api_keys)
+                        "RECOVERY_KEY" -> getString(R.string.category_recovery_keys)
+                        else -> item.category
+                    }
                     val presentation = RemoteViews(packageName, android.R.layout.activity_list_item).apply {
-                        setImageViewResource(android.R.id.icon, com.example.R.drawable.splash_logo)
-                        setTextViewText(android.R.id.text1, "PureLock: ${item.title} (${item.category})")
+                        setImageViewResource(android.R.id.icon, R.drawable.splash_logo)
+                        setTextViewText(
+                            android.R.id.text1,
+                            getString(R.string.autofill_dataset_label, item.title, localizedCategory)
+                        )
                     }
 
                     @Suppress("DEPRECATION")

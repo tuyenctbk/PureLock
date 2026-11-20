@@ -5,11 +5,23 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Color
 import android.view.ContextThemeWrapper
+import androidx.fragment.app.FragmentActivity
 import androidx.test.core.app.ApplicationProvider
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.example.service.BillingGateway
+import com.example.service.DonationBillingManager
+import com.example.service.DonationTier
 import com.example.service.findActivity
 import com.example.util.DonationChannelsHelper
 import com.example.util.DonationEngagementManager
 import com.example.util.DonationEngagementState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -25,6 +37,49 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
 class DonationSystemTest {
+
+    private class FakeBillingGateway : BillingGateway {
+        override var isReady: Boolean = false
+        var startConnectionCalls: Int = 0
+        var queryCatalogCalls: Int = 0
+        var queryPurchasesCalls: Int = 0
+        var endConnectionCalls: Int = 0
+
+        override fun startConnection(onSetupFinished: (Boolean) -> Unit, onDisconnected: () -> Unit) {
+            startConnectionCalls++
+            isReady = true
+            onSetupFinished(true)
+        }
+
+        override fun queryProductDetails(
+            productIds: List<String>,
+            onResult: (BillingResult, List<ProductDetails>) -> Unit
+        ) {
+            queryCatalogCalls++
+            val ok = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
+            onResult(ok, emptyList())
+        }
+
+        override fun queryOwnedPurchases(onResult: (BillingResult, List<Purchase>) -> Unit) {
+            queryPurchasesCalls++
+            val ok = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
+            onResult(ok, emptyList())
+        }
+
+        override fun acknowledgePurchase(purchaseToken: String, onResult: (BillingResult) -> Unit) {
+            val ok = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
+            onResult(ok)
+        }
+
+        override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult {
+            return BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
+        }
+
+        override fun endConnection() {
+            endConnectionCalls++
+            isReady = false
+        }
+    }
 
     @Test
     fun `banner and prompts never show at install or first launch`() {
@@ -146,6 +201,57 @@ class DonationSystemTest {
 
         liveActivity.finish()
         assertNull(themedWrapper.findActivity())
+    }
+
+    @Test
+    fun `lifecycle-aware billing manager tracks Activity session across lifecycle transitions and release`() {
+        val appContext = ApplicationProvider.getApplicationContext<Context>()
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+        val fakeGateway = FakeBillingGateway()
+
+        val manager = DonationBillingManager(
+            context = appContext,
+            coroutineScope = scope,
+            ownsScope = false,
+            ioDispatcher = Dispatchers.Unconfined,
+            mainDispatcher = Dispatchers.Unconfined,
+            gatewayFactory = { _, _ -> fakeGateway },
+            onSupporterVerified = {}
+        )
+
+        // Before binding an Activity session, launching without a host reports a safe UI error instead of crashing
+        assertFalse(manager.hasBoundActiveSession())
+        manager.launchDonationFlow(DonationTier.TIER_1)
+        assertTrue(manager.uiState.value.isError)
+        assertEquals(
+            appContext.getString(R.string.donation_play_no_activity_error),
+            manager.uiState.value.statusMessage
+        )
+        manager.clearStatusMessage()
+
+        // Bind a live FragmentActivity and drive ON_START -> ON_RESUME -> ON_STOP -> ON_DESTROY
+        val controller = Robolectric.buildActivity(FragmentActivity::class.java).create().start()
+        val activity = controller.get()
+        manager.bindActivitySession(activity)
+
+        assertTrue(manager.hasBoundActiveSession())
+        assertTrue(fakeGateway.startConnectionCalls >= 1)
+        assertTrue(fakeGateway.queryCatalogCalls >= 1)
+        assertTrue(fakeGateway.queryPurchasesCalls >= 1)
+
+        val purchasesBeforeResume = fakeGateway.queryPurchasesCalls
+        controller.resume()
+        assertTrue(fakeGateway.queryPurchasesCalls > purchasesBeforeResume)
+
+        // When Activity stops or is destroyed, session is no longer active
+        controller.pause().stop()
+        assertFalse(manager.hasBoundActiveSession())
+        controller.destroy()
+        assertFalse(manager.hasBoundActiveSession())
+
+        manager.release()
+        assertEquals(1, fakeGateway.endConnectionCalls)
+        scope.cancel()
     }
 
     @Test

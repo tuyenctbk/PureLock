@@ -321,7 +321,7 @@ fun AppShieldScreen(
                         onClick = { selectedCategory = category },
                         label = {
                             Text(
-                                text = if (category == "ALL") stringResource(R.string.category_all) else category.lowercase().replaceFirstChar { it.uppercase() },
+                                text = stringResource(appCategoryLabelRes(category)),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -546,7 +546,7 @@ private fun AppShieldItemCard(
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Text(
-                        text = app.category.lowercase().replaceFirstChar { it.uppercase() },
+                        text = stringResource(appCategoryLabelRes(app.category)),
                         style = MaterialTheme.typography.bodySmall,
                         color = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )
@@ -578,6 +578,16 @@ private fun AppShieldItemCard(
             }
         }
     }
+}
+
+private fun appCategoryLabelRes(category: String): Int = when (category.uppercase()) {
+    "ALL" -> R.string.vault_filter_all
+    "FINANCIAL" -> R.string.app_cat_financial
+    "SOCIAL" -> R.string.app_cat_social
+    "SYSTEM" -> R.string.app_cat_system
+    "MEDIA" -> R.string.app_cat_media
+    "GAMES" -> R.string.app_cat_games
+    else -> R.string.app_cat_other
 }
 
 @Composable

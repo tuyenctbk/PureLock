@@ -1,0 +1,512 @@
+0	PureLock používá tuto lehkou službu výhradně k rozpoznání spuštění chráněných aplikací a zobrazení zabezpečené zamykací obrazovky. PureLock nemá žádné oprávnění k internetu a nikdy neodesílá ani nesdílí vaše data.
+1	Zobrazit trezor
+2	Otevřít šifrovaný tajný trezor
+3	Generátor hesel
+4	Vygenerovat silné heslo
+5	Při detekci náhlého zatřesení spustí nouzové uzamčení.
+6	Snímky
+7	Smazat
+8	Zrušit
+9	Hledat poznámky, hesla a tajemství…
+10	Vymazat hledání
+11	Nenalezena žádná odpovídající tajemství
+12	Položka „%1$s“ nebyla nalezena. Zkuste jiné klíčové slovo.
+13	Uložit první tajnou poznámku
+14	Heslo
+15	Tajná poznámka
+16	Bankovní PIN
+17	Zkopírováno! Schránka se vymaže za %1$d s
+18	Vymazat nyní
+19	Zpoždění automatického vymazání schránky
+20	Automaticky vymaže zkopírovaná tajemství ze schránky, aby zabránil odposlechu na pozadí.
+21	Nikdy (ruční vymazání)
+22	Práce
+23	Osobní
+24	Finance
+25	Hesla
+26	PINy
+27	Přístup povolen
+28	Bezpečnostní štít PureLock
+29	Ověření úspěšné. Otevírání %1$s…
+30	Pro %1$s je vyžadováno ověření
+31	Hardwarový biometrický senzor nebyl zjištěn. Použije se záložní PIN nebo gesto.
+32	V zařízení není zaregistrována žádná biometrie. Použije se záložní PIN nebo gesto.
+33	%1$d neúspěšné pokusy! Snímek narušitele byl uložen lokálně.
+34	PIN klávesnice
+35	Gesto
+36	Biometrie
+37	Nesprávný PIN. Zkuste to znovu.
+38	Nesprávné gesto. Zkuste to znovu.
+39	Nakreslete gesto pro odemčení
+40	Nakreslete gesto (neviditelná stopa)
+41	Resetovat gesto
+42	Přiložte prst ke čtečce nebo použijte Face ID pro odemčení %1$s
+43	Zrušit a ukončit štít
+44	Vymazat
+45	Kopírovat vygenerované
+46	Přehledy trezoru
+47	Kryptografické statistiky a telemetrie síly hesel
+48	Rozdělení síly hesel
+49	Rozdělení kategorií
+50	Četnost použití a uložení
+51	Váš trezor je prázdný
+52	Chraňte svá hesla, soukromé poznámky, bankovní PINy a citlivé položky lokálně pomocí hardwarové ochrany AES-256-GCM.
+53	Nebyly nalezeny žádné položky %1$s
+54	V kategorii „%1$s“ nemáte uložené žádné šifrované položky. Přidejte své první tajemství nebo poznámku.
+55	Trezor zabezpečen — žádné pokusy o vniknutí
+56	Pokud se neoprávněná osoba pokusí otevřít zamčenou aplikaci chybnými údaji, její snímek se uloží a zobrazí zde.
+57	Koš je prázdný
+58	Smazané poznámky a tajemství zůstávají v koši %1$d dní před trvalým odstraněním.
+59	Uložit tajemství do %1$s
+60	Šifrovaný trezor
+61	AES-256 SQLCipher • Zero-Knowledge
+62	Schránka chráněna
+63	Citlivá data se vymažou za %1$d s
+64	Schránka okamžitě vymazána
+65	Hledat šifrované položky…
+66	Vyprázdnit
+67	Žádné šifrované položky neodpovídají „%1$s“
+68	Šifrovaný záznam aktualizován
+69	Bezpečně uloženo pomocí šifrování AES-256
+70	Tajemství trvale smazáno
+71	Koš vyprázdněn
+72	Vyprázdnit koš?
+73	Všech %1$d položek v koši bude trvale smazáno.
+74	Vyprázdnit koš
+75	Trvale smazat tajemství?
+76	Opravdu chcete smazat „%1$s“? Tento šifrovaný záznam nelze obnovit.
+77	Smazat trvale
+78	Nové šifrované tajemství
+79	Upravit šifrovanou položku
+80	Kategorie
+81	Název / Služba *
+82	např. ProtonMail, GitHub, Tajná poznámka
+83	Heslo / Tajemství *
+84	Tajný obsah *
+85	Uživatelské jméno / E-mail
+86	Web nebo aplikace
+87	Šifrované poznámky (volitelné)
+88	Připnout nahoru
+89	Oblíbené
+90	Uložit šifrovaně
+91	Vygenerovat
+92	Automaticky vygenerovat 20znakový klíč s vysokou entropií
+93	Vše
+94	Hesla
+95	Poznámky
+96	Karty
+97	2FA / Kódy
+98	PINy
+99	Oblíbené
+100	Koš
+101	Trezor
+102	Štít aplikací
+103	Narušitel
+104	Nastavení
+105	Audit
+106	Offline zabezpečení Zero-Knowledge
+107	Inicializace trezoru AES-256…
+108	100% Offline • Nulová telemetrie
+109	Zamčeno %1$d/%2$d
+110	Zamknout vše
+111	Odemknout vše
+112	Podrobnosti ochrany
+113	Vítejte v PureLock
+114	Offline bezpečnostní engine bez cloudu.\nChraňte své aplikace, fotky a tajemství místním šifrováním vojenské úrovně.
+115	Nastavit hlavní bezpečnostní klíč
+116	Nakreslete hlavní gesto (minimálně 4 body) a nastavte záložní PIN.
+117	Vytvořte hlavní PIN pro odemčení PureLock a chráněných aplikací.
+118	Pokračovat
+119	Vstoupit do PureLock
+120	Zpět
+121	Hlavní PIN musí mít alespoň 4 číslice.
+122	Potvrzení hlavního PINu se neshoduje.
+123	Gesto musí spojovat alespoň 4 body.
+124	Informace o službě Usnadnění přístupu
+125	Proč PureLock potřebuje oprávnění Usnadnění přístupu:
+126	PureLock používá API AccessibilityService výhradně ke zjištění otevření chráněných aplikací na popředí a okamžitému zobrazení zamykací obrazovky.
+127	Záruka shromažďování dat a soukromí:
+128	PureLock NESLEDUJE, NEUKLÁDÁ ani NEODESÍLÁ žádná citlivá uživatelská data, psaný text, hesla ani osobní obsah. PureLock je 100% offline bez oprávnění k internetu.
+129	Souhlasit a zapnout
+130	Odmítnout
+131	Povolit Štít soukromí
+132	Udělte oprávnění, aby PureLock mohl okamžitě detekovat spuštění aplikací.
+133	Služba Usnadnění přístupu
+134	Okamžitě detekuje aplikace na popředí.
+135	Udělit oprávnění Usnadnění
+136	Zobrazovat přes jiné aplikace
+137	Umožňuje PureLock bezpečně zobrazit zamykací obrazovku při otevření chráněné aplikace.
+138	Udělit oprávnění překrytí
+139	Aktivní
+140	Neaktivní
+141	Uděleno
+142	Vyžadováno
+143	Povolit
+144	Nápověda k omezeným nastavením Android 13+
+145	Omezená nastavení Android 13+
+146	Pokud Android zakázal Usnadnění přístupu s varováním „Omezené nastavení“, postupujte podle těchto 4 kroků:
+147	1. Klepnutím níže otevřete Informace o aplikaci PureLock v nastavení systému.
+148	2. V pravém horním rohu klepněte na tři svislé tečky (⋮).
+149	3. Klepněte na „Povolit omezená nastavení“ a potvrďte PINem nebo biometrií.
+150	4. Vraťte se sem a klepněte na „Udělit oprávnění Usnadnění“.
+151	Otevřít informace o PureLock
+152	Doba odkladu opětovného uzamčení
+153	Nastavte, jak dlouho zůstane odemčená aplikace přístupná po jejím opuštění.
+154	Do vypnutí obrazovky
+155	Ochrana aktivní!
+156	Váš trezor soukromí Zero-Knowledge je připraven.\nVšechny hlavní klíče a šifrované položky jsou uloženy výhradně ve vašem zařízení.
+157	Hlavní PIN
+158	Záložní hlavní PIN
+159	Potvrdit hlavní PIN
+160	Biometrie povolena
+161	Otisk prstu nebo ověření obličeje odemkne PureLock okamžitě. Zadejte hlavní PIN níže pro restarty systému.
+162	Nakreslete hlavní gesto níže
+163	Vybrané body: %1$s
+164	Resetovat gesto
+165	Sdílejte soukromí Zero-Knowledge
+166	Líbí se vám PureLock? Sdílejte maximální ochranu soukromí s přáteli a rodinou!
+167	Později
+168	Sdílet
+169	Líbí se vám PureLock?
+170	Vaše 5hvězdičková recenze nám pomáhá udržet PureLock 100% zdarma a bez cloudu pro každého!
+171	Teď ne
+172	Ohodnotit
+173	Hledat nainstalované aplikace…
+174	Nebyly nalezeny žádné aplikace
+175	Odemčeno
+176	Zamčeno
+177	Neviditelná stopa gesta
+178	Náhodné zamíchání klávesnice
+179	Snímek narušitele
+180	%1$d sekund
+181	Šifrovaná záloha AES-256
+182	Trezor snímků narušitelů
+183	Pokus: %1$s
+184	Cíl: %1$s
+185	Zatím nejsou k dispozici žádná data kategorií.
+186	Hardwarová ochrana bez cloudu
+187	Všechny přehledy trezoru se počítají přímo v zařízení bez jakékoli síťové telemetrie nebo sledování.
+188	bitů prům.
+189	Velmi silné
+190	Silné
+191	Střední
+192	Slabé
+193	Silné (75+ bitů)
+194	Dobré (55-74 bitů)
+195	Střední (35-54 bitů)
+196	Slabé (<35 bitů)
+197	Starší (>30d)
+198	Ukončit
+199	Systémové upozornění
+200	Aplikace %1$s bohužel přestala pracovat.
+201	V aplikaci došlo k neošetřené výjimce a systém ji ukončil.
+202	Protokol selhání byl odeslán vývojáři.
+203	Odeslat zpětnou vazbu
+204	Zavřít aplikaci
+205	Klepněte tajný 4-kvadrantový rytmus (%1$d klepnutí)
+206	Nesprávný vzor klepání. Zkuste to znovu.
+207	Vymazat klepnutí
+208	OK
+209	Uložit
+210	Vymazat
+211	Maskování, návnady a ověřování
+212	Přihlašovací údaje a typ zámku
+213	Metoda zámku
+214	Kamufláž a skryté návnady
+215	Návnada zamykací obrazovky
+216	Klame zvědavce zobrazením falešné obrazovky před výzvou k odemčení.
+217	Žádná
+218	Kalkulačka
+219	Falešný pád
+220	Tísňový PIN (Duress)
+221	Vizuální motiv a paleta zabezpečení
+222	Barevná paleta
+223	Spouštěče a časový limit
+224	Zatřesením zamknout
+225	Limit automatického uzamčení
+226	Fotky narušitelů (%1$d)
+227	Tajný trezor (%1$d)
+228	Podrobnosti zabezpečení trezoru
+229	• Zachycení narušitele pořídí snímek přední kamerou automaticky po 1-3 chybných pokusech.
+230	• Tajné poznámky a hesla jsou uložena šifrovaně pomocí AES-256 SQLCipher.
+231	• Zkopírovaná hesla se automaticky smažou ze schránky po 30 sekundách.
+232	Smazat snímek
+233	Vymazat všechny snímky?
+234	Tím trvale smažete všechny fotky narušitelů.
+235	Upravit tajemství
+236	Nové tajemství
+237	Název
+238	Tajný obsah
+239	Smazat tajemství?
+240	Trvale smazat „%1$s“?
+241	Kód klepnutí
+242	Změnit hlavní gesto
+243	Nastavit kód klepnutí (4 kvadranty)
+244	Změnit hlavní PIN
+245	Gesto nastaveno (%1$d bodů)
+246	Rytmus klepnutí (%1$d klepnutí)
+247	Aktuální: ••••
+248	Zamíchá pozice čísel při každém pokusu o odemčení proti odpozorování a stopám prstů.
+249	Skryje spojovací čáru při kreslení gesta, aby přihlížející neviděli váš vzor.
+250	Při vynuceném odemčení pod nátlakem se tísňový PIN tváří jako normální odemčení, ale skrytě uzamkne citlivé položky a zaloguje výstrahu.
+251	Tiše pořídí fotografii přední kamerou při zadání nesprávného PINu nebo gesta a uloží ji do šifrovaného trezoru.
+252	Okamžitě uzamkne PureLock a vymaže aktivní relace při zjištění fyzického zatřesení.
+253	Určuje, jak dlouho zůstane odemčená aplikace přístupná po opuštění. „0s“ uzamkne okamžitě. „Vypnutí obrazovky“ zachová relaci do zhasnutí displeje.
+254	Nastavit hlavní PIN
+255	Zadejte 4-8místný hlavní bezpečnostní PIN:
+256	Hlavní PIN aktualizován
+257	Uložit PIN
+258	Nastavit hlavní gesto
+259	Hlavní gesto aktualizováno
+260	Uložit gesto
+261	Nastavit kód klepnutí
+262	Klepněte na oblast 4 kvadrantů pro záznam rytmu (min. 3 klepnutí). Zaznamenáno: %1$d klepnutí
+263	Klepněte alespoň na 3 kvadranty pro vytvoření vzoru
+264	Kód klepnutí nastaven
+265	Uložit kód klepnutí
+266	Nastavit tísňový PIN
+267	Zadejte falešný PIN odlišný od hlavního PINu:
+268	Tísňový PIN nastaven
+269	Odemknout biometrií
+270	• PureLock nemá ŽÁDNÁ oprávnění k internetu („android.permission.INTERNET“ chybí).
+271	• Všechny protokoly, snímky, PINy a gesta jsou šifrovány pomocí SQLCipher AES-256.
+272	• Statistiky zamykání aplikací nikdy neopustí vaše zařízení.
+273	Kopírovat historii protokolu auditu ve formátu CSV (%1$d záznamů):
+274	Protokoly auditu zkopírovány do schránky (formát CSV)
+275	Filtrovat protokoly auditu…
+276	Hodnocení ochrany
+277	• Skóre vychází z pokrytí chráněných aplikací a aktivních obranných vrstev.
+278	• Práh automatického uzamčení 0s-30s minimalizuje dobu vystavení riziku.
+279	• SQLCipher AES-256 chrání všechny databáze lokálně bez telemetrie.
+280	Rozumím
+281	Kopírovat
+282	Zavřít
+283	Celkem poznámek
+284	Šifrováno lokálně
+285	Index zdraví
+286	Podrobnosti
+287	Autozámek %1$d s
+288	Citlivá schránka byla automaticky vymazána.
+289	Více než 30 dní nebyla provedena šifrovaná záloha! Klepnutím zálohujte nyní.
+290	Upozornění na stav zálohování
+291	Upozornění zálohování
+292	Upozorní, pokud nebyla provedena šifrovaná záloha déle než 30 dní.
+293	Synchronizováno: %1$d odinstalovaných aplikací odebráno ze štítu.
+294	Nainstalované aplikace úspěšně synchronizovány.
+295	Synchronizovat aplikace
+296	Vše
+297	Zamčeno
+298	Odemčeno
+299	Okamžité ověření zámku přes Službu usnadnění
+300	Nulová síťová oprávnění a žádná telemetrie
+301	Maskování kalkulačkou nebo falešným pádem
+302	Přesunuto do koše
+303	Obnoveno z koše
+304	Zavřít
+305	Exportovat
+306	Android Keystore ověřen
+307	Databáze SQLCipher AES-256 připojena
+308	Aktivní obrana připravena
+309	Přeskočit
+310	Průvodce oprávněními a nastavením
+311	Udělte potřebná oprávnění zařízení pro zapnutí štítu aplikací
+312	Diagnostika a průvodce oprávněními
+313	Základní oprávnění aktivní
+314	Vyžadována základní oprávnění
+315	Všechna bezpečnostní oprávnění jsou povolena. Vaše aplikace a data jsou bezpečně chráněna!
+316	Pokyny k nastavení
+317	Tipy pro zařízení
+318	Tipy k nastavení zařízení
+319	Na zařízeních Samsung přejděte do Nastavení > Aplikace > PureLock > Baterie > Bez omezení, aby nedocházelo k ukončování na pozadí.
+320	Na MIUI/HyperOS povolte pro PureLock Automatické spuštění a nastavte Spořič baterie na Bez omezení.
+321	Na zařízeních Google Pixel zkontrolujte, zda je zapnuto Usnadnění > Stažené aplikace > PureLock.
+322	VYŽADOVÁNO
+323	DOPORUČENO
+324	VOLITELNÉ
+325	AKTIVNÍ
+326	NASTAVIT
+327	Otevřít nastavení
+328	Otestovat překrytí zámku
+329	Spouštění testovací zamykací obrazovky…
+330	Štít aplikací neaktivní
+331	Pro detekci a zamykání aplikací jsou vyžadována oprávnění Usnadnění a Překrytí.
+332	Povolit nyní
+333	Služba Usnadnění přístupu
+334	Detekce spuštění chráněných aplikací v reálném čase.
+335	1. Klepněte níže na „Otevřít nastavení“ a přejděte do Usnadnění.
+336	2. Najděte „PureLock“ v části Stažené aplikace nebo Nainstalované služby.
+337	3. Přepněte přepínač na ZAPNUTO a potvrďte systémovou bezpečnostní výzvu.
+338	4. Vraťte se do PureLock a ověřte aktivní stav.
+339	Zobrazovat přes jiné aplikace
+340	Umožňuje okamžitě zobrazit zamykací vrstvu PIN/gesta nad chráněnými aplikacemi.
+341	1. Klepněte na „Otevřít nastavení“ pro oprávnění překrytí.
+342	2. Vyhledejte „PureLock“ v seznamu.
+343	3. Povolte „Zobrazování nad ostatními aplikacemi“.
+344	Přístup k datům o využití (Doporučeno)
+345	Sekundární detekce pro Android TV a systémy s agresivní správou napájení.
+346	1. Klepněte na „Otevřít nastavení“ pro Přístup k datům o využití.
+347	2. Najděte a vyberte „PureLock“.
+348	3. Zapněte „Povolit přístup k údajům o využití“.
+349	Oprávnění fotoaparátu (Volitelné)
+350	Umožňuje tiché pořízení selfie přední kamerou při chybných pokusech o odemčení.
+351	Oprávnění oznámení (Volitelné)
+352	Umožňuje zobrazovat bezpečnostní oznámení a trvalý stav štítu.
+353	Zatím žádné zaznamenané události
+354	Zjištěno %1$d výstrah
+355	Stav ochrany
+356	Zaznamenané hrozby
+357	Aktivní obrana
+358	Časové razítko
+359	Podrobnosti
+360	Průměrná síla a entropie hesel
+361	Průměrná entropie je %1$.1f bitů na tajemství. Vaše údaje mají vysokou kryptografickou odolnost vůči útokům hrubou silou.
+362	Průměrná entropie je %1$.1f bitů na tajemství. Zvažte delší hesla se speciálními znaky.
+363	Přidejte šifrované poznámky a přihlašovací údaje pro zobrazení živé entropie.
+364	Položky
+365	Posledních 24 h
+366	Posledních 7 d
+367	Posledních 30 d
+368	Půlnoc
+369	OLED Černá
+370	Smaragdová
+371	Safírová
+372	Monet
+373	Minimální
+374	Okamžitě (Vždy)
+375	%1$d s nečinnosti
+376	Bezpečnostní architektura PureLock
+377	Verze %1$s • Hardwarový Keystore a SQLCipher AES-256
+378	100% Offline • Nulová telemetrie • Izolovaný engine soukromí
+379	Rychlé uzamčení
+380	Opětovné ověření trezoru
+381	Offline automatické vyplňování PureLock
+382	Podpořit PureLock
+383	100% Offline • Bez reklam • Nezávislý software pro soukromí
+384	Google Play
+385	PayPal a QR
+386	Ko-fi
+387	Příspěvek na espresso
+388	Podpořte soustředěnou opravu chyb
+389	Káva a bezpečnost
+390	Podpořte průběžné aktualizace SQLCipher a OS
+391	Patron soukromí
+392	Pomozte udržet PureLock bez reklam pro všechny
+393	Šampion strážce
+394	Sponzorujte velké nové offline moduly zabezpečení
+395	Podpořit přes Google Play (%1$s)
+396	Připojování ke Google Play…
+397	Nákup zrušen. Děkujeme, že jste zvážili podporu PureLock!
+398	Vaše úroveň podporovatele je již na Google Play ověřena. Obnovování odznaku…
+399	Fakturace Google Play není na tomto zařízení nebo v této relaci dostupná. Zkuste PayPal nebo Ko-fi.
+400	Upozornění fakturace Google Play: %1$s
+401	Nelze připojit platební okno k aktivní obrazovce. Otevřete Podporu znovu z Nastavení.
+402	Úrovně podpory Google Play nejsou pro toto sestavení ještě publikovány. Použijte PayPal nebo Ko-fi.
+403	Děkujeme! Váš odznak Aktivního podporovatele je nyní odemčen.
+404	Platba čeká na potvrzení na Google Play. Odznak se odemkne automaticky po dokončení.
+405	Vyberte částku (USD)
+406	Libovolná částka
+407	Vlastní USD (např. 7.50)
+408	Naskenujte QR kód jiným telefonem nebo bankovní aplikací
+409	Otevřít PayPal
+410	Kopírovat odkaz
+411	Sdílet
+412	Sdílet odkaz podpory PureLock
+413	Podpořte PureLock — 100% offline androidový trezor soukromí bez telemetrie:
+414	Odkaz podpory zkopírován do schránky
+415	Nenalezen žádný prohlížeč — odkaz zkopírován do schránky
+416	Pozvěte nezávislého vývojáře na kávu
+417	PureLock funguje zcela offline bez reklam, sledovačů či cloudových předplatných. Každý příspěvek přes Ko-fi přímo financuje nezávislou údržbu zabezpečení.
+418	Podpořit na Ko-fi
+419	Podporovatel
+420	Aktivní podporovatel ověřen
+421	Děkujeme za podporu nezávislého softwaru pro soukromí! Všechny výzvy k podpoře jsou trvale skryty.
+422	Líbí se vám offline soukromí?
+423	100% bez reklam a nezávislé. Klepnutím podpořte.
+424	Podpořit
+425	Skrýt banner podpory
+426	PODPOŘIT VÝVOJ
+427	Podpořit PureLock
+428	100% Offline a bez reklam • Nulová telemetrie. Dobrovolné příspěvky přes Google Play, PayPal QR nebo Ko-fi pomáhají dalšímu vývoji.
+429	Otevřít možnosti podpory
+430	Milník: Zabezpečeno %1$d akcí
+431	PureLock právě znovu ochránil vaše soukromí — 100% offline bez reklam či sledování. Pokud vám ušetřil čas nebo přinesl klid, zvažte podporu nezávislého vývoje.
+432	Podpořit vývoj
+433	Teď ne
+434	Kryptografický audit integrity
+435	Spočítejte živý ověřovací hash SHA-256 napříč všemi šifrovanými záznamy trezoru, chráněnými aplikacemi a pravidly rozvrhu.
+436	Spustit audit integrity
+437	Ověřování součtu SHA-256…
+438	Úspěch • Ověřeno %1$d entit
+439	Trezor ověřen jako neporušený! Podpořte nezávislý offline vývoj.
+440	Štít PureLock
+441	Trezor PureLock
+442	ZAMKNOUT
+443	Chráněné položky: 0
+444	Chráněné položky: %1$d (Aplikace: %2$d, Trezor: %3$d)
+445	Trezor zabezpečen a uzamčen! (%1$d pol.)
+446	Biometrické odemčení
+447	Uzamčení AKTIVNÍ
+448	Všechny aplikace zabezpečeny
+449	Klepnutím uzamknete vše
+450	Detektor instalace nových aplikací
+451	Upozorní při instalaci nových aplikací a nabídne ochranu PureLock.
+452	Nainstalována nová aplikace: %1$s
+453	PureLock automaticky ochránil %1$s podle nastavení vysokého soukromí.
+454	Chcete aplikaci %1$s uzamknout pro ochranu soukromí?
+455	PureLock: %1$s (%2$s)
+456	Biometrické zabezpečení PureLock
+457	Pro pokračování ověřte otisk prstu nebo obličej
+458	Použít PIN / Gesto
+459	Biometrické skenování nebylo rozpoznáno. Zkuste to znovu.
+460	Nelze spustit biometrickou výzvu: %1$s
+461	V zařízení není zaregistrována biometrie. Použijte PIN nebo gesto.
+462	Biometrický senzor není dostupný. Použijte PIN nebo gesto.
+463	Kontext aktivity není dostupný pro biometrickou výzvu.
+464	Naskenujte otisk nebo Face ID pro odemčení
+465	ZÁCHYT NARUŠITELE
+466	Aplikace: %1$s
+467	Finance
+468	Sociální
+469	Systém
+470	Média
+471	Hry
+472	Ostatní
+473	24h
+474	7d
+475	30d
+476	Vše
+477	Vše
+478	Hrozby
+479	Panika
+480	Odemčení
+481	Časové limity
+482	Systém
+483	Přihlašovací údaje
+484	API klíče
+485	Klíče obnovení
+486	%1$d s
+487	%1$d m
+488	Přidat šifrovaný záznam
+489	Hledat
+490	Vymazat hledání
+491	Připnuto
+492	Oblíbené
+493	Upravit
+494	Koš
+495	Obnovit
+496	Smazat trvale
+497	Skrýt tajemství
+498	Zobrazit tajemství
+499	Kopírovat do schránky
+500	Přepnout viditelnost
+501	Vygenerovat heslo
+502	Vymazat vše
+503	Přidat tajemství
+504	Info o trezoru
+505	Kopírovat tajemství
+506	Smazat
+507	Odkaz podpory PayPal
+508	Odkaz podpory Ko-fi
+509	Soukromí Zero-Knowledge PureLock
+510	Chraňte své osobní soukromí s PureLock! Offline zámek aplikací bez cloudu a šifrovaný trezor. Stáhnout nyní: https://play.google.com/store/apps/details?id=%1$s
+511	Sdílet PureLock přes

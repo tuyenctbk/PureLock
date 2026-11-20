@@ -58,6 +58,7 @@ class MainActivity : FragmentActivity() {
         com.example.service.DatabaseChecksumManager(this).validateChecksumAndLog()
         com.example.service.BackupHealthService(this).checkBackupHealth()
 
+        viewModel.bindBillingSession(this)
         viewModel.recordAppLaunch()
 
         setContent {
@@ -182,9 +183,6 @@ class MainActivity : FragmentActivity() {
                                         viewModel.clearSensitiveState()
                                     }
                                 }
-                            }
-                            androidx.lifecycle.Lifecycle.Event.ON_RESUME -> {
-                                viewModel.refreshDonationBilling()
                             }
                             androidx.lifecycle.Lifecycle.Event.ON_START -> {
                                 if (appBackgroundTimestamp > 0L) {

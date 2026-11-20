@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="24.dp"
             android:layout_height="24.dp"
-            android:contentDescription="Shield"
+            android:contentDescription="@string/widget_shield_cd"
             android:src="@drawable/splash_logo" />
 
         <TextView
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="PureLock Vault"
+            android:text="@string/widget_title"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="36.dp"
             android:backgroundTint="#EF4444"
-            android:text="LOCK"
+            android:text="@string/widget_btn_lock"
             android:textColor="#FFFFFF"
             android:textSize="12sp" />
     </LinearLayout>
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Protected Items: 0"
+        android:text="@string/widget_protected_items_initial"
         android:textColor="#E2E8F0"
         android:textSize="14sp" />
 
@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Zero-Knowledge Offline Security"
+        android:text="@string/splash_tagline"
         android:textColor="#94A3B8"
         android:textSize="11sp" />
 

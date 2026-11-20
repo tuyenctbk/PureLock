@@ -1,0 +1,512 @@
+0	PureLock käyttää tätä kevyttä palvelua ainoastaan havaitakseen, milloin suojatut sovellukset avataan, ja näyttääkseen turvallisen lukitusnäytön. PureLockilla ei ole internet-käyttöoikeuksia eikä se koskaan lähetä tai jaa tietojasi.
+1	Näytä holvi
+2	Avaa salattu salainen holvi
+3	Salasanageneraattori
+4	Luo vahva salasana
+5	Aktivoi hätälukituksen, kun äkillinen ravistus havaitaan.
+6	Kuvat
+7	Poista
+8	Peruuta
+9	Hae muistiinpanoja, salasanoja ja salaisuuksia…
+10	Tyhjennä haku
+11	Vastaavia salaisuuksia ei löytynyt
+12	Yksikään kohde ei vastaa hakua "%1$s". Kokeile toista hakusanaa.
+13	Tallenna ensimmäinen salainen muistiinpano
+14	Salasana
+15	Salainen muistiinpano
+16	Pankin PIN
+17	Kopioitu! Leikepöytä tyhjennetään %1$d s kuluttua
+18	Tyhjennä nyt
+19	Leikepöydän automaattisen tyhjennyksen viive
+20	Poistaa kopioidut salaisuudet automaattisesti leikepöydältä taustasalakuuntelun estämiseksi.
+21	Ei koskaan (tyhjennä manuaalisesti)
+22	Työ
+23	Henkilökohtainen
+24	Talous
+25	Salasanat
+26	PIN-koodit
+27	Pääsy sallittu
+28	PureLock-suojakilpi
+29	Todennus onnistui. Avataan %1$s…
+30	Todennus vaaditaan kohteelle %1$s
+31	Laitteiston biometristä anturia ei havaittu. Käytetään toissijaista PIN-koodia tai kuviota.
+32	Laitteeseen ei ole rekisteröity biometriikkaa. Käytetään toissijaista PIN-koodia tai kuviota.
+33	%1$d epäonnistunutta yritystä! Tunkeilijan selfie otettu paikallisesti.
+34	PIN-näppäimistö
+35	Kuvio
+36	Biometriikka
+37	Virheellinen PIN. Yritä uudelleen.
+38	Virheellinen kuvio. Yritä uudelleen.
+39	Avaa lukitus piirtämällä kuvio
+40	Piirrä kuvio (näkymätön jälki)
+41	Nollaa kuvio
+42	Kosketa sormenjälkitunnistinta tai käytä Face ID:tä kohteen %1$s avaamiseen
+43	Peruuta ja poistu suojauksesta
+44	Tyhjennä
+45	Kopioi luotu
+46	Holvin tiedot
+47	Salaustilastot ja vahvuustelemetria
+48	Salasanojen vahvuusjakauma
+49	Luokkajakauma
+50	Käyttö- ja tallennustiheys
+51	Holvisi on tyhjä
+52	Suojaa salasanasi, yksityiset muistiinpanosi, pankin PIN-koodisi ja arkaluonteiset kohteesi paikallisesti AES-256-GCM-laitteistosuojauksella.
+53	%1$s-kohteita ei löytynyt
+54	Luokassa "%1$s" ei ole salattuja kohteita. Lisää ensimmäinen salaisuutesi tai muistiinpanosi nyt.
+55	Holvi turvassa — ei tunkeutumisyrityksiä
+56	Jos asiaton henkilö yrittää avata lukitun sovelluksen väärillä tiedoilla, hänen selfie-kuvansa otetaan ja näytetään täällä.
+57	Roskakori on tyhjä
+58	Poistetut muistiinpanot ja salaisuudet säilyvät roskakorissa %1$d päivää ennen pysyvää poistoa.
+59	Tallenna salaisuus kohteeseen %1$s
+60	Salattu holvi
+61	AES-256 SQLCipher • Zero-Knowledge
+62	Leikepöytä suojattu
+63	Tyhjennetään arkaluonteinen leike %1$d s kuluttua
+64	Leikepöytä tyhjennetty heti
+65	Hae salattuja kohteita…
+66	Tyhjennä
+67	Yksikään salattu kohde ei vastaa hakua "%1$s"
+68	Salattu merkintä päivitetty
+69	Tallennettu turvallisesti AES-256-salauksella
+70	Salaisuus poistettu pysyvästi
+71	Roskakori tyhjennetty
+72	Tyhjennetäänkö roskakori?
+73	Kaikki %1$d kohdetta roskakorissa poistetaan pysyvästi.
+74	Tyhjennä roskakori
+75	Poistetaanko salaisuus pysyvästi?
+76	Haluatko varmasti poistaa kohteen "%1$s"? Tätä salattua merkintää ei voi palauttaa.
+77	Poista pysyvästi
+78	Uusi salattu salaisuus
+79	Muokkaa salattua kohdetta
+80	Luokka
+81	Otsikko / Palvelun nimi *
+82	esim. ProtonMail, GitHub, Salainen muistiinpano
+83	Salasana / Salaisuus *
+84	Salainen sisältö *
+85	Käyttäjätunnus / Sähköposti
+86	Verkkosivusto tai sovellus
+87	Salatut muistiinpanot (valinnainen)
+88	Kiinnitä ylös
+89	Suosikki
+90	Tallenna salattuna
+91	Luo
+92	Luo automaattisesti 20 merkin korkean entropian avain
+93	Kaikki
+94	Salasanat
+95	Muistiinpanot
+96	Kortit
+97	2FA / Koodit
+98	PIN-koodit
+99	Suosikit
+100	Roskakori
+101	Holvi
+102	Sovellussuoja
+103	Tunkeilija
+104	Asetukset
+105	Tarkastus
+106	Zero-Knowledge offline-tietoturva
+107	Alustetaan AES-256-holvia…
+108	100 % Offline • Nolla telemetriaa
+109	%1$d/%2$d lukittu
+110	Lukitse kaikki
+111	Avaa kaikki
+112	Suojauksen tiedot
+113	Tervetuloa PureLockiin
+114	Pilvitön offline-suojausmoottori.\nSuojaa sovelluksesi, valokuvasi ja salaisuutesi sotilastason paikallisella salauksella.
+115	Määritä pääsuojausavain
+116	Piirrä pääkuviosi (vähintään 4 pistettä) ja määritä varakoodi (PIN).
+117	Luo pää-PIN PureLockin ja suojattujen sovellusten lukituksen avaamiseksi.
+118	Jatka
+119	Siirry PureLockiin
+120	Takaisin
+121	Pää-PIN-koodissa on oltava vähintään 4 numeroa.
+122	Pää-PIN-koodin vahvistus ei täsmää.
+123	Kuvion on yhdistettävä vähintään 4 pistettä.
+124	Ilmoitus esteettömyyspalvelusta
+125	Miksi PureLock tarvitsee esteettömyysluvan:
+126	PureLock käyttää AccessibilityService API:a ainoastaan havaitakseen suojattujen sovellusten avautumisen etualalla ja näyttääkseen lukitusnäytön välittömästi.
+127	Tiedonkeruu- ja yksityisyystakuu:
+128	PureLock EI seuraa, tallenna tai lähetä mitään arkaluonteisia käyttäjätietoja, kirjoitettua tekstiä, salasanoja tai henkilökohtaista sisältöä. PureLock toimii 100 % offline ilman internet-käyttöoikeutta.
+129	Hyväksy ja ota käyttöön
+130	Hylkää
+131	Ota yksityisyyskilpi käyttöön
+132	Myönnä käyttöoikeudet, jotta PureLock havaitsee sovellusten käynnistykset heti.
+133	Esteettömyyspalvelu
+134	Havaitsee etualan sovellukset välittömästi.
+135	Myönnä esteettömyyslupa
+136	Näytä muiden sovellusten päällä
+137	Antaa PureLockin näyttää lukitusnäytön turvallisesti, kun suojattu sovellus avataan.
+138	Myönnä päällekkäislupa
+139	Aktiivinen
+140	Ei käytössä
+141	Myönnetty
+142	Vaaditaan
+143	Ota käyttöön
+144	Android 13+ rajoitettujen asetusten ohje
+145	Android 13+ rajoitetut asetukset
+146	Jos Android poisti esteettömyyden käytöstä varoituksella "Rajoitettu asetus", noudata näitä 4 ohjetta:
+147	1. Avaa PureLockin sovellustiedot järjestelmäasetuksista napauttamalla alta.
+148	2. Napauta oikeasta yläkulmasta kolmea pystypistettä (⋮).
+149	3. Napauta "Salli rajoitetut asetukset" ja vahvista PIN-koodilla tai biometriikalla.
+150	4. Palaa tänne ja napauta "Myönnä esteettömyyslupa" viimeistelläksesi.
+151	Avaa PureLockin sovellustiedot
+152	Sovelluksen uudelleenlukituksen viive
+153	Määritä, kuinka kauan avattu sovellus pysyy käytettävissä poistumisen jälkeen.
+154	Kunnes näyttö sammuu
+155	Suojaus aktiivinen!
+156	Zero-knowledge-yksityisyysholvisi on valmis.\nKaikki pääavaimet ja salatut kohteet suojataan vain laitteessasi.
+157	Pää-PIN
+158	Varapää-PIN
+159	Vahvista pää-PIN
+160	Biometriikka käytössä
+161	Sormenjälki tai kasvojentunnistus avaa PureLockin heti. Anna alle pää-PIN järjestelmän uudelleenkäynnistyksiä varten.
+162	Piirrä pääkuvio alle
+163	Valitut pisteet: %1$s
+164	Nollaa kuvio
+165	Jaa Zero-Knowledge-yksityisyys
+166	Pidätkö PureLockista? Jaa huippuluokan yksityisyyssuoja ystävillesi ja perheellesi!
+167	Myöhemmin
+168	Jaa
+169	Pidätkö PureLockista?
+170	5 tähden arvostelusi auttaa pitämään PureLockin 100 % ilmaisena ja pilvettömänä kaikille!
+171	Ei nyt
+172	Arvostele meidät
+173	Hae asennettuja sovelluksia…
+174	Sovelluksia ei ole asennettu tai löytynyt
+175	Avattu
+176	Lukittu
+177	Näkymätön kuviopolku
+178	Satunnainen näppäinjärjestys
+179	Tunkeilijaselfie
+180	%1$d sekuntia
+181	AES-256-salattu varmuuskopio
+182	Tunkeilijakuvien holvi
+183	Yritys: %1$s
+184	Kohde: %1$s
+185	Luokkatietoja ei ole vielä saatavilla.
+186	Pilvitön laitteistosuojaus
+187	Kaikki holvitiedot lasketaan laitteella ilman verkkotelemetriaa tai seurantaa.
+188	bittiä keskim.
+189	Erittäin vahva
+190	Vahva
+191	Kohtalainen
+192	Heikko
+193	Vahva (75+ bittiä)
+194	Hyvä (55-74 bittiä)
+195	Kohtalainen (35-54 bittiä)
+196	Heikko (<35 bittiä)
+197	Vanhemmat (>30 pv)
+198	Poistu
+199	Järjestelmähälytys
+200	Valitettavasti %1$s pysähtyi.
+201	Sovelluksessa tapahtui käsittelemätön poikkeus, ja järjestelmä sulki sen.
+202	Kaatumisloki lähetetty kehittäjälle.
+203	Lähetä palautetta
+204	Sulje sovellus
+205	Napauta 4-neljänneksen salainen rytmi (%1$d napautusta)
+206	Virheellinen koputuskuvio. Yritä uudelleen.
+207	Tyhjennä napautukset
+208	OK
+209	Tallenna
+210	Tyhjennä
+211	Naamiointi, syötit ja todennus
+212	Tunnukset ja lukitustyyppi
+213	Lukitustapa
+214	Naamiointi ja salasyötit
+215	Lukitusnäytön syötti
+216	Hämää urkkijoita näyttämällä valenäytön ennen lukitusruutua.
+217	Ei mitään
+218	Laskin
+219	Valekaatuminen
+220	Hätä-PIN (Duress)
+221	Visuaalinen teema ja suojauspaletti
+222	Väripaletti
+223	Laukaisimet ja aikakatkaisu
+224	Lukitse ravistamalla
+225	Automaattisen lukituksen aikakatkaisu
+226	Tunkeilijakuvat (%1$d)
+227	Salainen holvi (%1$d)
+228	Holvin suojaustiedot
+229	• Tunkeilijakuvaus ottaa automaattisesti kuvan etukameralla 1-3 epäonnistuneen yrityksen jälkeen.
+230	• Salaiset muistiinpanot ja salasanat salataan levossa AES-256 SQLCipherillä.
+231	• Kopioidut salasanat poistetaan järjestelmän leikepöydältä automaattisesti 30 sekunnin kuluttua.
+232	Poista kuva
+233	Tyhjennetäänkö kaikki kuvat?
+234	Tämä poistaa kaikki tunkeilijakuvat pysyvästi.
+235	Muokkaa salaisuutta
+236	Uusi salaisuus
+237	Otsikko
+238	Salainen sisältö
+239	Poistetaanko salaisuus?
+240	Poistetaanko "%1$s" pysyvästi?
+241	Koputuskoodi
+242	Vaihda pääkuvio
+243	Määritä koputuskoodi (4-neljännes)
+244	Vaihda pää-PIN
+245	Kuvio asetettu (%1$d pistettä)
+246	Koputusrytmi (%1$d napautusta)
+247	Nykyinen: ••••
+248	Sekoittaa numeroiden sijainnin joka avauskerralla olkapään yli kurkkimisen ja sormenjälkianalyysin estämiseksi.
+249	Piilottaa yhdistävän viivan kuviota piirrettäessä, jotta sivulliset eivät näe elettäsi.
+250	Jos sinut pakotetaan avaamaan painostuksen alla, hätä-PIN näyttää avaavan normaalisti mutta lukitsee salatut tiedot ja kirjaa hälytyksen.
+251	Ottaa äänettömästi etukamerakuvan väärän PIN-koodin tai kuvion syöttämisen yhteydessä ja tallentaa sen salattuun holviisi.
+252	Lukitsee PureLockin välittömästi ja tyhjentää aktiiviset istunnot, kun laitteen ravistus havaitaan.
+253	Määrittää kuinka kauan avattu sovellus pysyy käytettävissä poistumisen jälkeen. '0s' lukitsee heti. 'Näyttö pois' säilyttää istunnon näytön sammumiseen asti.
+254	Aseta pää-PIN
+255	Syötä 4-8-numeroinen pääsuojaus-PIN:
+256	Pää-PIN päivitetty
+257	Tallenna PIN
+258	Aseta pääkuvio
+259	Pääkuvio päivitetty
+260	Tallenna kuvio
+261	Määritä koputuskoodi
+262	Napauta 4-neljännesaluetta rytmin tallentamiseksi (vähintään 3 napautusta). Tallennettu: %1$d napautusta
+263	Napauta vähintään 3 neljännestä kuvion muodostamiseksi
+264	Koputuskoodi määritetty
+265	Tallenna koputuskoodi
+266	Aseta hätä-PIN
+267	Syötä syötti-PIN, joka eroaa pää-PIN-koodistasi:
+268	Hätä-PIN määritetty
+269	Avaa biometriikalla
+270	• PureLockilla on NOLLA internet-käyttöoikeutta ('android.permission.INTERNET' on jätetty pois).
+271	• Kaikki suojauslokit, kuvat, PIN-koodit ja kuviot salataan SQLCipher AES-256:lla.
+272	• Sovellusten lukitustilastot eivät koskaan poistu laitteestasi.
+273	Kopioi CSV-muotoinen tarkastuslokihistoria (%1$d tietuetta):
+274	Tarkastuslokit kopioitu leikepöydälle (CSV-muoto)
+275	Suodata tarkastuslokeja…
+276	Suojausluokitus
+277	• Pisteet perustuvat suojattujen sovellusten kattavuuteen ja aktiivisiin puolustuskerroksiin.
+278	• 0s-30s automaattisen lukituksen raja minimoi altistumisen.
+279	• SQLCipher AES-256 suojaa kaikki tietokannat paikallisesti ilman telemetriaa.
+280	Selvä
+281	Kopioi
+282	Sulje
+283	Muistiinpanoja yhteensä
+284	Salattu levossa
+285	Terveysindeksi
+286	Tiedot
+287	%1$d s automaattilukitus
+288	Arkaluonteinen leikepöytä tyhjennetty automaattisesti.
+289	Salattua varmuuskopiota ei ole tehty yli 30 päivään! Napauta varmuuskopioidaksesi nyt.
+290	Varmuuskopioinnin kuntovaroitus
+291	Varmuuskopioinnin tilavaroitukset
+292	Varoittaa, kun salattua varmuuskopiota ei ole tehty yli 30 päivään.
+293	Synkronoitu: %1$d poistettua sovellusta poistettu suojauksesta.
+294	Asennetut sovellukset synkronoitu onnistuneesti.
+295	Synkronoi asennetut sovellukset
+296	Kaikki
+297	Lukittu
+298	Avattu
+299	Välitön lukituksen varmistus esteettömyyspalvelun kautta
+300	Nolla verkkokäyttöoikeutta eikä telemetriaa
+301	Naamiointi laskimeksi tai valekaatumiseksi
+302	Siirretty roskakoriin
+303	Palautettu roskakorista
+304	Sulje
+305	Vie
+306	Android Keystore vahvistettu
+307	SQLCipher AES-256 -tietokanta liitetty
+308	Aktiivinen puolustus valmiina
+309	Ohita
+310	Käyttöoikeus- ja asennusopas
+311	Myönnä tarvittavat laiteoikeudet sovellussuojan käyttöönottoon
+312	Diagnostiikka- ja käyttöoikeusopas
+313	Ydinoikeudet aktiiviset
+314	Ydinoikeudet vaaditaan
+315	Kaikki suojausoikeudet ovat käytössä. Sovelluksesi ja tietosi on suojattu turvallisesti!
+316	Asennusohjeet
+317	Laitevinkit
+318	Laitteen asennusvinkit
+319	Samsung-laitteilla: siirry kohtaan Asetukset > Sovellukset > PureLock > Akku > Rajoittamaton estääksesi taustasulkemisen.
+320	MIUI/HyperOS-laitteilla: ota käyttöön Automaattinen käynnistys PureLockille ja aseta Virransäästö tilaan Ei rajoituksia.
+321	Google Pixel -laitteilla: varmista että Esteettömyys > Ladatut sovellukset > PureLock on KÄYTÖSSÄ.
+322	VAADITTU
+323	SUOSITELTU
+324	VALINNAINEN
+325	AKTIIVINEN
+326	MÄÄRITÄ
+327	Avaa asetukset
+328	Testaa lukitusnäytön peittokuvaa
+329	Käynnistetään testilukitusnäyttö…
+330	Sovellussuoja pois päältä
+331	Esteettömyys- ja peittoluvat vaaditaan sovellusten havaitsemiseen ja lukitsemiseen.
+332	Ota käyttöön nyt
+333	Esteettömyyspalvelu
+334	Reaaliaikainen tunnistus suojattujen sovellusten käynnistyessä.
+335	1. Napauta alta 'Avaa asetukset' siirtyäksesi Esteettömyyteen.
+336	2. Etsi 'PureLock' kohdasta Ladatut sovellukset tai Asennetut palvelut.
+337	3. Kytke kytkin PÄÄLLE ja vahvista järjestelmän suojauskehote.
+338	4. Palaa PureLockiin vahvistaaksesi aktiivisen tilan.
+339	Näytä muiden sovellusten päällä
+340	Mahdollistaa PIN/kuvio-lukitusnäytön näyttämisen heti suojattujen sovellusten päällä.
+341	1. Napauta 'Avaa asetukset' avataksesi peittoluvan.
+342	2. Etsi 'PureLock' luettelosta.
+343	3. Ota käyttöön 'Salli näyttäminen muiden sovellusten päällä'.
+344	Käyttötietojen käyttö (Suositeltu)
+345	Toissijainen tunnistus Android TV:lle ja virtaa aggressiivisesti hallitseville järjestelmille.
+346	1. Napauta 'Avaa asetukset' siirtyäksesi Käyttötietoihin.
+347	2. Etsi ja valitse 'PureLock'.
+348	3. Kytke 'Salli käyttötietojen käyttö' PÄÄLLE.
+349	Kamerankäyttöoikeus (Valinnainen)
+350	Mahdollistaa hiljaisen etukameran tunkeilijaselfien epäonnistuneilla avausyrityksillä.
+351	Ilmoitusluvat (Valinnainen)
+352	Sallii suojausilmoitusten ja pysyvän suojaustilan näyttämisen.
+353	Ei kirjattuja tapahtumia
+354	%1$d hälytystä havaittu
+355	Suojaustila
+356	Kirjatut uhat
+357	Aktiivinen puolustus
+358	Aikaleima
+359	Tiedot
+360	Keskimääräinen salasanan vahvuus ja entropia
+361	Keskimääräinen entropia on %1$.1f bittiä salaisuutta kohden. Tunnuksillasi on korkea salakirjoituksellinen kestävyys raa'an voiman hyökkäyksiä vastaan.
+362	Keskimääräinen entropia on %1$.1f bittiä salaisuutta kohden. Harkitse pidempiä salasanoja erikoismerkkien kera.
+363	Lisää salattuja muistiinpanoja ja tunnuksia nähdäksesi reaaliaikaiset entropiamittarit.
+364	Kohteet
+365	Viimeiset 24 h
+366	Viimeiset 7 pv
+367	Viimeiset 30 pv
+368	Keskiyö
+369	OLED Musta
+370	Smaragdi
+371	Safiiri
+372	Monet
+373	Minimaalinen
+374	Heti (Aina)
+375	%1$d s toimettomuus
+376	PureLock-suojausarkkitehtuuri
+377	Versio %1$s • Laitteisto-Keystore ja SQLCipher AES-256
+378	100 % Offline • Nolla telemetriaa • Ilmaeristetty yksityisyysmoottori
+379	Pikalukitus
+380	Holvin uudelleentodennus
+381	PureLock Offline Automaattinen täyttö
+382	Tue PureLockia
+383	100 % Offline • Ei mainoksia • Riippumaton tietosuojaohjelmisto
+384	Google Play
+385	PayPal ja QR
+386	Ko-fi
+387	Espressotippi
+388	Tue keskittynyttä virheenkorjausistuntoa
+389	Kahvi ja tietoturva
+390	Tue jatkuvia SQLCipher- ja OS-päivityksiä
+391	Yksityisyyden suojelija
+392	Auta pitämään PureLock mainoksettomana kaikille
+393	Suojelijamestari
+394	Sponsoroi merkittäviä uusia offline-tietoturvamoduuleja
+395	Tue Google Playn kautta (%1$s)
+396	Yhdistetään Google Playhin…
+397	Ostos peruutettu. Kiitos PureLockin harkitsemisesta!
+398	Tukijatasosi on jo vahvistettu Google Playssa. Palautetaan merkkiä…
+399	Google Play -laskutus ei ole käytettävissä tässä laitteessa tai istunnossa. Kokeile PayPal- tai Ko-fi-välilehtiä.
+400	Google Play -laskutusilmoitus: %1$s
+401	Laskutusikkunaa ei voitu liittää aktiiviseen näyttöön. Avaa Tuki uudelleen Asetuksista.
+402	Google Play -tukijatasoja ei ole vielä julkaistu tälle versiolle. Käytä PayPalia tai Ko-fia.
+403	Kiitos! Aktiivinen tukija -merkkisi on nyt avattu.
+404	Maksu odottaa vahvistusta Google Playssa. Merkkisi avautuu automaattisesti valmistuttuaan.
+405	Valitse summa (USD)
+406	Mielivaltainen summa
+407	Mukautettu USD (esim. 7.50)
+408	Skannaa QR-koodi toisella puhelimella tai pankkisovelluksella
+409	Avaa PayPal
+410	Kopioi linkki
+411	Jaa
+412	Jaa PureLock-tukilinkki
+413	Tue PureLockia — 100 % offline Android-yksityisyysholvi ilman telemetriaa:
+414	Tukilinkki kopioitu leikepöydälle
+415	Selainsovellusta ei löytynyt — linkki kopioitu leikepöydälle
+416	Tarjoa riippumattomalle kehittäjälle kahvi
+417	PureLock toimii täysin offline ilman mainoksia, seurantalaitteita tai pilvitilauksia. Jokainen Ko-fi-tippi rahoittaa suoraan riippumatonta tietoturvaylläpitoa.
+418	Tue Ko-fissa
+419	Tukija
+420	Aktiivinen tukija vahvistettu
+421	Kiitos riippumattoman tietosuojaohjelmiston tukemisesta! Kaikki lahjoituskehotteet on piilotettu pysyvästi.
+422	Pidätkö offline-yksityisyydestä?
+423	100 % mainokseton ja riippumaton. Napauta tukeaksesi.
+424	Tue
+425	Sulje tukibanneri
+426	TUE KEHITYSTÄ
+427	Tue PureLockia
+428	100 % Offline & Mainokseton • Nolla telemetriaa. Vapaaehtoiset lahjoitukset Google Playn, PayPal QR:n tai Ko-fin kautta tukevat kehitystä.
+429	Avaa tukivaihtoehdot
+430	Virstanpylväs: %1$d toimintoa suojattu
+431	PureLock suojasi jälleen yksityisyytesi—100 % offline ilman mainoksia tai seurantaa. Jos tämä säästi aikaasi tai toi mielenrauhaa, harkitse itsenäisen kehityksen tukemista.
+432	Tue kehitystä
+433	Ei nyt
+434	Salakirjoituksellinen eheystarkastus
+435	Laske reaaliaikainen SHA-256-tarkistussumma kaikista salatuista holvitietueista, suojatuista sovelluksista ja aikataulusäännöistä.
+436	Suorita eheystarkastus
+437	Tarkistetaan SHA-256-tiivistettä…
+438	Läpäisty • %1$d kohdetta vahvistettu
+439	Holvi todettu eheäksi! Tue riippumatonta offline-kehitystä.
+440	PureLock-kilpi
+441	PureLock-holvi
+442	LUKITSE
+443	Suojattuja kohteita: 0
+444	Suojattuja kohteita: %1$d (Sovellukset: %2$d, Holvi: %3$d)
+445	Holvi suojattu & lukittu! (%1$d kohdetta)
+446	Biometrinen avaus
+447	Lukitus AKTIIVINEN
+448	Kaikki sovellukset suojattu
+449	Napauta lukitaksesi kaikki
+450	Uusien sovellusten asennustunnistin
+451	Ilmoittaa uusien sovellusten asennuksesta PureLock-suojauksen tarjoamiseksi.
+452	Uusi sovellus asennettu: %1$s
+453	PureLock suojasi kohteen %1$s automaattisesti korkean yksityisyyden asetusten perusteella.
+454	Haluatko lukita kohteen %1$s yksityisyytesi suojaamiseksi?
+455	PureLock: %1$s (%2$s)
+456	PureLock Biometrinen tietoturva
+457	Vahvista sormenjälkesi tai kasvosi jatkaaksesi
+458	Käytä PIN / Kuviota
+459	Biometristä skannausta ei tunnistettu. Yritä uudelleen.
+460	Biometristä kehotetta ei voi käynnistää: %1$s
+461	Laitteeseen ei ole rekisteröity biometriikkaa. Käytä PIN-koodia tai kuviota.
+462	Biometrinen anturi ei ole käytettävissä. Käytä PIN-koodia tai kuviota.
+463	Toimintokonteksti ei ole käytettävissä biometriselle kehotteelle.
+464	Skannaa sormenjälki tai Face ID avataksesi
+465	TUNKEILIJAKAAPPAUS
+466	Sovellus: %1$s
+467	Talous
+468	Sosiaalinen media
+469	Järjestelmä
+470	Media
+471	Pelit
+472	Muut
+473	24h
+474	7pv
+475	30pv
+476	Kaikki
+477	Kaikki
+478	Uhat
+479	Paniikki
+480	Avaukset
+481	Aikakatkaisut
+482	Järjestelmä
+483	Tunnukset
+484	API-avaimet
+485	Palautusavaimet
+486	%1$ds
+487	%1$dm
+488	Lisää salattu merkintä
+489	Hae
+490	Tyhjennä haku
+491	Kiinnitetty
+492	Suosikki
+493	Muokkaa
+494	Roskakori
+495	Palauta
+496	Poista pysyvästi
+497	Piilota salaisuus
+498	Näytä salaisuus
+499	Kopioi leikepöydälle
+500	Vaihda näkyvyyttä
+501	Luo salasana
+502	Tyhjennä kaikki
+503	Lisää salaisuus
+504	Holvin tiedot
+505	Kopioi salaisuus
+506	Poista
+507	PayPal-tukilinkki
+508	Ko-fi-tukilinkki
+509	PureLock Zero-Knowledge -yksityisyys
+510	Suojaa henkilökohtainen yksityisyytesi PureLockilla! Pilvitön offline-sovelluslukko & salattu holvi. Lataa nyt: https://play.google.com/store/apps/details?id=%1$s
+511	Jaa PureLock sovelluksella

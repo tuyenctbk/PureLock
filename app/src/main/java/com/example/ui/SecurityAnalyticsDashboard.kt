@@ -39,20 +39,20 @@ import com.example.data.model.SecurityLogEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class TimeRangeFilter(val label: String, val durationMs: Long) {
-    HOURS_24("24h", 24L * 60 * 60 * 1000),
-    DAYS_7("7d", 7L * 24 * 60 * 60 * 1000),
-    DAYS_30("30d", 30L * 24 * 60 * 60 * 1000),
-    ALL_TIME("All", Long.MAX_VALUE)
+enum class TimeRangeFilter(@param:androidx.annotation.StringRes val labelRes: Int, val durationMs: Long) {
+    HOURS_24(R.string.audit_range_24h, 24L * 60 * 60 * 1000),
+    DAYS_7(R.string.audit_range_7d, 7L * 24 * 60 * 60 * 1000),
+    DAYS_30(R.string.audit_range_30d, 30L * 24 * 60 * 60 * 1000),
+    ALL_TIME(R.string.audit_range_all, Long.MAX_VALUE)
 }
 
-enum class EventCategoryFilter(val label: String, val icon: ImageVector) {
-    ALL("All", Icons.Default.AllInclusive),
-    INTRUDER("Threats", Icons.Default.Warning),
-    DURESS("Panic", Icons.Default.GppBad),
-    UNLOCK("Unlocks", Icons.Default.LockOpen),
-    TIMEOUT("Timeouts", Icons.Default.Timer),
-    SYSTEM("System", Icons.Default.Shield)
+enum class EventCategoryFilter(@param:androidx.annotation.StringRes val labelRes: Int, val icon: ImageVector) {
+    ALL(R.string.audit_cat_all, Icons.Default.AllInclusive),
+    INTRUDER(R.string.audit_cat_threats, Icons.Default.Warning),
+    DURESS(R.string.audit_cat_panic, Icons.Default.GppBad),
+    UNLOCK(R.string.audit_cat_unlocks, Icons.Default.LockOpen),
+    TIMEOUT(R.string.audit_cat_timeouts, Icons.Default.Timer),
+    SYSTEM(R.string.audit_cat_system, Icons.Default.Shield)
 }
 
 @Composable
@@ -137,7 +137,7 @@ fun SecurityAnalyticsDashboard(
                 FilterChip(
                     selected = selectedTimeRange == filter,
                     onClick = { selectedTimeRange = filter },
-                    label = { Text(filter.label, fontSize = 12.sp, fontWeight = if (selectedTimeRange == filter) FontWeight.Bold else FontWeight.Normal) },
+                    label = { Text(stringResource(filter.labelRes), fontSize = 12.sp, fontWeight = if (selectedTimeRange == filter) FontWeight.Bold else FontWeight.Normal) },
                     modifier = Modifier.testTag("chip_timerange_${filter.name.lowercase()}")
                 )
             }
@@ -148,7 +148,7 @@ fun SecurityAnalyticsDashboard(
                 FilterChip(
                     selected = selectedCategoryFilter == cat,
                     onClick = { selectedCategoryFilter = cat },
-                    label = { Text(cat.label, fontSize = 12.sp) },
+                    label = { Text(stringResource(cat.labelRes), fontSize = 12.sp) },
                     leadingIcon = {
                         Icon(cat.icon, contentDescription = null, modifier = Modifier.size(14.dp))
                     },

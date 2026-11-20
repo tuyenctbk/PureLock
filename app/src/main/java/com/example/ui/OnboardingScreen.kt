@@ -193,9 +193,13 @@ fun OnboardingScreen(
                         if (currentStep < 3) {
                             currentStep++
                         } else {
-                            val finalPin = if (inputPin.isNotBlank()) inputPin else "1234"
-                            val finalPattern = if (patternNodes.isNotEmpty()) patternNodes.joinToString(",") else "1,2,5,8,9"
-                            onOnboardingComplete(finalPin, selectedSecurityType, finalPattern)
+                            if (inputPin.length < 4) {
+                                currentStep = 1
+                                pinError = minPinError
+                                return@Button
+                            }
+                            val finalPattern = patternNodes.joinToString(",")
+                            onOnboardingComplete(inputPin, selectedSecurityType, finalPattern)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
@@ -301,11 +305,15 @@ private fun OnboardingStepSecuritySetup(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            listOf("PIN", "PATTERN", "BIOMETRIC").forEach { mode ->
+            listOf(
+                "PIN" to R.string.lock_mode_pin,
+                "PATTERN" to R.string.lock_mode_pattern,
+                "BIOMETRIC" to R.string.lock_mode_biometric
+            ).forEach { (mode, labelRes) ->
                 FilterChip(
                     selected = selectedSecurityType == mode,
                     onClick = { onSecurityTypeSelected(mode) },
-                    label = { Text(mode, fontWeight = FontWeight.SemiBold) },
+                    label = { Text(stringResource(labelRes), fontWeight = FontWeight.SemiBold, maxLines = 1) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = Color(0xFF2563EB),
                         selectedLabelColor = Color.White,

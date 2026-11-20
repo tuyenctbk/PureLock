@@ -63,9 +63,11 @@ fun InvisibleSuiteScreen(
 
     var showChangePatternDialog by remember { mutableStateOf(false) }
     var newPatternNodes by remember { mutableStateOf(listOf<Int>()) }
+    var activatePatternAfterSave by remember { mutableStateOf(false) }
 
     var showChangeKnockDialog by remember { mutableStateOf(false) }
     var newKnockList by remember { mutableStateOf(listOf<Int>()) }
+    var activateKnockAfterSave by remember { mutableStateOf(false) }
 
     var showDuressPinDialog by remember { mutableStateOf(false) }
     var newDuressPinInput by remember { mutableStateOf(duressPin) }
@@ -136,14 +138,32 @@ fun InvisibleSuiteScreen(
                         )
                         FilterChip(
                             selected = securityType == "PATTERN",
-                            onClick = { viewModel.setSecurityType("PATTERN") },
+                            onClick = {
+                                val parsed = masterPattern.split(',').mapNotNull { it.trim().toIntOrNull() }.filter { it in 1..9 }
+                                if (parsed.size >= 4) {
+                                    viewModel.setSecurityType("PATTERN")
+                                } else {
+                                    newPatternNodes = emptyList()
+                                    activatePatternAfterSave = true
+                                    showChangePatternDialog = true
+                                }
+                            },
                             label = { Text(stringResource(R.string.lock_mode_pattern), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.Pattern, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_security_pattern")
                         )
                         FilterChip(
                             selected = securityType == "KNOCK",
-                            onClick = { viewModel.setSecurityType("KNOCK") },
+                            onClick = {
+                                val parsed = masterKnock.split(',').mapNotNull { it.trim().toIntOrNull() }.filter { it in 1..4 }
+                                if (parsed.size >= 3) {
+                                    viewModel.setSecurityType("KNOCK")
+                                } else {
+                                    newKnockList = emptyList()
+                                    activateKnockAfterSave = true
+                                    showChangeKnockDialog = true
+                                }
+                            },
                             label = { Text(stringResource(R.string.lock_mode_knock), fontSize = 11.sp) },
                             leadingIcon = { Icon(Icons.Default.TouchApp, contentDescription = null, modifier = Modifier.size(13.dp)) },
                             modifier = Modifier.weight(1f).testTag("chip_security_knock")
@@ -183,10 +203,12 @@ fun InvisibleSuiteScreen(
                         when (securityType) {
                             "PATTERN" -> {
                                 newPatternNodes = masterPattern.split(',').mapNotNull { it.trim().toIntOrNull() }.filter { it in 1..9 }
+                                activatePatternAfterSave = false
                                 showChangePatternDialog = true
                             }
                             "KNOCK" -> {
                                 newKnockList = emptyList()
+                                activateKnockAfterSave = false
                                 showChangeKnockDialog = true
                             }
                             else -> {
@@ -507,17 +529,17 @@ fun InvisibleSuiteScreen(
                         FilterChip(
                             selected = inactivityTimeoutSec == 0,
                             onClick = { viewModel.setInactivityTimeout(0) },
-                            label = { Text("0s", fontSize = 11.sp) }
+                            label = { Text(stringResource(R.string.duration_sec_short, 0), fontSize = 11.sp) }
                         )
                         FilterChip(
                             selected = inactivityTimeoutSec == 30,
                             onClick = { viewModel.setInactivityTimeout(30) },
-                            label = { Text("30s", fontSize = 11.sp) }
+                            label = { Text(stringResource(R.string.duration_sec_short, 30), fontSize = 11.sp) }
                         )
                         FilterChip(
                             selected = inactivityTimeoutSec == 60,
                             onClick = { viewModel.setInactivityTimeout(60) },
-                            label = { Text("60s", fontSize = 11.sp) }
+                            label = { Text(stringResource(R.string.duration_sec_short, 60), fontSize = 11.sp) }
                         )
                     }
                 }
@@ -567,25 +589,25 @@ fun InvisibleSuiteScreen(
                         FilterChip(
                             selected = gracePeriodMs <= 0L && gracePeriodMs != -1L,
                             onClick = { viewModel.updateGracePeriodMs(0L) },
-                            label = { Text("0s", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.duration_sec_short, 0), fontSize = 11.sp) },
                             modifier = Modifier.weight(1f)
                         )
                         FilterChip(
                             selected = gracePeriodMs == 30_000L,
                             onClick = { viewModel.updateGracePeriodMs(30_000L) },
-                            label = { Text("30s", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.duration_sec_short, 30), fontSize = 11.sp) },
                             modifier = Modifier.weight(1f)
                         )
                         FilterChip(
                             selected = gracePeriodMs == 60_000L,
                             onClick = { viewModel.updateGracePeriodMs(60_000L) },
-                            label = { Text("1m", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.duration_min_short, 1), fontSize = 11.sp) },
                             modifier = Modifier.weight(1f)
                         )
                         FilterChip(
                             selected = gracePeriodMs == 300_000L,
                             onClick = { viewModel.updateGracePeriodMs(300_000L) },
-                            label = { Text("5m", fontSize = 11.sp) },
+                            label = { Text(stringResource(R.string.duration_min_short, 5), fontSize = 11.sp) },
                             modifier = Modifier.weight(1f)
                         )
                         FilterChip(
@@ -643,7 +665,12 @@ fun InvisibleSuiteScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        listOf(10 to "10s", 30 to "30s", 60 to "60s", 0 to stringResource(R.string.suite_decoy_none)).forEach { (sec, label) ->
+                        listOf(
+                            10 to stringResource(R.string.duration_sec_short, 10),
+                            30 to stringResource(R.string.duration_sec_short, 30),
+                            60 to stringResource(R.string.duration_sec_short, 60),
+                            0 to stringResource(R.string.suite_decoy_none)
+                        ).forEach { (sec, label) ->
                             FilterChip(
                                 selected = clipboardAutoClearSec == sec,
                                 onClick = { viewModel.setClipboardAutoClearSec(sec) },
@@ -888,6 +915,10 @@ fun InvisibleSuiteScreen(
                     onClick = {
                         if (newPatternNodes.size >= 4) {
                             viewModel.setMasterPattern(newPatternNodes.joinToString(","))
+                            if (activatePatternAfterSave) {
+                                viewModel.setSecurityType("PATTERN")
+                                activatePatternAfterSave = false
+                            }
                             showChangePatternDialog = false
                             Toast.makeText(context, context.getString(R.string.suite_master_pattern_updated_toast), Toast.LENGTH_SHORT).show()
                         } else {
@@ -899,7 +930,10 @@ fun InvisibleSuiteScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showChangePatternDialog = false }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = {
+                    activatePatternAfterSave = false
+                    showChangePatternDialog = false
+                }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -991,6 +1025,10 @@ fun InvisibleSuiteScreen(
                         if (newKnockList.size >= 3) {
                             val codeStr = newKnockList.joinToString(",")
                             viewModel.setMasterKnock(codeStr)
+                            if (activateKnockAfterSave) {
+                                viewModel.setSecurityType("KNOCK")
+                                activateKnockAfterSave = false
+                            }
                             showChangeKnockDialog = false
                             Toast.makeText(context, context.getString(R.string.suite_knock_configured_toast), Toast.LENGTH_SHORT).show()
                         } else {
@@ -1002,7 +1040,10 @@ fun InvisibleSuiteScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showChangeKnockDialog = false }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = {
+                    activateKnockAfterSave = false
+                    showChangeKnockDialog = false
+                }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

@@ -40,6 +40,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
 
         donationBillingManager = com.example.service.DonationBillingManager(
             context = application,
+            coroutineScope = viewModelScope,
             onSupporterVerified = { tierId ->
                 viewModelScope.launch {
                     userSettings.activateSupporterStatus(tierId)
@@ -50,7 +51,6 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                 }
             }
         )
-        donationBillingManager.startConnectionAndLoad()
 
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
@@ -66,7 +66,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     override fun onCleared() {
-        donationBillingManager.destroy()
+        donationBillingManager.release()
         super.onCleared()
     }
 
@@ -276,10 +276,12 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     val totalVaultUnlocks: StateFlow<Int> = repository.preferences.totalVaultUnlocks
         .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0)
 
-    fun completeOnboarding(pin: String, securityType: String, pattern: String = "1,2,5,8,9") {
+    fun completeOnboarding(pin: String, securityType: String, pattern: String = "") {
         viewModelScope.launch {
             repository.preferences.setMasterPin(pin)
-            repository.preferences.setMasterPattern(pattern)
+            if (pattern.isNotBlank()) {
+                repository.preferences.setMasterPattern(pattern)
+            }
             repository.preferences.setSecurityType(securityType)
             repository.preferences.setOnboardingCompleted(true)
             com.example.util.FirebaseManager.logEvent("onboarding_complete", mapOf("security_type" to securityType))
@@ -364,6 +366,18 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         _pendingPostOpSupportMilestone.value = null
     }
 
+    fun bindBillingSession(activity: androidx.fragment.app.FragmentActivity) {
+        donationBillingManager.bindActivitySession(activity)
+    }
+
+    fun bindBillingSession(fragment: androidx.fragment.app.Fragment) {
+        donationBillingManager.bindFragmentSession(fragment)
+    }
+
+    fun launchGooglePlayDonation(tier: com.example.service.DonationTier) {
+        donationBillingManager.launchDonationFlow(tier)
+    }
+
     fun launchGooglePlayDonation(context: Context, tier: com.example.service.DonationTier) {
         donationBillingManager.launchDonationFlow(context, tier)
     }
@@ -381,10 +395,10 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val masterPin: StateFlow<String> = userSettings.masterPin
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1234")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val masterPattern: StateFlow<String> = userSettings.masterPattern
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1,2,5,8,9")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val securityType: StateFlow<String> = userSettings.securityType
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "PIN")
@@ -414,7 +428,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "NONE")
 
     val masterKnock: StateFlow<String> = userSettings.masterKnock
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1,2,4,3")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val hidePatternPath: StateFlow<Boolean> = userSettings.hidePatternPath
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)

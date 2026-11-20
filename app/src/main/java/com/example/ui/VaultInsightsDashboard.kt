@@ -49,14 +49,22 @@ fun VaultInsightsDialog(
     val avgEntropy = remember(entropyList) {
         if (entropyList.isEmpty()) 0.0 else entropyList.average()
     }
-    val avgStrengthLabel = remember(avgEntropy) {
+    val strengthColor = remember(avgEntropy) {
         when {
-            avgEntropy >= 75.0 -> "Very Strong"
-            avgEntropy >= 55.0 -> "Strong"
-            avgEntropy >= 35.0 -> "Fair"
-            else -> "Weak"
+            avgEntropy >= 75.0 -> Color(0xFF2E7D32)
+            avgEntropy >= 55.0 -> Color(0xFF43A047)
+            avgEntropy >= 35.0 -> Color(0xFFFB8C00)
+            else -> Color(0xFFE53935)
         }
     }
+    val avgStrengthLabel = stringResource(
+        when {
+            avgEntropy >= 75.0 -> R.string.insights_strength_very_strong
+            avgEntropy >= 55.0 -> R.string.insights_strength_strong
+            avgEntropy >= 35.0 -> R.string.insights_strength_fair
+            else -> R.string.insights_strength_weak
+        }
+    )
 
     // Health Index (0 - 100%)
     val healthIndex = remember(avgEntropy, totalCount) {
@@ -70,24 +78,25 @@ fun VaultInsightsDialog(
     val goodCount = remember(entropyList) { entropyList.count { it >= 55.0 && it < 75.0 } }
     val strongCount = remember(entropyList) { entropyList.count { it >= 75.0 } }
 
-    // Category breakdown
-    val categoryCounts = remember(vaultItems) {
+    // Category breakdown mapped to localized strings
+    val categoryLabelCounts = remember(vaultItems) {
         vaultItems.groupingBy {
             when (it.category.uppercase()) {
-                "WORK" -> "Work"
-                "PERSONAL" -> "Personal"
-                "FINANCE" -> "Finance"
-                "PASSWORD" -> "Passwords"
-                "CREDENTIAL" -> "Credentials"
-                "PIN", "BANK_PIN" -> "PINs"
-                "CODE_2FA" -> "2FA"
-                "API_KEY" -> "API Keys"
-                "RECOVERY_KEY" -> "Recovery Keys"
-                "CARD" -> "Cards"
-                else -> "Notes"
+                "WORK" -> R.string.category_work
+                "PERSONAL" -> R.string.category_personal
+                "FINANCE" -> R.string.category_finance
+                "PASSWORD" -> R.string.category_passwords
+                "CREDENTIAL" -> R.string.category_credentials
+                "PIN", "BANK_PIN" -> R.string.category_pins
+                "CODE_2FA" -> R.string.vault_filter_2fa
+                "API_KEY" -> R.string.category_api_keys
+                "RECOVERY_KEY" -> R.string.category_recovery_keys
+                "CARD" -> R.string.vault_filter_cards
+                else -> R.string.vault_filter_notes
             }
         }.eachCount()
     }
+    val categoryCounts = categoryLabelCounts.mapKeys { (resId, _) -> stringResource(resId) }
 
     // Timeline breakdown (Creation & update frequency)
     val now = System.currentTimeMillis()
@@ -189,6 +198,7 @@ fun VaultInsightsDialog(
                             avgEntropy = avgEntropy,
                             healthScore = healthIndex,
                             strengthLabel = avgStrengthLabel,
+                            strengthColor = strengthColor,
                             modifier = Modifier
                                 .size(160.dp)
                                 .padding(vertical = 8.dp)
@@ -464,6 +474,7 @@ private fun D3StrengthGaugeChart(
     avgEntropy: Double,
     healthScore: Int,
     strengthLabel: String,
+    strengthColor: Color,
     modifier: Modifier = Modifier
 ) {
     val progress = (avgEntropy / 100.0).coerceIn(0.0, 1.0).toFloat()
@@ -532,12 +543,7 @@ private fun D3StrengthGaugeChart(
                 text = strengthLabel,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
-                color = when (strengthLabel) {
-                    "Very Strong" -> Color(0xFF2E7D32)
-                    "Strong" -> Color(0xFF43A047)
-                    "Fair" -> Color(0xFFFB8C00)
-                    else -> Color(0xFFE53935)
-                }
+                color = strengthColor
             )
         }
     }

@@ -7,6 +7,7 @@ import androidx.biometric.BiometricManager.Authenticators
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.R
 
 enum class BiometricStatus {
     AVAILABLE,
@@ -54,10 +55,10 @@ class BiometricPromptManager(private val context: Context) {
 
     fun showBiometricPrompt(
         activity: FragmentActivity,
-        title: String = "PureLock Biometric Security",
-        subtitle: String = "Verify your fingerprint or face to proceed",
+        title: String = context.getString(R.string.biometric_prompt_title),
+        subtitle: String = context.getString(R.string.biometric_prompt_subtitle),
         description: String? = null,
-        negativeButtonText: String = "Use PIN / Pattern",
+        negativeButtonText: String = context.getString(R.string.biometric_prompt_negative_btn),
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
         onDismiss: () -> Unit = {}
@@ -100,7 +101,7 @@ class BiometricPromptManager(private val context: Context) {
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    onError("Biometric scan not recognized. Try again.")
+                    onError(context.getString(R.string.biometric_scan_not_recognized))
                 }
             }
         )
@@ -108,16 +109,16 @@ class BiometricPromptManager(private val context: Context) {
         try {
             biometricPrompt.authenticate(promptInfo)
         } catch (e: Exception) {
-            onError("Unable to launch biometric prompt: ${e.localizedMessage}")
+            onError(context.getString(R.string.biometric_launch_error, e.localizedMessage ?: ""))
         }
     }
 
     fun authenticate(
         context: Context,
-        title: String = "PureLock Biometric Security",
-        subtitle: String = "Verify your fingerprint or face to proceed",
+        title: String = this.context.getString(R.string.biometric_prompt_title),
+        subtitle: String = this.context.getString(R.string.biometric_prompt_subtitle),
         description: String? = null,
-        negativeButtonText: String = "Use PIN / Pattern",
+        negativeButtonText: String = this.context.getString(R.string.biometric_prompt_negative_btn),
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
         onDismiss: () -> Unit = {}
@@ -138,14 +139,14 @@ class BiometricPromptManager(private val context: Context) {
                     )
                 }
                 BiometricStatus.NOT_ENROLLED -> {
-                    onError("No biometrics enrolled on device. Please use PIN or Pattern.")
+                    onError(context.getString(R.string.biometric_not_enrolled_error))
                 }
                 BiometricStatus.NO_HARDWARE, BiometricStatus.UNAVAILABLE -> {
-                    onError("Biometric sensor unavailable. Please use PIN or Pattern.")
+                    onError(context.getString(R.string.biometric_unavailable_error))
                 }
             }
         } else {
-            onError("Activity context not available for biometric prompt.")
+            onError(context.getString(R.string.biometric_no_activity_error))
         }
     }
 }
