@@ -593,20 +593,23 @@ fun IntruderVaultScreen(
             },
             confirmButton = {
                 Button(
+                    enabled = title.isNotBlank() && secretContent.isNotBlank(),
                     onClick = {
-                        if (title.isNotBlank()) {
+                        val trimmedTitle = title.trim()
+                        val trimmedSecret = secretContent.trim()
+                        if (trimmedTitle.isNotEmpty() && trimmedSecret.isNotEmpty()) {
                             val currentItem = editingVaultItem
                             if (isEditing && currentItem != null) {
                                 viewModel.updateEncryptedVaultItem(
                                     currentItem.copy(
-                                        title = title,
-                                        secretContent = secretContent
+                                        title = trimmedTitle,
+                                        secretContent = trimmedSecret
                                     )
                                 )
                             } else {
                                 viewModel.saveEncryptedVaultItem(
-                                    title = title,
-                                    secretContent = secretContent,
+                                    title = trimmedTitle,
+                                    secretContent = trimmedSecret,
                                     category = "NOTE"
                                 )
                             }

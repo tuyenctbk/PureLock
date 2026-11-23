@@ -111,7 +111,6 @@ class OfflineBackupManager(context: Context) {
         }
 
         val encryptedPackage = encryptPayload(backupDataJson.toString(), passphrase, typeHeader = null)
-        com.example.data.UserSettingsManager(appContext).setLastBackupTimestamp(System.currentTimeMillis())
         return@withContext encryptedPackage.toString(2)
     }
 
@@ -146,7 +145,6 @@ class OfflineBackupManager(context: Context) {
         }
 
         val encryptedPackage = encryptPayload(dataJson.toString(), passphrase, typeHeader = "PURELOCK_ENCRYPTED_NOTES")
-        com.example.data.UserSettingsManager(appContext).setLastBackupTimestamp(System.currentTimeMillis())
         return@withContext encryptedPackage.toString(2)
     }
 
@@ -216,6 +214,7 @@ class OfflineBackupManager(context: Context) {
                 stream.write(encryptedJson.toByteArray(StandardCharsets.UTF_8))
                 stream.flush()
             } ?: return@withContext false
+            com.example.data.UserSettingsManager(appContext).setLastBackupTimestamp(System.currentTimeMillis())
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -241,6 +240,7 @@ class OfflineBackupManager(context: Context) {
         val fileName = "purelock_notes_encrypted_${System.currentTimeMillis()}.plk"
         val file = java.io.File(backupDir, fileName)
         file.writeText(encryptedJson, StandardCharsets.UTF_8)
+        com.example.data.UserSettingsManager(appContext).setLastBackupTimestamp(System.currentTimeMillis())
         file
     }
 
@@ -253,14 +253,14 @@ class OfflineBackupManager(context: Context) {
     suspend fun importEncryptedNotesJson(jsonPackageStr: String, passphrase: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val backupDataObj = decryptPayload(jsonPackageStr, passphrase)
-            val db = PureLockDatabase.getDatabase(appContext)
-
-            if (backupDataObj.has("vaultItems")) {
-                db.withTransaction {
-                    restoreVaultItems(db, backupDataObj.getJSONArray("vaultItems"))
-                }
-                VaultWidgetProvider.requestUpdate(appContext)
+            if (!backupDataObj.has("vaultItems")) {
+                return@withContext false
             }
+            val db = PureLockDatabase.getDatabase(appContext)
+            db.withTransaction {
+                restoreVaultItems(db, backupDataObj.getJSONArray("vaultItems"))
+            }
+            VaultWidgetProvider.requestUpdate(appContext)
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -274,6 +274,7 @@ class OfflineBackupManager(context: Context) {
         val fileName = "purelock_full_backup_${System.currentTimeMillis()}.plk"
         val file = java.io.File(backupDir, fileName)
         file.writeText(encryptedJson, StandardCharsets.UTF_8)
+        com.example.data.UserSettingsManager(appContext).setLastBackupTimestamp(System.currentTimeMillis())
         file
     }
 
@@ -286,6 +287,13 @@ class OfflineBackupManager(context: Context) {
     suspend fun importEncryptedBackup(jsonPackageStr: String, passphrase: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val backupDataObj = decryptPayload(jsonPackageStr, passphrase)
+            val hasRecognizedSection = backupDataObj.has("lockedApps") ||
+                backupDataObj.has("scheduleRules") ||
+                backupDataObj.has("vaultItems")
+            if (!hasRecognizedSection) {
+                return@withContext false
+            }
+
             val db = PureLockDatabase.getDatabase(appContext)
 
             db.withTransaction {
@@ -297,6 +305,7 @@ class OfflineBackupManager(context: Context) {
                     for (i in 0 until appsArray.length()) {
                         val appObj = appsArray.getJSONObject(i)
                         val pkg = appObj.getString("packageName")
+                        if (pkg.isBlank() || pkg == appContext.packageName) continue
                         val prev = existingApps[pkg]
                         appsToUpsert.add(
                             LockedAppEntity(
@@ -324,6 +333,7 @@ class OfflineBackupManager(context: Context) {
                     for (i in 0 until rulesArray.length()) {
                         val ruleObj = rulesArray.getJSONObject(i)
                         val pkgName = ruleObj.getString("packageName")
+                        if (pkgName.isBlank() || pkgName == appContext.packageName) continue
                         val entity = ScheduleRuleEntity(
                             id = 0L,
                             packageName = pkgName,

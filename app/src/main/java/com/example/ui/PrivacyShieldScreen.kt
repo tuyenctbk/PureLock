@@ -557,11 +557,19 @@ fun PrivacyShieldScreen(
     // Export Logs Dialog
     if (showExportDialog) {
         val exportText = remember(securityLogs) {
+            fun escapeCsvCell(raw: String): String {
+                val safe = if (raw.isNotEmpty() && raw[0] in charArrayOf('=', '+', '-', '@', '\t', '\r')) {
+                    "'$raw"
+                } else {
+                    raw
+                }
+                return "\"${safe.replace("\"", "\"\"").replace("\r", " ").replace("\n", " ")}\""
+            }
             val sb = StringBuilder()
             sb.append("Timestamp,Action,Details\n")
             val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             securityLogs.forEach { log ->
-                sb.append("${fmt.format(Date(log.timestamp))},\"${log.action}\",\"${log.details.replace("\"", "\"\"")}\"\n")
+                sb.append("${fmt.format(Date(log.timestamp))},${escapeCsvCell(log.action)},${escapeCsvCell(log.details)}\n")
             }
             sb.toString()
         }

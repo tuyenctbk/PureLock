@@ -1082,6 +1082,7 @@ fun InvisibleSuiteScreen(
                     enabled = exportPassphrase.length >= 6,
                     onClick = {
                         pendingExportPassphrase = exportPassphrase
+                        exportPassphrase = ""
                         showExportBackupDialog = false
                         com.example.util.PermissionManager.recordSettingsOpened()
                         exportBackupLauncher.launch("purelock_backup_${System.currentTimeMillis()}.plk")
@@ -1125,6 +1126,7 @@ fun InvisibleSuiteScreen(
                     onClick = {
                         val uri = pendingImportUri ?: return@Button
                         val pass = importPassphrase
+                        importPassphrase = ""
                         showImportBackupDialog = false
                         pendingImportUri = null
                         isBackupBusy = true
@@ -1179,9 +1181,7 @@ fun InvisibleSuiteScreen(
                         selectedNodes = newPatternNodes,
                         hidePath = false,
                         onNodeSelected = { node ->
-                            if (!newPatternNodes.contains(node)) {
-                                newPatternNodes = newPatternNodes + node
-                            }
+                            newPatternNodes = appendPatternNodeWithMidpoint(newPatternNodes, node)
                         },
                         onPatternCompleted = {}
                     )

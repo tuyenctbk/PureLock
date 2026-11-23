@@ -388,7 +388,15 @@ class PureLockRepository(
 
     suspend fun addScheduleRule(rule: ScheduleRuleEntity) {
         scheduleRuleDao.insertRule(rule)
-        logSecurityEvent("SCHEDULE_RULE_ADDED", "Added schedule rule for ${rule.appName} (${rule.startHour}:${rule.startMinute} to ${rule.endHour}:${rule.endMinute})")
+        val window = String.format(
+            java.util.Locale.US,
+            "%02d:%02d to %02d:%02d",
+            rule.startHour,
+            rule.startMinute,
+            rule.endHour,
+            rule.endMinute
+        )
+        logSecurityEvent("SCHEDULE_RULE_ADDED", "Added schedule rule for ${rule.appName} ($window)")
     }
 
     suspend fun deleteScheduleRule(id: Long) {
@@ -421,7 +429,9 @@ class PureLockRepository(
         val app = appLockDao.getLockedAppByPackage(packageName)
         val appName = app?.appName ?: packageName
         appLockDao.deleteApp(packageName)
+        scheduleRuleDao.deleteRulesForPackage(packageName)
         logSecurityEvent("PACKAGE_UNINSTALLED", "Application uninstalled and removed from security shield: $appName ($packageName)")
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun syncInstalledAppsWithDevice(): Int = withContext(Dispatchers.IO) {
@@ -433,6 +443,7 @@ class PureLockRepository(
         for (app in existing) {
             if (app.packageName !in installedPackages) {
                 appLockDao.deleteApp(app.packageName)
+                scheduleRuleDao.deleteRulesForPackage(app.packageName)
                 removedCount++
             }
         }

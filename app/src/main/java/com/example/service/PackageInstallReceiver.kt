@@ -15,17 +15,21 @@ import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class PackageInstallReceiver : BroadcastReceiver() {
 
+    companion object {
+        private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
+        val appContext = context.applicationContext
         val packageName = intent.data?.schemeSpecificPart ?: return
-        if (packageName == context.packageName) return
+        if (packageName == appContext.packageName) return
 
         val pendingResult = goAsync()
-        val scope = CoroutineScope(Dispatchers.IO)
-
         val isReplacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
 
         if (intent.action == Intent.ACTION_PACKAGE_REMOVED || intent.action == Intent.ACTION_PACKAGE_FULLY_REMOVED) {
@@ -35,12 +39,12 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 pendingResult.finish()
                 return
             }
-            scope.launch {
+            receiverScope.launch {
                 try {
-                    val db = PureLockDatabase.getDatabase(context)
-                    val prefs = PureLockPreferences(context)
+                    val db = PureLockDatabase.getDatabase(appContext)
+                    val prefs = PureLockPreferences(appContext)
                     val repository = PureLockRepository(
-                        context,
+                        appContext,
                         db.appLockDao(),
                         db.intruderDao(),
                         db.logDao(),
@@ -60,9 +64,8 @@ class PackageInstallReceiver : BroadcastReceiver() {
         }
 
         if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
-            scope.launch {
+            receiverScope.launch {
                 try {
-                    val appContext = context.applicationContext
                     val pm = appContext.packageManager
                     val isLaunchable = pm.getLaunchIntentForPackage(packageName) != null ||
                         pm.getLeanbackLaunchIntentForPackage(packageName) != null

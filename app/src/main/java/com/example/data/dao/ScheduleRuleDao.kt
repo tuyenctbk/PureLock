@@ -30,6 +30,9 @@ interface ScheduleRuleDao {
     @Query("DELETE FROM schedule_rules WHERE id = :id")
     suspend fun deleteRule(id: Long)
 
+    @Query("DELETE FROM schedule_rules WHERE packageName = :packageName")
+    suspend fun deleteRulesForPackage(packageName: String)
+
     @Query("UPDATE schedule_rules SET isEnabled = :isEnabled WHERE id = :id")
     suspend fun updateRuleStatus(id: Long, isEnabled: Boolean)
 }

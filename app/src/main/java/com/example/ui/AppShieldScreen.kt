@@ -59,7 +59,7 @@ fun AppShieldScreen(
 ) {
     val context = LocalContext.current
     val allApps by viewModel.allApps.collectAsState()
-    val activeCount by viewModel.activeLockedAppsCount.collectAsState()
+    val activeCount = remember(allApps) { allApps.count { it.isLocked } }
     val scheduleRules by viewModel.scheduleRules.collectAsState()
     val isSyncingApps by viewModel.isSyncingApps.collectAsState()
     val haptic = LocalHapticFeedback.current
@@ -751,7 +751,10 @@ private fun CustomScheduleRulesDialog(
 ) {
     val lockedApps = remember(apps) { apps.filter { it.isLocked }.ifEmpty { apps } }
     var showAddForm by remember { mutableStateOf(false) }
-    var selectedApp by remember(lockedApps) { mutableStateOf(lockedApps.firstOrNull()) }
+    var selectedPackageName by remember { mutableStateOf(lockedApps.firstOrNull()?.packageName) }
+    val selectedApp = remember(lockedApps, selectedPackageName) {
+        lockedApps.firstOrNull { it.packageName == selectedPackageName } ?: lockedApps.firstOrNull()
+    }
     var appDropdownExpanded by remember { mutableStateOf(false) }
     var startHour by remember { mutableIntStateOf(22) }
     var endHour by remember { mutableIntStateOf(7) }
@@ -813,7 +816,7 @@ private fun CustomScheduleRulesDialog(
                                         DropdownMenuItem(
                                             text = { Text(app.appName) },
                                             onClick = {
-                                                selectedApp = app
+                                                selectedPackageName = app.packageName
                                                 appDropdownExpanded = false
                                             }
                                         )

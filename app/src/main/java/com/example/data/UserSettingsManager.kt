@@ -336,6 +336,10 @@ class UserSettingsManager(private val context: Context) {
 
     suspend fun setDuressPin(pin: String) {
         dataStore.edit { prefs ->
+            val currentMaster = decodeCredential(prefs[KEY_MASTER_PIN])
+            if (pin.isNotEmpty() && pin == currentMaster) {
+                return@edit
+            }
             prefs[KEY_DURESS_PIN] = encodeCredential(pin)
         }
     }

@@ -42,12 +42,12 @@ class LockOverlayActivity : FragmentActivity() {
 
     private lateinit var repository: PureLockRepository
     private var lockedPackageState = mutableStateOf("")
-    private var isAutofillAuthRequest = false
+    private var isAutofillAuthRequestState = mutableStateOf(false)
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        isAutofillAuthRequest = intent.getBooleanExtra(EXTRA_AUTOFILL_AUTH_REQUEST, false)
+        isAutofillAuthRequestState.value = intent.getBooleanExtra(EXTRA_AUTOFILL_AUTH_REQUEST, false)
         val newPackage = intent.getStringExtra(EXTRA_LOCKED_PACKAGE)
         if (!newPackage.isNullOrEmpty()) {
             lockedPackageState.value = newPackage
@@ -66,11 +66,11 @@ class LockOverlayActivity : FragmentActivity() {
         }
         enableEdgeToEdge()
 
-        isAutofillAuthRequest = intent.getBooleanExtra(EXTRA_AUTOFILL_AUTH_REQUEST, false)
+        isAutofillAuthRequestState.value = intent.getBooleanExtra(EXTRA_AUTOFILL_AUTH_REQUEST, false)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (isAutofillAuthRequest) {
+                if (isAutofillAuthRequestState.value) {
                     setResult(Activity.RESULT_CANCELED)
                     finish()
                 } else {
@@ -97,6 +97,7 @@ class LockOverlayActivity : FragmentActivity() {
 
         setContent {
             val lockedPackage by lockedPackageState
+            val isAutofillAuth by isAutofillAuthRequestState
             val dsTheme by repository.userSettings.themeMode.collectAsState(initial = "SYSTEM")
             val roomTheme by repository.roomThemeMode.collectAsState(initial = null)
             val activeThemeMode = roomTheme ?: dsTheme
@@ -107,7 +108,7 @@ class LockOverlayActivity : FragmentActivity() {
                         packageName = lockedPackage,
                         repository = repository,
                         onUnlocked = {
-                            if (isAutofillAuthRequest && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            if (isAutofillAuth && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 completeAutofillAuthentication()
                             } else {
                                 PureLockAccessibilityService.onPackageUnlocked(lockedPackage)
@@ -121,7 +122,7 @@ class LockOverlayActivity : FragmentActivity() {
                             }
                         },
                         onCancelled = {
-                            if (isAutofillAuthRequest) {
+                            if (isAutofillAuth) {
                                 setResult(Activity.RESULT_CANCELED)
                                 finish()
                             } else {

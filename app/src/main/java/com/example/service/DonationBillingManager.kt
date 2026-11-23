@@ -441,6 +441,7 @@ class DonationBillingManager internal constructor(
     }
 
     private fun launchDonationFlowInternal(explicitContext: Context?, tier: DonationTier) {
+        if (_uiState.value.isPurchaseInProgress) return
         val initialHostActivity = resolveLiveActivity(explicitContext)
         if (initialHostActivity == null) {
             Log.w(TAG, "launchDonationFlow aborted: no active Activity/Fragment session available")

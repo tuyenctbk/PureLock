@@ -9,6 +9,8 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.data.PureLockDatabase
 import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.LockedAppEntity
+import com.example.data.model.ScheduleRuleEntity
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -216,6 +218,18 @@ class PureLockDatabaseMigrationTest {
             val vaultTuples = db.encryptedVaultDao().getIntegrityTuples()
             assertEquals(1, vaultTuples.size)
             assertEquals("Master Key", vaultTuples.first().title)
+
+            // Verify orphaned schedule cleanup for uninstalled packages
+            db.scheduleRuleDao().insertRule(
+                ScheduleRuleEntity(packageName = "com.app.a", appName = "App A", startHour = 9, startMinute = 0, endHour = 17, endMinute = 0)
+            )
+            db.scheduleRuleDao().insertRule(
+                ScheduleRuleEntity(packageName = "com.app.b", appName = "App B", startHour = 22, startMinute = 0, endHour = 6, endMinute = 0)
+            )
+            db.scheduleRuleDao().deleteRulesForPackage("com.app.a")
+            val remainingRules = db.scheduleRuleDao().getAllRules().first()
+            assertEquals(1, remainingRules.size)
+            assertEquals("com.app.b", remainingRules.first().packageName)
         } finally {
             db.close()
         }

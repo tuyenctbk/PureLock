@@ -80,15 +80,6 @@ class MainActivity : FragmentActivity() {
                 val latestAppAuthenticated by rememberUpdatedState(appAuthenticated)
 
                 val shortcutAction by shortcutActionState
-                val startRoute = remember(shortcutAction) {
-                    when (shortcutAction) {
-                        "VIEW_SHIELD" -> "shield"
-                        "VIEW_INTRUDER" -> "intruder"
-                        "VIEW_AUDIT" -> "audit"
-                        "VIEW_SETTINGS" -> "suite"
-                        else -> "vault"
-                    }
-                }
 
                 val latestHapticEnabled by rememberUpdatedState(hapticFeedbackEnabled)
                 val parsedSensitivity = remember(shakeSensitivity) {
@@ -435,7 +426,7 @@ class MainActivity : FragmentActivity() {
                                 ) { innerPadding ->
                                     NavHost(
                                         navController = navController,
-                                        startDestination = startRoute,
+                                        startDestination = "vault",
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .padding(innerPadding),

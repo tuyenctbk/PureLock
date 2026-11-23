@@ -14,13 +14,14 @@ import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
 import com.example.ui.LockOverlayActivity
 import com.example.util.ClipboardSecurityManager
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class PureLockAccessibilityService : AccessibilityService() {
 
@@ -85,9 +86,13 @@ class PureLockAccessibilityService : AccessibilityService() {
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val repositoryDeferred = CompletableDeferred<PureLockRepository>()
+    private val repositoryInitMutex = Mutex()
+    @Volatile
+    private var repositoryInstance: PureLockRepository? = null
     private var shakeController: ShakeToLockSensorController? = null
+    @Volatile
     private var lastCheckedPackage: String? = null
+    @Volatile
     private var lastCheckTimestamp = 0L
 
     @Volatile
@@ -117,10 +122,11 @@ class PureLockAccessibilityService : AccessibilityService() {
                     updateShakeSensorState()
                     Log.d(TAG, "Screen off detected: Pausing shake sensor and clearing active unlock sessions")
                     clearAllSessions()
+                    lastCheckedPackage = null
                     LockdownSignalBus.emitLockdown()
                     serviceScope.launch {
                         try {
-                            repositoryDeferred.await().resetAllUnlockedSessions()
+                            getOrInitRepository()?.resetAllUnlockedSessions()
                         } catch (e: Exception) {
                             Log.e(TAG, "Failed to reset unlocked timestamps on screen off", e)
                         }
@@ -151,7 +157,7 @@ class PureLockAccessibilityService : AccessibilityService() {
         val hadSessions = hasActiveUnlockedSessions()
         serviceScope.launch {
             try {
-                val repo = repositoryDeferred.await()
+                val repo = getOrInitRepository() ?: return@launch
                 val isForegroundProtected = !activePkg.isNullOrBlank() && repo.isPackageProtected(activePkg)
                 if (!isForegroundProtected && !hadSessions) {
                     // Avoid false vibrations or log spam while walking/jogging outside protected apps
@@ -188,17 +194,10 @@ class PureLockAccessibilityService : AccessibilityService() {
         launchOverlayForPackage(applicationContext, packageName)
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
-        isScreenInteractive = powerManager?.isInteractive ?: true
-
-        shakeController = ShakeToLockSensorController(
-            context = this,
-            onShakeDetected = ::handleGlobalShakeDetected
-        )
-
-        serviceScope.launch {
+    private suspend fun getOrInitRepository(): PureLockRepository? {
+        repositoryInstance?.let { return it }
+        return repositoryInitMutex.withLock {
+            repositoryInstance?.let { return@withLock it }
             try {
                 val db = PureLockDatabase.getDatabase(this@PureLockAccessibilityService)
                 val prefs = PureLockPreferences(this@PureLockAccessibilityService)
@@ -212,53 +211,72 @@ class PureLockAccessibilityService : AccessibilityService() {
                     db.userSettingDao(),
                     prefs
                 )
-                repositoryDeferred.complete(repo)
-                refreshImePackageCache()
+                repositoryInstance = repo
+                startPreferenceCollectors(repo)
+                repo
+            } catch (e: Exception) {
+                Log.e(TAG, "Transient failure initializing PureLockAccessibilityService repository; will retry", e)
+                null
+            }
+        }
+    }
 
-                launch {
-                    try {
-                        repo.activeLockedPackageNames.collect { lockedList ->
-                            cachedLockedPackages = lockedList.toHashSet()
-                            lockedPackagesCacheReady = true
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error collecting active locked packages", e)
-                    }
-                }
-
-                launch {
-                    try {
-                        repo.preferences.gracePeriodMs.collect {
-                            cachedGracePeriodMs = it
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error collecting grace period preference", e)
-                    }
-                }
-
-                launch {
-                    try {
-                        combine(
-                            repo.preferences.shakeToLock,
-                            repo.preferences.shakeSensitivity,
-                            repo.preferences.hapticFeedbackEnabled
-                        ) { enabled, sensitivityKey, haptic ->
-                            Triple(enabled, ShakeSensitivity.fromKey(sensitivityKey), haptic)
-                        }.collect { (enabled, sensitivity, haptic) ->
-                            cachedShakeEnabled = enabled
-                            cachedShakeSensitivity = sensitivity
-                            cachedHapticEnabled = haptic
-                            shakeController?.updateSensitivity(sensitivity)
-                            updateShakeSensorState()
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error collecting Shake-to-Lock preferences", e)
-                    }
+    private fun startPreferenceCollectors(repo: PureLockRepository) {
+        serviceScope.launch {
+            try {
+                repo.activeLockedPackageNames.collect { lockedList ->
+                    cachedLockedPackages = lockedList.toHashSet()
+                    lockedPackagesCacheReady = true
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to initialize PureLockAccessibilityService repository", e)
-                repositoryDeferred.completeExceptionally(e)
+                Log.e(TAG, "Error collecting active locked packages", e)
             }
+        }
+
+        serviceScope.launch {
+            try {
+                repo.preferences.gracePeriodMs.collect {
+                    cachedGracePeriodMs = it
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error collecting grace period preference", e)
+            }
+        }
+
+        serviceScope.launch {
+            try {
+                combine(
+                    repo.preferences.shakeToLock,
+                    repo.preferences.shakeSensitivity,
+                    repo.preferences.hapticFeedbackEnabled
+                ) { enabled, sensitivityKey, haptic ->
+                    Triple(enabled, ShakeSensitivity.fromKey(sensitivityKey), haptic)
+                }.collect { (enabled, sensitivity, haptic) ->
+                    cachedShakeEnabled = enabled
+                    cachedShakeSensitivity = sensitivity
+                    cachedHapticEnabled = haptic
+                    shakeController?.updateSensitivity(sensitivity)
+                    updateShakeSensorState()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error collecting Shake-to-Lock preferences", e)
+            }
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
+        isScreenInteractive = powerManager?.isInteractive ?: true
+
+        shakeController = ShakeToLockSensorController(
+            context = this,
+            onShakeDetected = ::handleGlobalShakeDetected
+        )
+
+        serviceScope.launch {
+            refreshImePackageCache()
+            getOrInitRepository()
         }
 
         try {
@@ -324,6 +342,11 @@ class PureLockAccessibilityService : AccessibilityService() {
             if (unlockedPackages.containsKey(prevForeground)) {
                 packageLeaveTimestamps[prevForeground] = currentTime
             }
+            // Clear debounce state when leaving to another non-PureLock app (e.g., Home Launcher)
+            // so rapidly re-opening a locked app after cancelling the overlay cannot bypass the lock.
+            if (packageName != applicationContext.packageName && packageName != lastCheckedPackage) {
+                lastCheckedPackage = null
+            }
         }
         currentForegroundPackage = packageName
 
@@ -354,7 +377,7 @@ class PureLockAccessibilityService : AccessibilityService() {
 
         serviceScope.launch {
             try {
-                val repo = repositoryDeferred.await()
+                val repo = getOrInitRepository() ?: return@launch
                 if (repo.isAppLockRequired(packageName, cachedGracePeriodMs)) {
                     Log.d(TAG, "Locking package: $packageName")
                     launchOverlayActivity(packageName)

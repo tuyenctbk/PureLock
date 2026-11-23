@@ -1,8 +1,8 @@
-# Google Play Store Listing & Accessibility Policy Documentation
+# Google Play Store Listing & Accessibility Policy Documentation (PureLock v2.8)
 
 ## 1. App Title & Short Description
 - **App Title (max 30 chars)**: `PureLock: Privacy App Lock`
-- **Short Description (max 80 chars)**: `Offline App Lock & SQLCipher AES-256 Vault. Zero ads, zero cloud, pure privacy.`
+- **Short Description (max 80 chars)**: `Offline App Lock & AES-256 Vault. Zero ads, zero telemetry, zero cloud.`
 
 ---
 
@@ -28,19 +28,19 @@ Accessibility service permission is optional and only requested when you choose 
 ## 3. Complete Full Description (English)
 
 ```text
-PureLock is a lightweight, ad-free privacy suite and encrypted vault built to protect your apps, passwords, 2FA codes, and private notes strictly on your device. Powered by SQLCipher AES-256 and hardware-backed Android Keystore encryption, PureLock works 100% offline with zero cloud accounts and zero ads.
+PureLock is a lightweight, ad-free privacy suite and encrypted vault built to protect your apps, passwords, 2FA codes, and private notes strictly on your device. Powered by SQLCipher AES-256 and hardware-backed Android Keystore encryption, PureLock runs offline with zero ads, zero telemetry, and zero cloud accounts.
 
 🔒 CORE SECURITY FEATURES:
-• App Shield (App Lock): Protect any installed app (Banking, Social, Photos, System) with PIN, 3×3 Pattern, 4-Quadrant Knock Code, or Biometrics (Fingerprint / Face ID).
-• Hardware-Encrypted Vault: Store passwords, secure notes, cards, 2FA codes, and PINs in a SQLCipher AES-256 database wrapped by Android Keystore. Includes Favorites, Pinning, Trash auto-purge, and Entropy Insights.
-• Camouflage & Stealth Decoys: Disguise your lock screen as a working Calculator or Fake Crash dialog, plus Randomized Keypad Scramble, Invisible Pattern Trail, and a Panic Duress PIN.
+• App Shield (App Lock) & Custom Schedules: Protect any installed app (Banking, Social, Photos, System) with PIN, 3×3 Pattern (invisible trail), 4-Quadrant Knock Code, or Biometrics (Fingerprint / Face ID). Set per-app time windows and active days, plus Randomized Keypad Scramble and configurable re-lock grace periods.
+• Hardware-Encrypted Vault & Credentials: Store passwords, secure notes, cards, 2FA codes, and PINs in a SQLCipher AES-256 database wrapped by Android Keystore TEE, with master credentials encrypted at rest using AES-256-GCM. Includes Favorites, Pinning, configurable Trash auto-purge (7–90 days), and Password Entropy Insights.
+• Active Anti-Tamper & Stealth Decoys: Progressive brute-force lockout cooldowns, app-wide screenshot & Recents blocking (FLAG_SECURE), working Calculator disguise, Fake Crash dialog, and a Panic Duress PIN.
 • Shake-to-Lock Gesture: Gravity-filtered accelerometer emergency lockdown with adjustable sensitivity (High / Medium / Low).
-• Intruder Capture & Audit Analytics: Records failed unlock attempts locally with a SHA-256 Cryptographic Vault Integrity Audit and CSV log export.
-• Clipboard Auto-Wipe & Password Generator: Generates high-entropy passwords offline and automatically wipes copied secrets from clipboard memory.
-• Local Autofill, Quick Tiles, Widget & TV: Offline Android Autofill Service, Quick Settings Lockdown tile, Home Screen Vault Widget, encrypted .plk backups, and Android TV support.
+• Intruder Capture & SHA-256 Audit: Records failed unlock attempts locally with a SHA-256 Cryptographic Vault Integrity Audit and CSV log export.
+• Clipboard Auto-Wipe & Password Generator: Generates high-entropy passwords offline and automatically clears copied secrets from clipboard memory.
+• Authenticated Offline Autofill, Backups & TV: Master-locked local Android Autofill Service, AES-256-GCM encrypted .plk backup & restore (PBKDF2-HMAC-SHA256) including apps and schedules, Quick Settings Lockdown tiles, Home Screen Vault Widget, and Android TV support.
 
 🛡️ 100% LOCAL PRIVACY GUARANTEE:
-PureLock operates offline without cloud sync, ads, or user accounts. Your encrypted vault, PINs, patterns, and logs remain strictly on your device.
+Zero ads, zero analytics or telemetry SDKs, zero Advertising ID, and zero cloud accounts. Your encrypted vault, credentials, schedules, and logs never leave your device.
 
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API USAGE & DISCLOSURE
@@ -58,6 +58,8 @@ Accessibility service permission is optional and only requested when you choose 
 
 ## 4. Multi-Language Accessibility Disclosures (For Translated Store Listings)
 
+> Note: All 30 localized listings (Title, Short Description, and Full Description including these disclosures) are generated and validated in `store_listing.csv` via `python3 generate_store_listing_csv.py`.
+
 ### 🇪🇸 Spanish (Español)
 ```text
 ────────────────────────────────────────
@@ -65,9 +67,11 @@ USO Y DIVULGACIÓN DE LA API DE ACCESIBILIDAD
 ────────────────────────────────────────
 PureLock utiliza la API de AccessibilityService estrictamente para proporcionar su función principal de Bloqueo de Aplicaciones (App Shield).
 
-• Cómo se utiliza: PureLock monitorea los eventos de cambio de ventana (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar cuándo se abre una aplicación protegida en primer plano y mostrar de inmediato la pantalla de bloqueo seguro (PIN, Patrón o Huella).
-• Privacidad y Seguridad: PureLock NO lee, captura ni accede al contenido de la pantalla, pulsaciones de teclas, contraseñas ni mensajes personales.
-• Cero recolección de datos: PureLock no recopila ni transmite ningún dato. Funciona 100% sin conexión (offline) y sin permiso de Internet.
+• Cómo se utiliza: PureLock monitorea eventos de cambio de ventana (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar cuándo se abre una app protegida en primer plano y mostrar de inmediato la pantalla de bloqueo seguro (PIN, Patrón, Knock o Biometría).
+• Privacidad y Seguridad: PureLock NO lee, captura ni accede al contenido de la pantalla, pulsaciones de teclas, contraseñas ni mensajes personales (canRetrieveWindowContent desactivado).
+• Cero recolección de datos: PureLock no recopila, sube ni transmite tu bóveda, actividad de apps ni credenciales.
+
+Este permiso es opcional, solo se solicita al activar App Shield y puede habilitarse o desactivarse en cualquier momento desde Ajustes de Accesibilidad.
 ```
 
 ### 🇧🇷 🇵🇹 Portuguese (Português)
@@ -77,9 +81,11 @@ USO E DIVULGAÇÃO DA API ACCESSIBILITYSERVICE
 ────────────────────────────────────────
 O PureLock utiliza a API AccessibilityService estritamente para fornecer sua função principal de Bloqueio de Aplicativos (App Shield).
 
-• Como é utilizado: O PureLock monitora eventos de alteração de janela (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar quando um aplicativo protegido é aberto em primeiro plano e exibir imediatamente a tela de bloqueio seguro (PIN, Padrão ou Biometria).
-• Privacidade e Proteção de Dados: O PureLock NÃO lê, captura ou acessa o conteúdo da tela, digitação, senhas ou mensagens pessoais.
-• Zero Coleta de Dados: O PureLock funciona 100% offline, sem nenhuma permissão de Internet.
+• Como é utilizado: O PureLock monitora eventos de alteração de janela (TYPE_WINDOW_STATE_CHANGED) exclusivamente para detectar quando um app protegido é aberto em primeiro plano e exibir imediatamente a tela de bloqueio seguro (PIN, Padrão, Knock ou Biometria).
+• Privacidade e Proteção de Dados: O PureLock NÃO lê, captura ou acessa conteúdo da tela, digitação, senhas ou mensagens pessoais (canRetrieveWindowContent desativado).
+• Zero Coleta de Dados: O PureLock não coleta, envia nem transmite dados do cofre, uso de apps ou credenciais.
+
+A permissão é opcional, solicitada apenas ao ativar o App Shield, e pode ser alterada a qualquer momento nas Configurações de Acessibilidade.
 ```
 
 ### 🇫🇷 French (Français)
@@ -89,9 +95,11 @@ UTILISATION DE L'API ACCESSIBILITYSERVICE ET DIVULGATION
 ────────────────────────────────────────
 PureLock utilise l'API AccessibilityService uniquement pour fournir sa fonctionnalité principale de verrouillage d'applications (App Shield).
 
-• Utilisation : PureLock surveille les changements d'état des fenêtres (TYPE_WINDOW_STATE_CHANGED) uniquement pour détecter l'ouverture d'une application protégée au premier plan et afficher instantanément l'écran de verrouillage sécurisé (PIN, Schéma ou Biométrie).
-• Confidentialité : PureLock NE lit, NE capture et N'accède à aucun contenu d'écran, frappe de clavier, mot de passe ou message privé.
-• Zéro collecte de données : PureLock fonctionne 100% hors ligne sans aucune permission Internet.
+• Utilisation : PureLock surveille les changements d'état des fenêtres (TYPE_WINDOW_STATE_CHANGED) uniquement pour détecter l'ouverture d'une application protégée au premier plan et afficher instantanément l'écran de verrouillage sécurisé (PIN, Schéma, Knock ou Biométrie).
+• Confidentialité : PureLock NE lit, NE capture et N'accède à aucun contenu d'écran, frappe de clavier, mot de passe ou message privé (canRetrieveWindowContent désactivé).
+• Zéro collecte de données : PureLock ne collecte, ne téléverse ni ne transmet vos données de coffre, votre usage d'applications ou vos identifiants.
+
+Cette autorisation est facultative, demandée uniquement pour App Shield, et modifiable à tout moment dans les Paramètres d'Accessibilité.
 ```
 
 ### 🇩🇪 German (Deutsch)
@@ -101,9 +109,11 @@ BARRIEREFREIHEITSDIENST (ACCESSIBILITY API) OFFENLEGUNG
 ────────────────────────────────────────
 PureLock verwendet die AccessibilityService-API ausschließlich zur Bereitstellung der App-Sperrfunktion (App Shield).
 
-• Verwendung: PureLock überwacht Fensterstatusänderungen (TYPE_WINDOW_STATE_CHANGED), um zu erkennen, wenn eine geschützte App im Vordergrund geöffnet wird, und zeigt sofort den sicheren Sperrbildschirm (PIN, Muster oder Biometrie) an.
-• Datenschutz: PureLock liest, erfasst oder speichert KEINE Bildschirminhalte, Tastatureingaben, Passwörter oder persönliche Daten.
-• Keine Datenerfassung: Die App funktioniert 100% offline ohne Internetberechtigung.
+• Verwendung: PureLock überwacht Fensterstatusänderungen (TYPE_WINDOW_STATE_CHANGED), um zu erkennen, wenn eine geschützte App im Vordergrund geöffnet wird, und zeigt sofort den sicheren Sperrbildschirm (PIN, Muster, Knock-Code oder Biometrie) an.
+• Datenschutz: PureLock liest, erfasst oder speichert KEINE Bildschirminhalte, Tastatureingaben, Passwörter oder persönlichen Nachrichten (canRetrieveWindowContent deaktiviert).
+• Keine Datenerfassung: PureLock sammelt, überträgt oder teilt keinerlei Tresordaten, App-Nutzung oder Zugangsdaten.
+
+Die Berechtigung ist optional, wird nur für App Shield angefordert und kann jederzeit in den Bedienungshilfen-Einstellungen geändert werden.
 ```
 
 ### 🇮🇹 Italian (Italiano)
@@ -113,9 +123,11 @@ USO E DIVULGAZIONE DELL'API ACCESSIBILITYSERVICE
 ────────────────────────────────────────
 PureLock utilizza l'API AccessibilityService esclusivamente per fornire la sua funzione principale di Blocco App (App Shield).
 
-• Utilizzo: PureLock monitora gli eventi di cambio stato della finestra (TYPE_WINDOW_STATE_CHANGED) unicamente per rilevare quando un'app protetta viene aperta in primo piano e mostrare immediatamente la schermata di blocco sicura (PIN, Sequenza o Biometria).
-• Privacy e Protezione Dati: PureLock NON legge, cattura o accede ai contenuti dello schermo, tasti digitati, password o messaggi personali.
-• Zero Raccolta Dati: PureLock funziona al 100% offline, senza autorizzazioni Internet.
+• Utilizzo: PureLock monitora gli eventi di cambio stato della finestra (TYPE_WINDOW_STATE_CHANGED) unicamente per rilevare quando un'app protetta viene aperta in primo piano e mostrare immediatamente la schermata di blocco sicura (PIN, Sequenza, Knock o Biometria).
+• Privacy e Protezione Dati: PureLock NON legge, cattura o accede ai contenuti dello schermo, tasti digitati, password o messaggi personali (canRetrieveWindowContent disattivato).
+• Zero Raccolta Dati: PureLock non raccoglie, carica né trasmette dati della cassaforte, utilizzo delle app o credenziali.
+
+L'autorizzazione è facoltativa, richiesta solo attivando App Shield, e può essere attivata o disattivata in qualsiasi momento nelle Impostazioni di Accessibilità.
 ```
 
 ### 🇷🇺 Russian (Русский)
@@ -123,11 +135,13 @@ PureLock utilizza l'API AccessibilityService esclusivamente per fornire la sua f
 ────────────────────────────────────────
 ИСПОЛЬЗОВАНИЕ API ACCESSIBILITYSERVICE
 ────────────────────────────────────────
-PureLock использует AccessibilityService API исключительно для обеспечения основной функции блокировки приложений (App Shield).
+PureLock использует AccessibilityService API исключительно для основной функции блокировки приложений (App Shield).
 
-• Назначение: PureLock отслеживает события смены окон (TYPE_WINDOW_STATE_CHANGED) исключительно для определения запуска защищенного приложения на переднем плане и мгновенного отображения защитного экрана блокировки (PIN-код, графический ключ или биометрия).
-• Конфиденциальность: PureLock НЕ читает, НЕ собирает и НЕ перехватывает содержимое экрана, нажатия клавиш, пароли или личные сообщения.
-• Полный офлайн: PureLock работает на 100% автономно без разрешения на доступ к Интернету.
+• Назначение: Отслеживаются только события смены окна (TYPE_WINDOW_STATE_CHANGED) для определения запуска защищенного приложения и мгновенного показа экрана блокировки (PIN, графический ключ, Knock-код или биометрия).
+• Конфиденциальность: PureLock НЕ читает, НЕ собирает и НЕ перехватывает содержимое экрана, нажатия клавиш, пароли или личные сообщения (canRetrieveWindowContent отключён).
+• Ноль сбора данных: PureLock не собирает и не передаёт данные сейфа, статистику приложений или учётные данные.
+
+Разрешение необязательно, запрашивается только для App Shield и может быть отключено в любой момент в настройках Специальных возможностей.
 ```
 
 ### 🇯🇵 Japanese (日本語)
@@ -137,9 +151,11 @@ PureLock использует AccessibilityService API исключительн�
 ────────────────────────────────────────
 PureLockは、コア機能である「アプリロック（App Shield）」を提供するためにのみAccessibilityService APIを使用します。
 
-・使用目的: 保護対象のアプリがフォアグラウンドで起動されたことを検知（TYPE_WINDOW_STATE_CHANGED）し、直ちに安全なロック画面（PIN、パターン、生体認証）を表示して不正アクセスを防ぎます。
-・プライバシー保護: PureLockは、画面上のテキスト、キーストローク、パスワード、個人メッセージなどの内容を閲覧・収集・保存・送信することは一切ありません。
-・完全オフライン: PureLockはインターネット通信権限を一切持たず、完全に端末内で動作します。
+・使用目的: 保護対象アプリがフォアグラウンドで起動されたことを検知（TYPE_WINDOW_STATE_CHANGED）し、直ちに安全なロック画面（PIN・パターン・ノックコード・生体認証）を表示します。
+・プライバシー保護: 画面上のテキスト、キー入力、パスワード、個人メッセージの閲覧・取得は一切行いません（canRetrieveWindowContentは無効）。
+・データ収集ゼロ: 保管庫データ、アプリ利用履歴、認証情報を収集・アップロード・送信することはありません。
+
+ユーザー補助権限は任意で、App Shield使用時のみリクエストされ、端末のユーザー補助設定からいつでも変更できます。
 ```
 
 ### 🇰🇷 Korean (한국어)
@@ -147,11 +163,13 @@ PureLockは、コア機能である「アプリロック（App Shield）」を�
 ────────────────────────────────────────
 접근성(ACCESSIBILITY SERVICE) API 사용 및 고지
 ────────────────────────────────────────
-PureLock은 핵심 기능인 '앱 잠금(App Shield)' 기능을 제공하기 위해서만 AccessibilityService API를 사용합니다.
+PureLock은 핵심 기능인 '앱 잠금(App Shield)' 제공을 위해서만 AccessibilityService API를 사용합니다.
 
-• 사용 목적: 보호하도록 설정된 앱이 포그라운드에서 실행되는 것을 감지(TYPE_WINDOW_STATE_CHANGED)하여 즉시 보안 잠금 화면(PIN, 패턴, 생체 인식)을 표시합니다.
-• 개인정보 보호: PureLock은 화면 콘텐츠, 입력된 텍스트, 비밀번호 또는 개인 메시지를 읽거나 수집, 저장, 전송하지 않습니다.
-• 100% 오프라인: PureLock은 인터넷 권한을 전혀 사용하지 않으며 완전히 오프라인으로 작동합니다.
+• 사용 목적: 보호 앱의 포그라운드 실행을 감지(TYPE_WINDOW_STATE_CHANGED)하여 즉시 보안 잠금 화면(PIN, 패턴, 노크 코드, 생체 인증)을 표시합니다.
+• 개인정보 보호: 화면 내용, 키 입력, 비밀번호 또는 개인 메시지를 절대 읽거나 수집·접근하지 않습니다(canRetrieveWindowContent 비활성화).
+• 데이터 수집 제로: 금고 데이터, 앱 사용 기록, 인증 정보를 수집·업로드·전송하지 않습니다.
+
+접근성 권한은 선택 사항이며 App Shield 사용 시에만 요청되고 기기의 접근성 설정에서 언제든 변경할 수 있습니다.
 ```
 
 ### 🇨🇳 Chinese Simplified (简体中文)
@@ -159,11 +177,13 @@ PureLock은 핵심 기능인 '앱 잠금(App Shield)' 기능을 제공하기 위
 ────────────────────────────────────────
 无障碍服务（ACCESSIBILITY SERVICE）API 使用声明
 ────────────────────────────────────────
-PureLock 仅使用 AccessibilityService API 来提供核心的“应用锁（App Shield）”功能。
+PureLock 仅使用 AccessibilityService API 提供核心“应用锁（App Shield）”功能。
 
-• 使用方式：PureLock 仅监听窗口状态更改事件（TYPE_WINDOW_STATE_CHANGED），以便在受保护的应用于前台打开时立即弹出安全锁屏（PIN 码、图案或生物识别），防止未经授权的访问。
-• 隐私保护：PureLock 绝不会读取、捕获或访问屏幕内容、按键记录、密码或个人消息。
-• 零数据收集：PureLock 完全离线运行，没有任何联网权限（未申请 INTERNET 权限）。
+• 使用方式：仅实时监听窗口状态变更事件（TYPE_WINDOW_STATE_CHANGED），用于检测受保护应用进入前台并立即显示安全锁屏（PIN、图案、敲击密码或生物识别）。
+• 隐私保护：绝不读取、捕获或访问屏幕内容、按键输入、密码或个人消息（已禁用 canRetrieveWindowContent）。
+• 零数据收集：不收集、上传或传输您的保险箱数据、应用使用记录或凭据。
+
+无障碍权限为可选项，仅在启用 App Shield 时申请，您可随时在系统“无障碍设置”中开启或关闭。
 ```
 
 ### 🇹🇼 Chinese Traditional (繁體中文)
@@ -171,11 +191,13 @@ PureLock 仅使用 AccessibilityService API 来提供核心的“应用锁（App
 ────────────────────────────────────────
 無障礙服務（ACCESSIBILITY SERVICE）API 使用聲明
 ────────────────────────────────────────
-PureLock 僅使用 AccessibilityService API 來提供核心的「應用程式鎖（App Shield）」功能。
+PureLock 僅使用 AccessibilityService API 提供核心「應用程式鎖（App Shield）」功能。
 
-• 使用方式：PureLock 僅監聽視窗狀態變更事件（TYPE_WINDOW_STATE_CHANGED），以便在受保護的應用程式於前景開啟時立即顯示安全鎖定畫面（PIN 碼、圖形或生物識別），防止未授權存取。
-• 隱私保護：PureLock 絕不會讀取、擷取或存取螢幕內容、按鍵輸入、密碼或私人訊息。
-• 零數據收集：PureLock 完全離線運作，無任何網路連線權限。
+• 使用方式：僅即時監聽視窗狀態變更事件（TYPE_WINDOW_STATE_CHANGED），於受保護應用程式開啟時立即顯示安全鎖定畫面（PIN、圖形、敲擊密碼或生物辨識）。
+• 隱私保護：絕不讀取、擷取或存取螢幕內容、按鍵輸入、密碼或私人訊息（已停用 canRetrieveWindowContent）。
+• 零資料收集：不會收集、上傳或傳送您的保險箱資料、應用程式使用紀錄或憑證。
+
+無障礙權限為選擇性項目，僅於啟用 App Shield 時請求，您可隨時於裝置的無障礙設定中變更。
 ```
 
 ### 🇻🇳 Vietnamese (Tiếng Việt)
@@ -185,9 +207,11 @@ CÔNG KHAI SỬ DỤNG ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
 PureLock sử dụng AccessibilityService API nghiêm ngặt chỉ nhằm phục vụ tính năng Khóa Ứng Dụng (App Shield).
 
-• Mục đích sử dụng: PureLock theo dõi sự kiện chuyển đổi cửa sổ (TYPE_WINDOW_STATE_CHANGED) trong thời gian thực chỉ để nhận biết khi nào ứng dụng được bảo vệ được mở lên màn hình chính, từ đó hiển thị lớp phủ màn hình khóa (Mã PIN, Hình vẽ hoặc Vân tay) ngay lập tức.
-• Bảo vệ quyền riêng tư: PureLock KHÔNG đọc, chụp hoặc truy cập nội dung màn hình, thao tác bàn phím, mật khẩu hoặc tin nhắn riêng tư.
-• Không thu thập dữ liệu: PureLock hoạt động 100% ngoại tuyến (offline), hoàn toàn không yêu cầu quyền truy cập Internet.
+• Mục đích sử dụng: PureLock chỉ theo dõi sự kiện thay đổi cửa sổ (TYPE_WINDOW_STATE_CHANGED) để nhận biết khi ứng dụng được bảo vệ mở lên và hiển thị ngay màn hình khóa an toàn (PIN, Hình vẽ, Knock Code hoặc Sinh trắc học).
+• Bảo vệ quyền riêng tư: PureLock KHÔNG đọc, chụp hoặc truy cập nội dung màn hình, thao tác bàn phím, mật khẩu hoặc tin nhắn cá nhân (canRetrieveWindowContent đã tắt).
+• Không thu thập dữ liệu: PureLock không thu thập, tải lên hoặc truyền dữ liệu két, lịch sử dùng ứng dụng hay thông tin đăng nhập của bạn.
+
+Quyền Trợ năng là tùy chọn, chỉ yêu cầu khi bật App Shield và có thể bật/tắt bất cứ lúc nào trong Cài đặt Trợ năng.
 ```
 
 ### 🇮🇩 Indonesian (Bahasa Indonesia)
@@ -195,11 +219,13 @@ PureLock sử dụng AccessibilityService API nghiêm ngặt chỉ nhằm phục
 ────────────────────────────────────────
 PENGGUNAAN & PENGUNGKAPAN ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
-PureLock menggunakan AccessibilityService API semata-mata untuk menyediakan fitur utama Pengunci Aplikasi (App Shield).
+PureLock menggunakan AccessibilityService API semata-mata untuk fitur utama Pengunci Aplikasi (App Shield).
 
-• Cara Penggunaan: PureLock memantau peristiwa perubahan status jendela (TYPE_WINDOW_STATE_CHANGED) untuk mendeteksi kapan aplikasi yang dilindungi dibuka di latar depan dan segera menampilkan layar kunci aman (PIN, Pola, atau Biometrik).
-• Privasi & Perlindungan Data: PureLock TIDAK membaca, merekam, atau mengakses konten layar, ketikan tombol, kata sandi, atau pesan pribadi.
-• Nol Pengumpulan Data: PureLock beroperasi 100% offline tanpa izin akses Internet.
+• Cara Penggunaan: Memantau perubahan status jendela (TYPE_WINDOW_STATE_CHANGED) untuk mendeteksi pembukaan aplikasi terlindungi dan segera menampilkan layar kunci aman (PIN, Pola, Knock Code, atau Biometrik).
+• Privasi Data: PureLock TIDAK membaca, merekam, atau mengakses konten layar, ketikan, kata sandi, atau pesan pribadi (canRetrieveWindowContent dinonaktifkan).
+• Nol Pengumpulan Data: PureLock tidak mengumpulkan, mengunggah, atau mengirimkan data brankas, penggunaan aplikasi, maupun kredensial Anda.
+
+Izin Aksesibilitas bersifat opsional, hanya diminta saat mengaktifkan App Shield, dan dapat diubah kapan saja di Pengaturan Aksesibilitas.
 ```
 
 ### 🇮🇳 Hindi (हिन्दी)
@@ -207,11 +233,13 @@ PureLock menggunakan AccessibilityService API semata-mata untuk menyediakan fitu
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API उपयोग और प्रकटीकरण
 ────────────────────────────────────────
-PureLock अपने मुख्य ऐप लॉक (App Shield) फीचर को प्रदान करने के लिए विशेष रूप से AccessibilityService API का उपयोग करता है।
+PureLock केवल अपने मुख्य ऐप लॉक (App Shield) फीचर के लिए AccessibilityService API का उपयोग करता है।
 
-• उपयोग का उद्देश्य: PureLock केवल यह पता लगाने के लिए विंडो स्थिति परिवर्तनों (TYPE_WINDOW_STATE_CHANGED) की निगरानी करता है कि संरक्षित ऐप कब खुला है, ताकि तुरंत सुरक्षित लॉक स्क्रीन (पिन, पैटर्न या बायोमेट्रिक) प्रदर्शित की जा सके।
-• गोपनीयता सुरक्षा: PureLock स्क्रीन सामग्री, कीस्ट्रोक्स, पासवर्ड या व्यक्तिगत संदेशों को कभी नहीं पढ़ता, कैप्चर या एक्सेस नहीं करता है।
-• शून्य डेटा संग्रह: PureLock 100% ऑफ़लाइन काम करता है और इसमें कोई इंटरनेट अनुमति नहीं है।
+• उद्देश्य: सुरक्षित ऐप खुलने का पता लगाने हेतु केवल विंडो परिवर्तन (TYPE_WINDOW_STATE_CHANGED) की निगरानी करता है और तुरंत सुरक्षित लॉक स्क्रीन (PIN, पैटर्न, नॉक कोड या बायोमेट्रिक) दिखाता है।
+• गोपनीयता: PureLock स्क्रीन सामग्री, कीस्ट्रोक्स, पासवर्ड या निजी संदेशों को कभी नहीं पढ़ता या एक्सेस नहीं करता (canRetrieveWindowContent अक्षम है)।
+• शून्य डेटा संग्रह: PureLock आपके वॉल्ट डेटा, ऐप उपयोग या क्रेडेंशियल्स को एकत्र, अपलोड या प्रसारित नहीं करता।
+
+यह अनुमति वैकल्पिक है, केवल App Shield के लिए माँगी जाती है और डिवाइस की Accessibility Settings से कभी भी बदली जा सकती है।
 ```
 
 ### 🇹🇷 Turkish (Türkçe)
@@ -219,11 +247,13 @@ PureLock अपने मुख्य ऐप लॉक (App Shield) फीचर
 ────────────────────────────────────────
 ACCESSIBILITY SERVICE API KULLANIMI VE AÇIKLAMASI
 ────────────────────────────────────────
-PureLock, AccessibilityService API'sini yalnızca temel Uygulama Kilidi (App Shield) özelliğini sağlamak için kullanır.
+PureLock, AccessibilityService API'sini yalnızca temel Uygulama Kilidi (App Shield) özelliği için kullanır.
 
-• Nasıl kullanılır: PureLock, korunan bir uygulamanın ön planda ne zaman açıldığını algılamak ve anında güvenli kilit ekranını (PIN, Desen veya Biyometrik) göstermek için yalnızca pencere durumu değişikliklerini (TYPE_WINDOW_STATE_CHANGED) izler.
-• Gizlilik Koruması: PureLock, ekran içeriğini, tuş vuruşlarını, şifreleri veya kişisel mesajları KESİNLİKLE okumaz, kaydetmez veya erişmez.
-• Sıfır Veri Toplama: PureLock, internet izni olmadan %100 çevrimdışı (offline) çalışır.
+• Kullanım: Korunan bir uygulamanın açıldığını algılamak ve güvenli kilit ekranını (PIN, Desen, Knock Kodu veya Biyometri) göstermek için yalnızca pencere durumu değişikliklerini (TYPE_WINDOW_STATE_CHANGED) izler.
+• Gizlilik: Ekran içeriğini, tuş vuruşlarını, parolaları veya kişisel mesajları ASLA okumaz, kaydetmez veya erişmez (canRetrieveWindowContent devre dışıdır).
+• Sıfır Veri Toplama: PureLock kasa verilerinizi, uygulama kullanımınızı veya kimlik bilgilerinizi toplamaz, yüklemez veya iletmez.
+
+Bu izin isteğe bağlıdır, yalnızca App Shield için istenir ve cihazınızın Erişilebilirlik Ayarları'ndan dilediğiniz zaman kapatılabilir.
 ```
 
 ### 🇹🇭 Thai (ภาษาไทย)
@@ -231,11 +261,13 @@ PureLock, AccessibilityService API'sini yalnızca temel Uygulama Kilidi (App Shi
 ────────────────────────────────────────
 การเปิดเผยการใช้งาน ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
-PureLock ใช้ AccessibilityService API เพื่อมอบคุณสมบัติหลักในการล็อกแอป (App Shield) เท่านั้น
+PureLock ใช้ AccessibilityService API เพื่อฟีเจอร์ล็อกแอป (App Shield) เท่านั้น
 
-• วัตถุประสงค์: PureLock ตรวจสอบการเปลี่ยนแปลงสถานะหน้าต่าง (TYPE_WINDOW_STATE_CHANGED) เพื่อตรวจจับเมื่อมีการเปิดแอปที่ได้รับการปกป้อง และแสดงหน้าจอล็อกที่ปลอดภัย (PIN, รูปแบบ หรือไบโอเมตริกซ์) ในทันที
-• การปกป้องความเป็นส่วนตัว: PureLock จะไม่เข้าถึง บันทึก หรืออ่านเนื้อหาบนหน้าจอ การกดแป้นพิมพ์ รหัสผ่าน หรือข้อความส่วนตัวใดๆ ทั้งสิ้น
-• ออฟไลน์ 100%: PureLock ทำงานแบบออฟไลน์ทั้งหมดและไม่มีการขอสิทธิ์เข้าถึงอินเทอร์เน็ต
+• วัตถุประสงค์: ตรวจจับการเปลี่ยนหน้าต่าง (TYPE_WINDOW_STATE_CHANGED) เพื่อรู้เมื่อแอปที่ปกป้องเปิดขึ้นและแสดงหน้าจอล็อกทันที (PIN, รูปแบบ, Knock Code หรือไบโอเมตริกซ์)
+• ความเป็นส่วนตัว: ไม่อ่าน บันทึก หรือเข้าถึงเนื้อหาหน้าจอ การพิมพ์ รหัสผ่าน หรือข้อความส่วนตัวใดๆ (ปิดใช้งาน canRetrieveWindowContent)
+• ไม่เก็บข้อมูลส่วนบุคคล: PureLock ไม่เก็บรวบรวม อัปโหลด หรือส่งข้อมูลตู้เซฟ การใช้งานแอป หรือรหัสผ่านของคุณ
+
+สิทธิ์การเข้าถึงนี้เป็นทางเลือก ขอเฉพาะเมื่อเปิดใช้ App Shield และสามารถเปิด/ปิดได้ตลอดเวลาในการตั้งค่าการเข้าถึงของอุปกรณ์
 ```
 
 ### 🇸🇦 Arabic (العربية)
@@ -243,11 +275,13 @@ PureLock ใช้ AccessibilityService API เพื่อมอบคุณส
 ────────────────────────────────────────
 إفصاح استخدام واجهة ACCESSIBILITY SERVICE API
 ────────────────────────────────────────
-يستخدم PureLock واجهة AccessibilityService API حصرياً لتقديم ميزة قفل التطبيقات الرئيسية (App Shield).
+يستخدم PureLock واجهة AccessibilityService API حصرياً لتوفير ميزة قفل التطبيقات الرئيسية (App Shield).
 
-• آلية الاستخدام: يراقب PureLock أحداث تغيير حالة النوافذ (TYPE_WINDOW_STATE_CHANGED) فقط لاكتشاف فتح أي تطبيق محمي في الواجهة الأمامية، وعرض شاشة القفل الآمنة فوراً (رمز PIN أو النمط أو البصمة).
-• حماية الخصوصية: لا يقوم PureLock بقراءة أو تسجيل أو الوصول إلى أي محتوى من الشاشة أو ضغطات المفاتيح أو كلمات المرور أو الرسائل الشخصية.
-• عدم جمع البيانات: يعمل PureLock بنسبة 100% دون اتصال بالإنترنت (Offline) ولا يطلب أي إذن للوصول للإنترنت.
+• آلية الاستخدام: يراقب PureLock أحداث تغيير حالة النوافذ (TYPE_WINDOW_STATE_CHANGED) فقط لاكتشاف فتح تطبيق محمي وعرض شاشة القفل الآمنة فوراً (PIN أو النمط أو Knock Code أو البصمة).
+• حماية الخصوصية: لا يقرأ PureLock أو يسجل أو يصل إلى محتوى الشاشة أو ضغطات المفاتيح أو كلمات المرور أو الرسائل الشخصية (تم تعطيل canRetrieveWindowContent).
+• عدم جمع البيانات: لا يجمع PureLock أو يرفع أو ينقل بيانات خزنتك أو استخدام التطبيقات أو بيانات اعتمادك.
+
+هذا الإذن اختياري ولا يُطلب إلا عند تفعيل App Shield، ويمكن تفعيله أو إيقافه في أي وقت من إعدادات إمكانية الوصول.
 ```
 
 ---
@@ -255,17 +289,20 @@ PureLock ใช้ AccessibilityService API เพื่อมอบคุณส
 ## 5. Play Console Step-by-Step Checklist
 1. **Main Store Listing**:
    - Go to **Play Console** -> **Grow** -> **Store presence** -> **Main store listing**.
-   - Paste the disclosure block into the **Full description** for the default language.
-   - Switch language tabs under **Manage translations** and paste the matching localized block into each translated Full Description.
+   - Import or copy localized fields from `store_listing.csv` (30 validated locales).
+   - Verify the English and translated Full Descriptions retain the complete AccessibilityService disclosure block.
 2. **App Content Declaration**:
    - Go to **Policy and programs** -> **App content** -> **Accessibility services**.
    - Answer **Yes** to using AccessibilityService API.
    - Answer **No** to `isAccessibilityTool`.
    - Add your unlisted video demo link showing: *Disclosure Dialog -> Enable in Accessibility Settings -> Opening a locked app -> Lock screen appears*.
-3. **Overlay (SYSTEM_ALERT_WINDOW) Declaration**:
+3. **Data Safety & Advertising ID**:
+   - PureLock includes **zero analytics, zero crashlytics, zero ads, and zero Advertising ID** SDKs.
+   - Optional voluntary supporter donations use Google Play Billing Library 8.3.0 (`com.android.vending.BILLING`).
+4. **Overlay (`SYSTEM_ALERT_WINDOW`) Declaration**:
    - Go to **Policy and programs** -> **App content** -> **Special app access** (if prompted).
-   - Core purpose: Displaying the privacy PIN/pattern lock overlay immediately on top of protected apps when launched.
-4. **Publish / Resubmit**:
+   - Core purpose: Displaying the privacy PIN/pattern/knock/biometric lock overlay immediately on top of protected apps when launched.
+5. **Publish / Resubmit**:
    - Save all changes and submit your update for review.
 
 ---
@@ -290,10 +327,14 @@ PureLock ใช้ AccessibilityService API เพื่อมอบคุณส
 - **Reviewer Justification**: PureLock only queries user-launchable apps that the user may want to select for privacy locking, respecting user privacy and adhering 100% to Google Play's Package Visibility policy without needing high-risk permission exceptions.
 
 ### B. Display Over Other Apps (`SYSTEM_ALERT_WINDOW`)
-- **Core Functionality**: When a protected application is brought to the foreground, PureLock's accessibility service launches the `LockOverlayActivity` to obstruct unauthorized viewing.
+- **Core Functionality**: When a protected application is brought to the foreground, PureLock's accessibility service launches the `LockOverlayActivity` (with `FLAG_SECURE`) to obstruct unauthorized viewing.
 - **Zero-Cloud & Zero-Ad Guarantee**: Overlay is never used for advertising, popups, or deceptive clicks. It serves exclusively as a security shield.
 
-### C. Android 13+ Restricted Settings Resolution Guide
+### C. Zero-Telemetry & Local Storage Policy (`allowBackup="false"`)
+- PureLock removes all third-party analytics, crash-reporting, and network-tracking SDKs.
+- Android cloud auto-backup is disabled (`android:allowBackup="false"`) so encrypted databases and Keystore material stay strictly on-device unless explicitly exported by the user via AES-256-GCM encrypted `.plk` offline backups.
+
+### D. Android 13+ Restricted Settings Resolution Guide
 For users who sideload or test APKs prior to Play Store installation:
 1. Android 13+ blocks Accessibility Services for non-store installations by default with a "Restricted setting" dialog.
 2. In-app guide directs users: **App Info -> Top-right menu (⋮) -> Allow restricted settings -> Authenticate -> Return to PureLock to enable Accessibility**.

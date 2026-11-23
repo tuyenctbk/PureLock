@@ -101,6 +101,21 @@ internal fun findCollinearMidpoint(from: Int, to: Int): Int? {
     }
 }
 
+/**
+ * Appends [node] to [currentNodes] while automatically inserting any unvisited collinear midpoint
+ * so Onboarding, Settings, and LockOverlay evaluate 3x3 patterns identically.
+ */
+internal fun appendPatternNodeWithMidpoint(currentNodes: List<Int>, node: Int): List<Int> {
+    if (node !in 1..9 || node in currentNodes) return currentNodes
+    val prev = currentNodes.lastOrNull()
+    val mid = if (prev != null) findCollinearMidpoint(prev, node) else null
+    return buildList(currentNodes.size + 2) {
+        addAll(currentNodes)
+        if (mid != null && mid !in currentNodes) add(mid)
+        add(node)
+    }
+}
+
 @Composable
 fun LockOverlayScreen(
     packageName: String,
@@ -813,16 +828,7 @@ fun LockOverlayScreen(
                                 hapticEnabled = isHapticFeedbackEnabled,
                                 onNodeSelected = { node ->
                                     if (lockoutRemainingSec > 0) return@PatternGridDrawer
-                                    if (!patternSelectedNodes.contains(node)) {
-                                        val prev = patternSelectedNodes.lastOrNull()
-                                        val mid = if (prev != null) findCollinearMidpoint(prev, node) else null
-                                        val nextList = buildList {
-                                            addAll(patternSelectedNodes)
-                                            if (mid != null && !contains(mid)) add(mid)
-                                            add(node)
-                                        }
-                                        patternSelectedNodes = nextList
-                                    }
+                                    patternSelectedNodes = appendPatternNodeWithMidpoint(patternSelectedNodes, node)
                                 },
                                 onPatternCompleted = {
                                     if (lockoutRemainingSec > 0 || patternSelectedNodes.isEmpty()) {
@@ -1239,6 +1245,7 @@ fun CalculatorDisguiseView(
 ) {
     var displayExpr by remember { mutableStateOf("") }
     var resultText by remember { mutableStateOf("0") }
+    var hasEvaluated by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
 
     fun handleEquals() {
@@ -1250,6 +1257,7 @@ fun CalculatorDisguiseView(
             onDuress()
         } else if (cleanInput.isNotEmpty()) {
             resultText = evaluateCalculatorExpression(cleanInput)
+            hasEvaluated = true
         }
     }
 
@@ -1257,6 +1265,7 @@ fun CalculatorDisguiseView(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .safeDrawingPadding()
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -1333,7 +1342,11 @@ fun CalculatorDisguiseView(
                         resultText
                     }
                     Text(
-                        text = if (displayExpr.isEmpty()) "0" else (if (resultText != "0" && displayExpr.contains(Regex("[-+×÷%]"))) displayResultText else displayExpr),
+                        text = when {
+                            displayExpr.isEmpty() -> "0"
+                            hasEvaluated -> displayResultText
+                            else -> displayExpr
+                        },
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1372,13 +1385,16 @@ fun CalculatorDisguiseView(
                                         "C" -> {
                                             displayExpr = ""
                                             resultText = "0"
+                                            hasEvaluated = false
                                         }
                                         "⌫" -> {
+                                            hasEvaluated = false
                                             if (displayExpr.isNotEmpty()) {
                                                 displayExpr = displayExpr.dropLast(1)
                                             }
                                         }
                                         "±" -> {
+                                            hasEvaluated = false
                                             if (displayExpr.startsWith("-")) {
                                                 displayExpr = displayExpr.drop(1)
                                             } else if (displayExpr.isNotEmpty()) {
@@ -1388,6 +1404,7 @@ fun CalculatorDisguiseView(
                                         "=" -> handleEquals()
                                         else -> {
                                             resultText = "0"
+                                            hasEvaluated = false
                                             displayExpr += key
                                         }
                                     }
@@ -1511,6 +1528,7 @@ fun FakeCrashDecoyView(
         modifier = Modifier
             .fillMaxSize()
             .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.85f))
+            .safeDrawingPadding()
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {

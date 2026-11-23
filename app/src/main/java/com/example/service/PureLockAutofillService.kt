@@ -25,14 +25,17 @@ import com.example.ui.LockOverlayActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 
 @RequiresApi(Build.VERSION_CODES.O)
 class PureLockAutofillService : AutofillService() {
 
     companion object {
         private val CREDENTIAL_CATEGORIES = setOf("PASSWORD", "PIN", "BANK_PIN", "CODE_2FA", "CREDENTIAL")
+        private val authRequestCodeCounter = AtomicInteger(10_000)
 
         /**
          * Ranks vault items for the target web domain / package name.
@@ -169,12 +172,6 @@ class PureLockAutofillService : AutofillService() {
             return
         }
 
-        val rootViewNode = structure.getWindowNodeAt(0)?.rootViewNode
-        if (rootViewNode == null) {
-            callback.onSuccess(null)
-            return
-        }
-
         val targetPackage = structure.activityComponent?.packageName?.lowercase() ?: ""
         // Never offer autofill inside PureLock's own lock/vault UI
         if (targetPackage == applicationContext.packageName.lowercase()) {
@@ -186,7 +183,11 @@ class PureLockAutofillService : AutofillService() {
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
 
-        findAutofillNodes(rootViewNode, usernameIds, passwordIds, webDomains)
+        // Inspect every window node in the AssistStructure (handles dialogs, popups, and WebViews)
+        for (i in 0 until structure.windowNodeCount) {
+            val rootNode = structure.getWindowNodeAt(i)?.rootViewNode ?: continue
+            findAutofillNodes(rootNode, usernameIds, passwordIds, webDomains)
+        }
 
         if (usernameIds.isEmpty() && passwordIds.isEmpty()) {
             callback.onSuccess(null)
@@ -197,8 +198,13 @@ class PureLockAutofillService : AutofillService() {
             try {
                 if (cancellationSignal.isCanceled) return@launch
                 val db = PureLockDatabase.getDatabase(applicationContext)
-                val activeCount = db.encryptedVaultDao().getActiveVaultItemsCountSync()
-                if (cancellationSignal.isCanceled || activeCount == 0) {
+                val activeItems = db.encryptedVaultDao().getActiveVaultItems().first()
+                val hasCandidates = selectAutofillCandidates(
+                    vaultItems = activeItems,
+                    webDomains = webDomains,
+                    targetPackage = targetPackage
+                ).isNotEmpty()
+                if (cancellationSignal.isCanceled || !hasCandidates) {
                     if (!cancellationSignal.isCanceled) callback.onSuccess(null)
                     return@launch
                 }
@@ -216,9 +222,10 @@ class PureLockAutofillService : AutofillService() {
 
                 val pendingIntentFlags = PendingIntent.FLAG_CANCEL_CURRENT or
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+                val requestCode = authRequestCodeCounter.incrementAndGet() and 0x7FFFFFFF
                 val authSender = PendingIntent.getActivity(
                     applicationContext,
-                    (System.currentTimeMillis() and 0x7FFFFFFFL).toInt(),
+                    requestCode,
                     authIntent,
                     pendingIntentFlags
                 ).intentSender
@@ -251,6 +258,11 @@ class PureLockAutofillService : AutofillService() {
 
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
         callback.onSuccess()
+    }
+
+    override fun onDestroy() {
+        serviceScope.cancel()
+        super.onDestroy()
     }
 
     private fun findAutofillNodes(

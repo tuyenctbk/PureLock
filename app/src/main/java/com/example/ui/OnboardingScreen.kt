@@ -344,9 +344,7 @@ private fun OnboardingStepSecuritySetup(
                         selectedNodes = patternNodes,
                         hidePath = false,
                         onNodeSelected = { node ->
-                            if (!patternNodes.contains(node)) {
-                                onPatternNodesChanged(patternNodes + node)
-                            }
+                            onPatternNodesChanged(appendPatternNodeWithMidpoint(patternNodes, node))
                         },
                         onPatternCompleted = {}
                     )

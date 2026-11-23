@@ -7,6 +7,7 @@ import com.example.service.PasswordGeneratorConfig
 import com.example.service.PasswordGeneratorService
 import com.example.service.PasswordStrength
 import com.example.service.PureLockAutofillService
+import com.example.ui.appendPatternNodeWithMidpoint
 import com.example.ui.computeLockoutCooldownSeconds
 import com.example.ui.evaluateCalculatorExpression
 import com.example.ui.findCollinearMidpoint
@@ -157,6 +158,21 @@ class PureLockSecurityLogicTest {
         assertNull(findCollinearMidpoint(1, 2))
         assertNull(findCollinearMidpoint(1, 6))
         assertNull(findCollinearMidpoint(4, 9))
+
+        // Shared pattern builder used across Onboarding, Settings, and LockOverlay
+        var nodes = listOf<Int>()
+        nodes = appendPatternNodeWithMidpoint(nodes, 1)
+        nodes = appendPatternNodeWithMidpoint(nodes, 3) // auto-inserts 2
+        nodes = appendPatternNodeWithMidpoint(nodes, 9) // auto-inserts 6
+        nodes = appendPatternNodeWithMidpoint(nodes, 7) // auto-inserts 8
+        nodes = appendPatternNodeWithMidpoint(nodes, 3) // duplicate ignored
+        assertEquals(listOf(1, 2, 3, 6, 9, 8, 7), nodes)
+    }
+
+    @Test
+    fun testCalculatorExpression_zeroResultEvaluatesCleanly() {
+        assertEquals("0", evaluateCalculatorExpression("5-5"))
+        assertEquals("0", evaluateCalculatorExpression("0×9"))
     }
 
     @Test
