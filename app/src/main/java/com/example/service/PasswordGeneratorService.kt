@@ -20,9 +20,11 @@ enum class PasswordStrength {
 
 class PasswordGeneratorService {
 
-    private val random = SecureRandom()
+    private val random: SecureRandom get() = sharedRandom
 
     companion object {
+        private val sharedRandom = SecureRandom()
+
         const val UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         const val LOWER = "abcdefghijklmnopqrstuvwxyz"
         const val DIGITS = "0123456789"
@@ -34,6 +36,8 @@ class PasswordGeneratorService {
         const val DIGITS_NO_AMBIGUOUS = "23456789"
         const val SYMBOLS_NO_AMBIGUOUS = "!@#$%^&*()_+-=[]{};:,.<>?"
 
+        private val defaultService = PasswordGeneratorService()
+
         fun generateSecurePassword(
             length: Int = 16,
             includeUppercase: Boolean = true,
@@ -42,8 +46,7 @@ class PasswordGeneratorService {
             includeSymbols: Boolean = true,
             excludeAmbiguous: Boolean = false
         ): String {
-            val service = PasswordGeneratorService()
-            return service.generatePassword(
+            return defaultService.generatePassword(
                 PasswordGeneratorConfig(
                     length = length,
                     includeUppercase = includeUppercase,
@@ -86,10 +89,12 @@ class PasswordGeneratorService {
             charPool.append(lowerPool)
         }
 
+        val targetLength = config.length.coerceAtLeast(1)
         val passwordChars = mutableListOf<Char>()
-        passwordChars.addAll(guaranteedChars)
+        guaranteedChars.shuffle(random)
+        passwordChars.addAll(guaranteedChars.take(targetLength))
 
-        val remainingLength = (config.length - guaranteedChars.size).coerceAtLeast(0)
+        val remainingLength = (targetLength - passwordChars.size).coerceAtLeast(0)
         val poolStr = charPool.toString()
         for (i in 0 until remainingLength) {
             passwordChars.add(poolStr[random.nextInt(poolStr.length)])

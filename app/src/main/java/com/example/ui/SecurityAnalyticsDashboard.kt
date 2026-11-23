@@ -71,10 +71,9 @@ fun SecurityAnalyticsDashboard(
     var inspectLog by remember { mutableStateOf<SecurityLogEntity?>(null) }
     var showChartInfoDialog by remember { mutableStateOf(false) }
 
-    val now = System.currentTimeMillis()
-
     // Filter logs by time
     val timeFilteredLogs = remember(securityLogs, selectedTimeRange) {
+        val now = System.currentTimeMillis()
         if (selectedTimeRange == TimeRangeFilter.ALL_TIME) {
             securityLogs
         } else {

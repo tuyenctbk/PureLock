@@ -22,27 +22,7 @@ object PermissionUtils {
      * Checks whether PureLockAccessibilityService is currently enabled in system accessibility settings.
      */
     fun isAccessibilityServiceEnabled(context: Context): Boolean {
-        val expectedServiceComponent = ComponentName(context, PureLockAccessibilityService::class.java).flattenToString()
-        val expectedShortComponent = "${context.packageName}/.service.PureLockAccessibilityService"
-
-        val enabledServicesSetting = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        ) ?: return false
-
-        val colonSplitter = TextUtils.SimpleStringSplitter(':')
-        colonSplitter.setString(enabledServicesSetting)
-
-        while (colonSplitter.hasNext()) {
-            val componentNameString = colonSplitter.next()
-            if (componentNameString.equals(expectedServiceComponent, ignoreCase = true) ||
-                componentNameString.equals(expectedShortComponent, ignoreCase = true) ||
-                componentNameString.contains(PureLockAccessibilityService::class.java.simpleName, ignoreCase = true)
-            ) {
-                return true
-            }
-        }
-        return false
+        return PermissionManager.isAccessibilityServiceEnabled(context)
     }
 
     /**
@@ -50,25 +30,14 @@ object PermissionUtils {
      * Required on Android 10+ to present LockOverlayActivity over third-party applications.
      */
     fun isOverlayPermissionGranted(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Settings.canDrawOverlays(context)
-        } else {
-            true
-        }
+        return PermissionManager.isOverlayPermissionGranted(context)
     }
 
     /**
      * Checks whether notification permissions are granted (Android 13+ / API 33).
      */
     fun isNotificationPermissionGranted(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
+        return PermissionManager.isNotificationPermissionGranted(context)
     }
 
     /**

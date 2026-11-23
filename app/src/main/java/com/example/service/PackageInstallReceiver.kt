@@ -62,14 +62,21 @@ class PackageInstallReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
             scope.launch {
                 try {
-                    val pm = context.packageManager
+                    val appContext = context.applicationContext
+                    val pm = appContext.packageManager
+                    val isLaunchable = pm.getLaunchIntentForPackage(packageName) != null ||
+                        pm.getLeanbackLaunchIntentForPackage(packageName) != null
+                    if (!isLaunchable) {
+                        return@launch
+                    }
+
                     val appInfo = pm.getApplicationInfo(packageName, 0)
                     val appName = pm.getApplicationLabel(appInfo).toString()
 
-                    val db = PureLockDatabase.getDatabase(context)
-                    val prefs = PureLockPreferences(context)
+                    val db = PureLockDatabase.getDatabase(appContext)
+                    val prefs = PureLockPreferences(appContext)
                     val repository = PureLockRepository(
-                        context,
+                        appContext,
                         db.appLockDao(),
                         db.intruderDao(),
                         db.logDao(),
@@ -80,18 +87,19 @@ class PackageInstallReceiver : BroadcastReceiver() {
                     )
 
                     val existing = db.appLockDao().getLockedAppByPackage(packageName)
-                    if (isReplacing && existing != null) {
-                        // Preserve lock state, category, and stats during app update; refresh label only
+                    if (existing != null) {
+                        // Preserve lock state, category, and stats during app update or re-index; refresh label only
                         db.appLockDao().upsertApp(existing.copy(appName = appName))
                         return@launch
                     }
 
                     val category = repository.categorizeApp(packageName, appName)
-                    val autoLock = existing?.isLocked ?: (category in listOf("FINANCIAL", "SOCIAL"))
+                    val autoLock = category in listOf("FINANCIAL", "SOCIAL")
                     repository.addNewlyInstalledApp(packageName, appName, category, autoLock)
+                    VaultWidgetProvider.requestUpdate(appContext)
 
                     if (!isReplacing) {
-                        sendNewAppNotification(context, packageName, appName, autoLock)
+                        sendNewAppNotification(appContext, packageName, appName, autoLock)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -120,7 +128,8 @@ class PackageInstallReceiver : BroadcastReceiver() {
         }
 
         val openAppIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("shortcut_action", "VIEW_SHIELD")
         }
         val pendingIntent = PendingIntent.getActivity(
             context,

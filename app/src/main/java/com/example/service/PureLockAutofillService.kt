@@ -1,11 +1,13 @@
 package com.example.service
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.CancellationSignal
 import android.service.autofill.AutofillService
 import android.service.autofill.Dataset
 import android.service.autofill.FillCallback
-import android.service.autofill.FillContext
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
 import android.service.autofill.SaveCallback
@@ -18,13 +20,136 @@ import com.example.R
 import com.example.data.PureLockDatabase
 import com.example.data.PureLockPreferences
 import com.example.data.PureLockRepository
+import com.example.data.model.EncryptedVaultEntity
+import com.example.ui.LockOverlayActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 class PureLockAutofillService : AutofillService() {
+
+    companion object {
+        private val CREDENTIAL_CATEGORIES = setOf("PASSWORD", "PIN", "BANK_PIN", "CODE_2FA", "CREDENTIAL")
+
+        /**
+         * Ranks vault items for the target web domain / package name.
+         * Never leaks generic notes or unrelated secrets when direct domain/package matches exist.
+         */
+        internal fun selectAutofillCandidates(
+            vaultItems: List<EncryptedVaultEntity>,
+            webDomains: Set<String>,
+            targetPackage: String,
+            maxResults: Int = 5
+        ): List<EncryptedVaultEntity> {
+            val normalizedPkg = targetPackage.lowercase().trim()
+            val pkgToken = normalizedPkg.substringAfterLast('.')
+            val normalizedDomains = webDomains.map { it.lowercase().trim() }.filter { it.isNotBlank() }
+
+            val scored = vaultItems.map { item ->
+                val itemSite = item.websiteOrApp.lowercase()
+                val itemTitle = item.title.lowercase()
+                val catUpper = item.category.uppercase()
+                var matchScore = 0
+                if (normalizedDomains.any { d -> itemSite.contains(d) || itemTitle.contains(d) }) {
+                    matchScore += 100
+                }
+                if (normalizedPkg.isNotBlank()) {
+                    if (itemSite.contains(normalizedPkg) ||
+                        (pkgToken.length >= 3 && (itemSite.contains(pkgToken) || itemTitle.contains(pkgToken)))
+                    ) {
+                        matchScore += 50
+                    }
+                }
+                val isCredentialCategory = catUpper in CREDENTIAL_CATEGORIES
+                val rankScore = matchScore + (if (isCredentialCategory) 20 else 0) + (if (item.isFavorite) 5 else 0)
+                Triple(item, matchScore, rankScore)
+            }
+
+            // If we have exact domain/package matches, restrict strictly to those matches
+            val directMatches = scored.filter { it.second > 0 }
+                .sortedByDescending { it.third }
+                .map { it.first }
+            if (directMatches.isNotEmpty()) {
+                return directMatches.take(maxResults)
+            }
+
+            // Otherwise only offer credential-type entries (never raw personal notes) behind authentication
+            return scored
+                .filter { it.first.category.uppercase() in CREDENTIAL_CATEGORIES }
+                .sortedByDescending { it.third }
+                .map { it.first }
+                .take(maxResults)
+        }
+
+        /**
+         * Builds the unlocked FillResponse containing matching encrypted credential datasets.
+         * Must ONLY be called after Master Lock authentication succeeds in LockOverlayActivity.
+         */
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun buildAuthenticatedFillResponse(
+            context: Context,
+            vaultItems: List<EncryptedVaultEntity>,
+            usernameIds: List<AutofillId>,
+            passwordIds: List<AutofillId>,
+            webDomains: Set<String>,
+            targetPackage: String
+        ): FillResponse? {
+            if (usernameIds.isEmpty() && passwordIds.isEmpty()) return null
+            val candidates = selectAutofillCandidates(vaultItems, webDomains, targetPackage)
+            if (candidates.isEmpty()) return null
+
+            val fillResponseBuilder = FillResponse.Builder()
+            candidates.forEach { item ->
+                val localizedCategory = when (item.category.uppercase()) {
+                    "PASSWORD" -> context.getString(R.string.vault_filter_passwords)
+                    "PIN", "BANK_PIN" -> context.getString(R.string.vault_filter_pins)
+                    "CODE_2FA" -> context.getString(R.string.vault_filter_2fa)
+                    "CARD" -> context.getString(R.string.vault_filter_cards)
+                    "NOTE" -> context.getString(R.string.vault_filter_notes)
+                    "WORK" -> context.getString(R.string.category_work)
+                    "PERSONAL" -> context.getString(R.string.category_personal)
+                    "FINANCE" -> context.getString(R.string.category_finance)
+                    "CREDENTIAL" -> context.getString(R.string.category_credentials)
+                    "API_KEY" -> context.getString(R.string.category_api_keys)
+                    "RECOVERY_KEY" -> context.getString(R.string.category_recovery_keys)
+                    else -> item.category
+                }
+                val presentation = RemoteViews(context.packageName, android.R.layout.activity_list_item).apply {
+                    setImageViewResource(android.R.id.icon, R.drawable.splash_logo)
+                    setTextViewText(
+                        android.R.id.text1,
+                        context.getString(R.string.autofill_dataset_label, item.title, localizedCategory)
+                    )
+                }
+
+                @Suppress("DEPRECATION")
+                val datasetBuilder = Dataset.Builder(presentation)
+
+                if (usernameIds.isNotEmpty()) {
+                    val userValue = if (item.username.isNotBlank()) item.username else item.title
+                    usernameIds.forEach { id ->
+                        @Suppress("DEPRECATION")
+                        datasetBuilder.setValue(id, AutofillValue.forText(userValue))
+                    }
+                }
+
+                if (passwordIds.isNotEmpty()) {
+                    passwordIds.forEach { id ->
+                        @Suppress("DEPRECATION")
+                        datasetBuilder.setValue(id, AutofillValue.forText(item.secretContent))
+                    }
+                }
+
+                fillResponseBuilder.addDataset(datasetBuilder.build())
+            }
+            return fillResponseBuilder.build()
+        }
+    }
+
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onFillRequest(
         request: FillRequest,
@@ -51,6 +176,12 @@ class PureLockAutofillService : AutofillService() {
         }
 
         val targetPackage = structure.activityComponent?.packageName?.lowercase() ?: ""
+        // Never offer autofill inside PureLock's own lock/vault UI
+        if (targetPackage == applicationContext.packageName.lowercase()) {
+            callback.onSuccess(null)
+            return
+        }
+
         val webDomains = mutableSetOf<String>()
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
@@ -62,101 +193,48 @@ class PureLockAutofillService : AutofillService() {
             return
         }
 
-        val job = CoroutineScope(Dispatchers.IO).launch {
+        val job = serviceScope.launch {
             try {
                 if (cancellationSignal.isCanceled) return@launch
                 val db = PureLockDatabase.getDatabase(applicationContext)
-                val prefs = PureLockPreferences(applicationContext)
-                val repository = PureLockRepository(
-                    applicationContext,
-                    db.appLockDao(),
-                    db.intruderDao(),
-                    db.logDao(),
-                    db.scheduleRuleDao(),
-                    db.encryptedVaultDao(),
-                    db.userSettingDao(),
-                    prefs
-                )
-
-                val vaultItems = repository.activeVaultItems.first()
-                if (cancellationSignal.isCanceled) return@launch
-                if (vaultItems.isEmpty()) {
-                    callback.onSuccess(null)
+                val activeCount = db.encryptedVaultDao().getActiveVaultItemsCountSync()
+                if (cancellationSignal.isCanceled || activeCount == 0) {
+                    if (!cancellationSignal.isCanceled) callback.onSuccess(null)
                     return@launch
                 }
 
-                // Rank matching domain/package items and credential categories first
-                val rankedItems = vaultItems.sortedByDescending { item ->
-                    var score = 0
-                    val itemSite = item.websiteOrApp.lowercase()
-                    val itemTitle = item.title.lowercase()
-                    if (webDomains.any { d -> d.isNotBlank() && (itemSite.contains(d) || itemTitle.contains(d)) }) {
-                        score += 100
-                    }
-                    if (targetPackage.isNotBlank()) {
-                        val pkgToken = targetPackage.substringAfterLast('.')
-                        if (itemSite.contains(targetPackage) || (pkgToken.length >= 3 && (itemSite.contains(pkgToken) || itemTitle.contains(pkgToken)))) {
-                            score += 50
-                        }
-                    }
-                    if (item.category in listOf("PASSWORD", "PIN", "CODE_2FA")) score += 20
-                    if (item.isFavorite) score += 5
-                    score
+                // Always gate vault credentials behind Master Lock authentication before revealing datasets
+                val allAutofillIds = (usernameIds + passwordIds).distinct().toTypedArray()
+                val authIntent = Intent(applicationContext, LockOverlayActivity::class.java).apply {
+                    putExtra(LockOverlayActivity.EXTRA_LOCKED_PACKAGE, targetPackage.ifBlank { applicationContext.packageName })
+                    putExtra(LockOverlayActivity.EXTRA_AUTOFILL_AUTH_REQUEST, true)
+                    putParcelableArrayListExtra(LockOverlayActivity.EXTRA_AUTOFILL_USERNAME_IDS, ArrayList(usernameIds))
+                    putParcelableArrayListExtra(LockOverlayActivity.EXTRA_AUTOFILL_PASSWORD_IDS, ArrayList(passwordIds))
+                    putStringArrayListExtra(LockOverlayActivity.EXTRA_AUTOFILL_WEB_DOMAINS, ArrayList(webDomains))
+                    putExtra(LockOverlayActivity.EXTRA_AUTOFILL_TARGET_PACKAGE, targetPackage)
                 }
 
-                val fillResponseBuilder = FillResponse.Builder()
+                val pendingIntentFlags = PendingIntent.FLAG_CANCEL_CURRENT or
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+                val authSender = PendingIntent.getActivity(
+                    applicationContext,
+                    (System.currentTimeMillis() and 0x7FFFFFFFL).toInt(),
+                    authIntent,
+                    pendingIntentFlags
+                ).intentSender
 
-                rankedItems.take(5).forEach { item ->
-                    val localizedCategory = when (item.category.uppercase()) {
-                        "PASSWORD" -> getString(R.string.vault_filter_passwords)
-                        "PIN", "BANK_PIN" -> getString(R.string.vault_filter_pins)
-                        "CODE_2FA" -> getString(R.string.vault_filter_2fa)
-                        "CARD" -> getString(R.string.vault_filter_cards)
-                        "NOTE" -> getString(R.string.vault_filter_notes)
-                        "WORK" -> getString(R.string.category_work)
-                        "PERSONAL" -> getString(R.string.category_personal)
-                        "FINANCE" -> getString(R.string.category_finance)
-                        "CREDENTIAL" -> getString(R.string.category_credentials)
-                        "API_KEY" -> getString(R.string.category_api_keys)
-                        "RECOVERY_KEY" -> getString(R.string.category_recovery_keys)
-                        else -> item.category
-                    }
-                    val presentation = RemoteViews(packageName, android.R.layout.activity_list_item).apply {
-                        setImageViewResource(android.R.id.icon, R.drawable.splash_logo)
-                        setTextViewText(
-                            android.R.id.text1,
-                            getString(R.string.autofill_dataset_label, item.title, localizedCategory)
-                        )
-                    }
-
-                    @Suppress("DEPRECATION")
-                    val datasetBuilder = Dataset.Builder(presentation)
-
-                    if (usernameIds.isNotEmpty()) {
-                        val userValue = if (item.username.isNotBlank()) item.username else item.title
-                        usernameIds.forEach { id ->
-                            @Suppress("DEPRECATION")
-                            datasetBuilder.setValue(id, AutofillValue.forText(userValue))
-                        }
-                    }
-
-                    if (passwordIds.isNotEmpty()) {
-                        passwordIds.forEach { id ->
-                            @Suppress("DEPRECATION")
-                            datasetBuilder.setValue(id, AutofillValue.forText(item.secretContent))
-                        }
-                    }
-
-                    fillResponseBuilder.addDataset(datasetBuilder.build())
+                val authPresentation = RemoteViews(packageName, android.R.layout.activity_list_item).apply {
+                    setImageViewResource(android.R.id.icon, R.drawable.splash_logo)
+                    setTextViewText(android.R.id.text1, getString(R.string.autofill_service_label))
                 }
 
-                repository.logSecurityEvent(
-                    "AUTOFILL_REQUEST",
-                    "PureLock Autofill Service provided offline suggestion for ${rankedItems.take(5).size} encrypted secrets."
-                )
+                @Suppress("DEPRECATION")
+                val lockedResponse = FillResponse.Builder()
+                    .setAuthentication(allAutofillIds, authSender, authPresentation)
+                    .build()
 
                 if (!cancellationSignal.isCanceled) {
-                    callback.onSuccess(fillResponseBuilder.build())
+                    callback.onSuccess(lockedResponse)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

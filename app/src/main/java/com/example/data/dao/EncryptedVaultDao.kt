@@ -22,6 +22,9 @@ interface EncryptedVaultDao {
     @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 ORDER BY isPinned DESC, isFavorite DESC, updatedTimestamp DESC")
     fun getActiveVaultItems(): Flow<List<EncryptedVaultEntity>>
 
+    @Query("SELECT COUNT(*) FROM encrypted_vault_items WHERE isDeleted = 0")
+    suspend fun getActiveVaultItemsCountSync(): Int
+
     @Query("SELECT * FROM encrypted_vault_items WHERE isDeleted = 0 AND (title LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR websiteOrApp LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%') ORDER BY isPinned DESC, isFavorite DESC, updatedTimestamp DESC")
     fun searchActiveVaultItems(query: String): Flow<List<EncryptedVaultEntity>>
 

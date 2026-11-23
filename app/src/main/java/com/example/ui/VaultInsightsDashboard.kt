@@ -99,15 +99,26 @@ fun VaultInsightsDialog(
     val categoryCounts = categoryLabelCounts.mapKeys { (resId, _) -> stringResource(resId) }
 
     // Timeline breakdown (Creation & update frequency)
-    val now = System.currentTimeMillis()
-    val oneDayMs = 24L * 60 * 60 * 1000
-    val sevenDaysMs = 7L * oneDayMs
-    val thirtyDaysMs = 30L * oneDayMs
-
-    val past24hCount = remember(vaultItems) { vaultItems.count { now - it.timestamp <= oneDayMs } }
-    val past7dCount = remember(vaultItems) { vaultItems.count { now - it.timestamp in (oneDayMs + 1)..sevenDaysMs } }
-    val past30dCount = remember(vaultItems) { vaultItems.count { now - it.timestamp in (sevenDaysMs + 1)..thirtyDaysMs } }
-    val olderCount = remember(vaultItems) { vaultItems.count { now - it.timestamp > thirtyDaysMs } }
+    val (past24hCount, past7dCount, past30dCount, olderCount) = remember(vaultItems) {
+        val now = System.currentTimeMillis()
+        val oneDayMs = 24L * 60 * 60 * 1000
+        val sevenDaysMs = 7L * oneDayMs
+        val thirtyDaysMs = 30L * oneDayMs
+        var c24 = 0
+        var c7 = 0
+        var c30 = 0
+        var cOld = 0
+        for (item in vaultItems) {
+            val age = (now - item.timestamp).coerceAtLeast(0L)
+            when {
+                age <= oneDayMs -> c24++
+                age <= sevenDaysMs -> c7++
+                age <= thirtyDaysMs -> c30++
+                else -> cOld++
+            }
+        }
+        listOf(c24, c7, c30, cOld)
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,

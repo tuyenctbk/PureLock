@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.example.R
+import com.example.service.findActivity
 
 object SmartPromptsManager {
 
@@ -60,13 +61,14 @@ object SmartPromptsManager {
                 context.getString(R.string.share_app_text_format, packageName)
             )
         }
+        val hostActivity = context.findActivity()
         try {
             val chooser = Intent.createChooser(shareIntent, context.getString(R.string.share_app_chooser_title)).apply {
-                if (context !is android.app.Activity) {
+                if (hostActivity == null) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             }
-            context.startActivity(chooser)
+            (hostActivity ?: context).startActivity(chooser)
             FirebaseManager.logEvent("share_app_action")
         } catch (_: Exception) {
         }
@@ -74,23 +76,24 @@ object SmartPromptsManager {
 
     fun openPlayStoreForRating(context: Context) {
         val packageName = context.packageName
+        val hostActivity = context.findActivity()
         try {
             val marketIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                if (context !is android.app.Activity) {
+                if (hostActivity == null) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             }
-            context.startActivity(marketIntent)
+            (hostActivity ?: context).startActivity(marketIntent)
             FirebaseManager.logEvent("rate_app_action")
         } catch (_: Exception) {
             try {
                 val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")).apply {
-                    if (context !is android.app.Activity) {
+                    if (hostActivity == null) {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
                 }
-                context.startActivity(webIntent)
+                (hostActivity ?: context).startActivity(webIntent)
                 FirebaseManager.logEvent("rate_app_action")
             } catch (_: Exception) {
             }

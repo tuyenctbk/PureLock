@@ -913,12 +913,24 @@ fun VaultItemCard(
                     }
                 }
 
-                // Top Actions (Favorite, Edit/More)
+                // Top Actions (Pin, Favorite, Edit, Trash)
                 if (!isInTrash) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
+                        IconButton(
+                            onClick = onTogglePin,
+                            modifier = Modifier.size(32.dp).testTag("btn_pin_${item.id}")
+                        ) {
+                            Icon(
+                                imageVector = if (item.isPinned) Icons.Default.PushPin else Icons.Outlined.PushPin,
+                                contentDescription = stringResource(R.string.cd_pinned),
+                                tint = if (item.isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+
                         IconButton(
                             onClick = onToggleFavorite,
                             modifier = Modifier.size(32.dp).testTag("btn_fav_${item.id}")

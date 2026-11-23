@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- Never upload encrypted local vault database or hardware-wrapped keys to cloud backup -->
+    <!-- Never upload encrypted local vault database, DataStore credentials, backups, or hardware-wrapped keys to cloud backup -->
     <exclude domain="database" path="purelock_privacy_encrypted.db" />
     <exclude domain="database" path="purelock_privacy_encrypted.db-wal" />
     <exclude domain="database" path="purelock_privacy_encrypted.db-shm" />
     <exclude domain="sharedpref" path="purelock_sec_vault.xml" />
     <exclude domain="sharedpref" path="pure_lock_checksum_prefs.xml" />
+    <exclude domain="file" path="datastore/" />
+    <exclude domain="file" path="backups/" />
 </full-backup-content>

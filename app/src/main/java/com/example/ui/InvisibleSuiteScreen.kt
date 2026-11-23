@@ -1,7 +1,13 @@
 package com.example.ui
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,16 +56,63 @@ fun InvisibleSuiteScreen(
     val intruderCapture by viewModel.intruderCapture.collectAsState()
     val biometricEnabled by viewModel.biometricEnabled.collectAsState()
     val clipboardAutoClearSec by viewModel.clipboardAutoClearSec.collectAsState()
+    val trashPurgeDays by viewModel.trashPurgeDays.collectAsState()
+    val lastBackupTimestamp by viewModel.lastBackupTimestamp.collectAsState()
     val donationEngagementState by viewModel.donationEngagementState.collectAsState()
     val donationBillingState by viewModel.donationBillingState.collectAsState()
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var infoDialogTitle by remember { mutableStateOf<String?>(null) }
     var infoDialogMessage by remember { mutableStateOf<String?>(null) }
     var showSupportDialog by remember { mutableStateOf(false) }
 
     var showChangePinDialog by remember { mutableStateOf(false) }
-    var newPinInput by remember { mutableStateOf(masterPin) }
+    var newPinInput by remember { mutableStateOf("") }
+    var confirmNewPinInput by remember { mutableStateOf("") }
+    var changePinError by remember { mutableStateOf<String?>(null) }
+
+    var showExportBackupDialog by remember { mutableStateOf(false) }
+    var exportPassphrase by remember { mutableStateOf("") }
+    var pendingExportPassphrase by remember { mutableStateOf<String?>(null) }
+
+    var showImportBackupDialog by remember { mutableStateOf(false) }
+    var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
+    var importPassphrase by remember { mutableStateOf("") }
+    var isBackupBusy by remember { mutableStateOf(false) }
+
+    val exportBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri ->
+        val pass = pendingExportPassphrase
+        pendingExportPassphrase = null
+        if (uri != null && !pass.isNullOrEmpty()) {
+            isBackupBusy = true
+            coroutineScope.launch {
+                val ok = try {
+                    viewModel.exportEncryptedBackupToUri(uri, pass)
+                } finally {
+                    isBackupBusy = false
+                }
+                val msg = if (ok) {
+                    context.getString(R.string.export_file_success, uri.lastPathSegment ?: "purelock_backup.plk")
+                } else {
+                    context.getString(R.string.import_file_error)
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    val importBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            pendingImportUri = uri
+            importPassphrase = ""
+            showImportBackupDialog = true
+        }
+    }
 
     var showChangePatternDialog by remember { mutableStateOf(false) }
     var newPatternNodes by remember { mutableStateOf(listOf<Int>()) }
@@ -213,6 +266,8 @@ fun InvisibleSuiteScreen(
                             }
                             else -> {
                                 newPinInput = ""
+                                confirmNewPinInput = ""
+                                changePinError = null
                                 showChangePinDialog = true
                             }
                         }
@@ -683,6 +738,97 @@ fun InvisibleSuiteScreen(
                         }
                     }
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                // Trash Auto-Purge Period
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.trash_purge),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = stringResource(R.string.trash_banner_info, trashPurgeDays),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(7, 14, 30, 90).forEach { days ->
+                            FilterChip(
+                                selected = trashPurgeDays == days,
+                                onClick = { viewModel.setTrashPurgeDays(days) },
+                                label = { Text("${days}d", fontSize = 11.sp) },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("chip_trash_purge_$days")
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Section 5: Encrypted Offline Backup (.plk) & Android Autofill
+            SettingsSectionCard(title = stringResource(R.string.suite_export_backup_title)) {
+                val backupDateFormatted = remember(lastBackupTimestamp) {
+                    if (lastBackupTimestamp > 0L) {
+                        java.text.SimpleDateFormat("MMM dd, yyyy • HH:mm", java.util.Locale.getDefault())
+                            .format(java.util.Date(lastBackupTimestamp))
+                    } else null
+                }
+
+                SettingsActionRow(
+                    icon = Icons.Default.FileUpload,
+                    title = stringResource(R.string.suite_export_backup_title),
+                    subtitle = backupDateFormatted ?: stringResource(R.string.suite_export_backup_desc),
+                    onClick = {
+                        if (!isBackupBusy) {
+                            exportPassphrase = ""
+                            showExportBackupDialog = true
+                        }
+                    },
+                    testTag = "btn_export_encrypted_backup"
+                )
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                SettingsActionRow(
+                    icon = Icons.Default.FileDownload,
+                    title = stringResource(R.string.suite_import_backup_title),
+                    subtitle = stringResource(R.string.suite_import_backup_desc),
+                    onClick = {
+                        if (!isBackupBusy) {
+                            com.example.util.PermissionManager.recordSettingsOpened()
+                            importBackupLauncher.launch(arrayOf("*/*"))
+                        }
+                    },
+                    testTag = "btn_import_encrypted_backup"
+                )
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                    SettingsActionRow(
+                        icon = Icons.Default.Password,
+                        title = stringResource(R.string.autofill_title),
+                        subtitle = stringResource(R.string.autofill_desc),
+                        onClick = {
+                            com.example.util.PermissionManager.recordSettingsOpened()
+                            try {
+                                val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                                    data = Uri.parse("package:${context.packageName}")
+                                }
+                                context.startActivity(intent)
+                            } catch (_: Exception) {
+                                com.example.util.PermissionManager.openAppSettings(context)
+                            }
+                        },
+                        testTag = "btn_enable_autofill"
+                    )
+                }
             }
 
             // Static Permanent Support Development Section (Settings / About)
@@ -833,7 +979,7 @@ fun InvisibleSuiteScreen(
         )
     }
 
-    // Change Master PIN Dialog
+    // Change Master PIN Dialog (with mandatory confirmation to prevent accidental lockout)
     if (showChangePinDialog) {
         AlertDialog(
             onDismissRequest = { showChangePinDialog = false },
@@ -843,7 +989,13 @@ fun InvisibleSuiteScreen(
                     Text(stringResource(R.string.suite_set_master_pin_desc), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newPinInput,
-                        onValueChange = { if (it.length <= 8 && it.all { char -> char.isDigit() }) newPinInput = it },
+                        onValueChange = {
+                            if (it.length <= 8 && it.all { char -> char.isDigit() }) {
+                                newPinInput = it
+                                changePinError = null
+                            }
+                        },
+                        label = { Text(stringResource(R.string.onboarding_master_pin_label)) },
                         visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
@@ -851,16 +1003,48 @@ fun InvisibleSuiteScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().testTag("input_new_pin")
                     )
+                    OutlinedTextField(
+                        value = confirmNewPinInput,
+                        onValueChange = {
+                            if (it.length <= 8 && it.all { char -> char.isDigit() }) {
+                                confirmNewPinInput = it
+                                changePinError = null
+                            }
+                        },
+                        label = { Text(stringResource(R.string.onboarding_confirm_pin_label)) },
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                        ),
+                        isError = changePinError != null,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().testTag("input_confirm_new_pin")
+                    )
+                    if (changePinError != null) {
+                        Text(
+                            text = changePinError ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             },
             confirmButton = {
                 Button(
-                    enabled = newPinInput.length >= 4,
+                    enabled = newPinInput.length >= 4 && confirmNewPinInput.length >= 4,
                     onClick = {
-                        if (newPinInput.length >= 4) {
-                            viewModel.setMasterPin(newPinInput)
-                            showChangePinDialog = false
-                            Toast.makeText(context, context.getString(R.string.suite_master_pin_updated_toast), Toast.LENGTH_SHORT).show()
+                        when {
+                            newPinInput.length < 4 -> {
+                                changePinError = context.getString(R.string.onboarding_pin_min_length_error)
+                            }
+                            newPinInput != confirmNewPinInput -> {
+                                changePinError = context.getString(R.string.onboarding_pin_mismatch_error)
+                            }
+                            else -> {
+                                viewModel.setMasterPin(newPinInput)
+                                showChangePinDialog = false
+                                Toast.makeText(context, context.getString(R.string.suite_master_pin_updated_toast), Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 ) {
@@ -869,6 +1053,103 @@ fun InvisibleSuiteScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showChangePinDialog = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    // Export AES-256-GCM Encrypted .plk Backup Passphrase Dialog
+    if (showExportBackupDialog) {
+        AlertDialog(
+            onDismissRequest = { showExportBackupDialog = false },
+            icon = { Icon(Icons.Default.FileUpload, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            title = { Text(stringResource(R.string.suite_export_backup_title), fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.suite_export_backup_desc), style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(
+                        value = exportPassphrase,
+                        onValueChange = { exportPassphrase = it },
+                        label = { Text(stringResource(R.string.export_passphrase_label)) },
+                        placeholder = { Text(stringResource(R.string.export_passphrase_hint)) },
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().testTag("input_export_passphrase")
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    enabled = exportPassphrase.length >= 6,
+                    onClick = {
+                        pendingExportPassphrase = exportPassphrase
+                        showExportBackupDialog = false
+                        com.example.util.PermissionManager.recordSettingsOpened()
+                        exportBackupLauncher.launch("purelock_backup_${System.currentTimeMillis()}.plk")
+                    }
+                ) {
+                    Text(stringResource(R.string.export_btn_label))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExportBackupDialog = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    // Import AES-256-GCM Encrypted .plk Backup Passphrase Dialog
+    if (showImportBackupDialog && pendingImportUri != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showImportBackupDialog = false
+                pendingImportUri = null
+            },
+            icon = { Icon(Icons.Default.FileDownload, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            title = { Text(stringResource(R.string.suite_import_backup_title), fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.suite_import_backup_desc), style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(
+                        value = importPassphrase,
+                        onValueChange = { importPassphrase = it },
+                        label = { Text(stringResource(R.string.import_passphrase_label)) },
+                        placeholder = { Text(stringResource(R.string.import_passphrase_hint)) },
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().testTag("input_import_passphrase")
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    enabled = importPassphrase.isNotEmpty() && !isBackupBusy,
+                    onClick = {
+                        val uri = pendingImportUri ?: return@Button
+                        val pass = importPassphrase
+                        showImportBackupDialog = false
+                        pendingImportUri = null
+                        isBackupBusy = true
+                        coroutineScope.launch {
+                            val ok = try {
+                                viewModel.importEncryptedBackupFromUri(uri, pass)
+                            } finally {
+                                isBackupBusy = false
+                            }
+                            Toast.makeText(
+                                context,
+                                context.getString(if (ok) R.string.import_file_success else R.string.import_file_error),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.import_btn_label))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showImportBackupDialog = false
+                    pendingImportUri = null
+                }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

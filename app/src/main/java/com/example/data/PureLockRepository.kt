@@ -45,6 +45,7 @@ class PureLockRepository(
 
     val allLockedApps: Flow<List<LockedAppEntity>> = appLockDao.getAllLockedApps()
     val activeLockedApps: Flow<List<LockedAppEntity>> = appLockDao.getActiveLockedApps()
+    val activeLockedPackageNames: Flow<List<String>> = appLockDao.getActiveLockedPackageNames()
     val intruderSelfies: Flow<List<IntruderSelfieEntity>> = intruderDao.getAllIntruderSelfies()
     val securityLogs: Flow<List<SecurityLogEntity>> = logDao.getAllLogs()
     val scheduleRules: Flow<List<ScheduleRuleEntity>> = scheduleRuleDao.getAllRules()
@@ -98,6 +99,7 @@ class PureLockRepository(
         )
         encryptedVaultDao.insertVaultItem(item)
         logSecurityEvent("VAULT_ITEM_ADDED", "Encrypted $category credential stored in Room DB: $title")
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun updateEncryptedVaultItem(item: EncryptedVaultEntity) {
@@ -118,11 +120,13 @@ class PureLockRepository(
     suspend fun moveVaultItemToTrash(id: Long) {
         encryptedVaultDao.moveToTrash(id)
         logSecurityEvent("VAULT_ITEM_TRASHED", "Encrypted secret #$id moved to Trash Bin.")
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun restoreVaultItemFromTrash(id: Long) {
         encryptedVaultDao.restoreFromTrash(id)
         logSecurityEvent("VAULT_ITEM_RESTORED", "Encrypted secret #$id restored from Trash Bin.")
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun purgeTrashVault(purgeDays: Int) = withContext(Dispatchers.IO) {
@@ -141,6 +145,7 @@ class PureLockRepository(
     suspend fun deleteEncryptedVaultItem(id: Long) {
         encryptedVaultDao.deleteVaultItemById(id)
         logSecurityEvent("VAULT_ITEM_DELETED", "Encrypted item #$id permanently removed from local DB.")
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun initializeDefaultAppsIfNeeded() = withContext(Dispatchers.IO) {
@@ -222,8 +227,8 @@ class PureLockRepository(
                 packageName
             }
             val category = categorizeApp(packageName, appName)
-            // Lock sensitive categories by default
-            val defaultLocked = category in listOf("FINANCIAL", "SOCIAL", "SYSTEM")
+            // Lock sensitive Financial & Social categories by default; leave System/Dialer/Settings opt-in
+            val defaultLocked = category in listOf("FINANCIAL", "SOCIAL")
 
             result.add(
                 LockedAppEntity(
@@ -265,11 +270,17 @@ class PureLockRepository(
 
         return when {
             lowerPkg.contains("bank") || lowerPkg.contains("pay") || lowerPkg.contains("crypto") ||
-                    lowerPkg.contains("finance") || lowerPkg.contains("wallet") || lowerName.contains("bank") -> "FINANCIAL"
+                    lowerPkg.contains("finance") || lowerPkg.contains("wallet") || lowerPkg.contains("revolut") ||
+                    lowerPkg.contains("venmo") || lowerPkg.contains("binance") || lowerPkg.contains("coinbase") ||
+                    lowerPkg.contains("metamask") || lowerPkg.contains("authenticator") ||
+                    lowerName.contains("bank") || lowerName.contains("wallet") -> "FINANCIAL"
 
             lowerPkg.contains("whatsapp") || lowerPkg.contains("telegram") || lowerPkg.contains("instagram") ||
                     lowerPkg.contains("facebook") || lowerPkg.contains("twitter") || lowerPkg.contains("social") ||
-                    lowerPkg.contains("message") || lowerName.contains("chat") -> "SOCIAL"
+                    lowerPkg.contains("message") || lowerPkg.contains("messaging") || lowerPkg.contains("signal") ||
+                    lowerPkg.contains("discord") || lowerPkg.contains("snapchat") || lowerPkg.contains("tiktok") ||
+                    lowerPkg.contains("viber") || lowerPkg.contains("wechat") || lowerPkg.contains("gmail") ||
+                    lowerPkg.contains("outlook") || lowerPkg.contains("proton") || lowerName.contains("chat") -> "SOCIAL"
 
             lowerPkg.contains("settings") || lowerPkg.contains("vending") || lowerPkg.contains("camera") ||
                     lowerPkg.contains("gallery") || lowerPkg.contains("contact") || lowerPkg.contains("dialer") -> "SYSTEM"
@@ -277,7 +288,7 @@ class PureLockRepository(
             lowerPkg.contains("youtube") || lowerPkg.contains("netflix") || lowerPkg.contains("spotify") ||
                     lowerPkg.contains("media") || lowerPkg.contains("photo") || lowerPkg.contains("video") -> "MEDIA"
 
-            lowerPkg.contains("game") || lowerPkg.contains("play") -> "GAMES"
+            lowerPkg.contains("game") || lowerPkg.contains("roblox") || lowerPkg.contains("minecraft") -> "GAMES"
             else -> "OTHER"
         }
     }
@@ -291,6 +302,7 @@ class PureLockRepository(
                 details = "${app?.appName ?: packageName} lock state set to $isLocked"
             )
         )
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun toggleLockState(packageName: String, currentIsLocked: Boolean) {
@@ -305,6 +317,7 @@ class PureLockRepository(
                 details = "Updated $updatedCount apps lock status to $isLocked"
             )
         )
+        com.example.service.VaultWidgetProvider.requestUpdate(context)
     }
 
     suspend fun updateLastUnlocked(packageName: String) {
@@ -425,22 +438,27 @@ class PureLockRepository(
         }
 
         val existingMap = existing.associateBy { it.packageName }
-        val toUpsert = installed.map { installedApp ->
+        val toUpsert = mutableListOf<LockedAppEntity>()
+        for (installedApp in installed) {
             val prev = existingMap[installedApp.packageName]
-            if (prev != null) {
-                installedApp.copy(
-                    isLocked = prev.isLocked,
-                    unlockCount = prev.unlockCount,
-                    lastUnlockedTimestamp = prev.lastUnlockedTimestamp
+            if (prev == null) {
+                toUpsert.add(installedApp)
+            } else if (prev.appName != installedApp.appName || prev.category != installedApp.category) {
+                toUpsert.add(
+                    prev.copy(
+                        appName = installedApp.appName,
+                        category = installedApp.category
+                    )
                 )
-            } else {
-                installedApp
             }
         }
         if (toUpsert.isNotEmpty()) {
             appLockDao.upsertApps(toUpsert)
         }
 
+        if (removedCount > 0 || toUpsert.isNotEmpty()) {
+            com.example.service.VaultWidgetProvider.requestUpdate(context)
+        }
         if (removedCount > 0) {
             logSecurityEvent("APPS_SYNCED", "Synchronized installed apps: purged $removedCount uninstalled applications from database.")
         }
@@ -505,6 +523,7 @@ class PureLockRepository(
 
     suspend fun lockAllAndClearSessions() = withContext(Dispatchers.IO) {
         resetAllUnlockedSessions()
+        com.example.service.LockdownSignalBus.emitLockdown()
         logSecurityEvent("VAULT_LOCKDOWN", "Emergency lockdown triggered. All session tokens cleared.")
     }
 

@@ -35,6 +35,8 @@ class PureLockAccessibilityService : AccessibilityService() {
         @Volatile
         private var currentForegroundPackage: String? = null
 
+        fun getCurrentForegroundPackage(): String? = currentForegroundPackage
+
         fun onPackageUnlocked(packageName: String) {
             val now = System.currentTimeMillis()
             unlockedPackages[packageName] = now
@@ -63,6 +65,23 @@ class PureLockAccessibilityService : AccessibilityService() {
             currentForegroundPackage = null
             Log.d(TAG, "All active sessions cleared.")
         }
+
+        fun launchOverlayForPackage(context: Context, packageName: String) {
+            try {
+                val appContext = context.applicationContext
+                val intent = Intent(appContext, LockOverlayActivity::class.java).apply {
+                    addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    )
+                    putExtra(LockOverlayActivity.EXTRA_LOCKED_PACKAGE, packageName)
+                }
+                appContext.startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Unable to launch LockOverlayActivity for $packageName", e)
+            }
+        }
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -71,6 +90,10 @@ class PureLockAccessibilityService : AccessibilityService() {
     private var lastCheckedPackage: String? = null
     private var lastCheckTimestamp = 0L
 
+    @Volatile
+    private var cachedLockedPackages: Set<String> = emptySet()
+    @Volatile
+    private var lockedPackagesCacheReady: Boolean = false
     @Volatile
     private var cachedGracePeriodMs: Long = 30000L
     @Volatile
@@ -94,6 +117,7 @@ class PureLockAccessibilityService : AccessibilityService() {
                     updateShakeSensorState()
                     Log.d(TAG, "Screen off detected: Pausing shake sensor and clearing active unlock sessions")
                     clearAllSessions()
+                    LockdownSignalBus.emitLockdown()
                     serviceScope.launch {
                         try {
                             repositoryDeferred.await().resetAllUnlockedSessions()
@@ -161,19 +185,7 @@ class PureLockAccessibilityService : AccessibilityService() {
     }
 
     private fun launchOverlayActivity(packageName: String) {
-        try {
-            val intent = Intent(applicationContext, LockOverlayActivity::class.java).apply {
-                addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP
-                )
-                putExtra(LockOverlayActivity.EXTRA_LOCKED_PACKAGE, packageName)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Unable to launch LockOverlayActivity for $packageName", e)
-        }
+        launchOverlayForPackage(applicationContext, packageName)
     }
 
     override fun onCreate() {
@@ -202,6 +214,17 @@ class PureLockAccessibilityService : AccessibilityService() {
                 )
                 repositoryDeferred.complete(repo)
                 refreshImePackageCache()
+
+                launch {
+                    try {
+                        repo.activeLockedPackageNames.collect { lockedList ->
+                            cachedLockedPackages = lockedList.toHashSet()
+                            lockedPackagesCacheReady = true
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error collecting active locked packages", e)
+                    }
+                }
 
                 launch {
                     try {
@@ -306,6 +329,11 @@ class PureLockAccessibilityService : AccessibilityService() {
 
         // PureLock manages its own internal lock state via MainActivity
         if (packageName == applicationContext.packageName) return
+
+        // Fast-path O(1) in-memory filter: avoid hitting SQLCipher Room DB for unlocked apps & launchers
+        if (lockedPackagesCacheReady && packageName !in cachedLockedPackages) {
+            return
+        }
 
         // Check if package has an active, unexpired unlock session
         if (isPackageSessionValid(packageName, cachedGracePeriodMs)) {

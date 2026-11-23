@@ -51,12 +51,13 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Prevent plaintext screenshots, screen recording, and Recents thumbnails of the encrypted vault
+        window.setFlags(
+            android.view.WindowManager.LayoutParams.FLAG_SECURE,
+            android.view.WindowManager.LayoutParams.FLAG_SECURE
+        )
         enableEdgeToEdge()
         shortcutActionState.value = intent?.getStringExtra("shortcut_action")
-
-        // Perform periodic background checks
-        com.example.service.DatabaseChecksumManager(this).validateChecksumAndLog()
-        com.example.service.BackupHealthService(this).checkBackupHealth()
 
         viewModel.bindBillingSession(this)
         viewModel.recordAppLaunch()
@@ -68,11 +69,10 @@ class MainActivity : FragmentActivity() {
             val shakeSensitivity by viewModel.shakeSensitivity.collectAsState()
             val hapticFeedbackEnabled by viewModel.hapticFeedbackEnabled.collectAsState()
             val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState()
+            val hasSplashFinished by viewModel.hasSplashFinished.collectAsState()
+            val appAuthenticated by viewModel.isAuthenticated.collectAsState()
 
             PureLockTheme(themeMode = themeMode) {
-                var hasSplashFinished by remember { mutableStateOf(false) }
-                var appAuthenticated by remember { mutableStateOf(false) }
-                var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
@@ -85,6 +85,7 @@ class MainActivity : FragmentActivity() {
                         "VIEW_SHIELD" -> "shield"
                         "VIEW_INTRUDER" -> "intruder"
                         "VIEW_AUDIT" -> "audit"
+                        "VIEW_SETTINGS" -> "suite"
                         else -> "vault"
                     }
                 }
@@ -103,9 +104,7 @@ class MainActivity : FragmentActivity() {
                                 if (latestHapticEnabled) {
                                     com.example.service.ShakeToLockSensorController.triggerLockHapticFeedback(context)
                                 }
-                                appAuthenticated = false
-                                viewModel.cancelAutoLockTimer()
-                                viewModel.clearSensitiveState()
+                                viewModel.lockApp()
                                 viewModel.triggerEmergencySessionLockdown()
                                 viewModel.logSecurityEvent(
                                     "SHAKE_TO_LOCK",
@@ -150,7 +149,7 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                // Auto-Lock on App Background Movement & Screen-Off
+                // Auto-Lock on App Background Movement & Screen-Off (preserving session across configuration changes)
                 var appBackgroundTimestamp by remember { mutableLongStateOf(0L) }
 
                 DisposableEffect(lifecycleOwner) {
@@ -158,9 +157,7 @@ class MainActivity : FragmentActivity() {
                         override fun onReceive(c: android.content.Context?, intent: android.content.Intent?) {
                             if (intent?.action == android.content.Intent.ACTION_SCREEN_OFF) {
                                 if (latestAppAuthenticated) {
-                                    appAuthenticated = false
-                                    viewModel.cancelAutoLockTimer()
-                                    viewModel.clearSensitiveState()
+                                    viewModel.lockApp()
                                 }
                             }
                         }
@@ -176,7 +173,7 @@ class MainActivity : FragmentActivity() {
                     val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
                         when (event) {
                             androidx.lifecycle.Lifecycle.Event.ON_STOP -> {
-                                if (latestAppAuthenticated) {
+                                if (!isChangingConfigurations && latestAppAuthenticated) {
                                     appBackgroundTimestamp = System.currentTimeMillis()
                                     viewModel.cancelAutoLockTimer()
                                     if (!com.example.util.PermissionManager.isReturningFromSettings()) {
@@ -195,15 +192,13 @@ class MainActivity : FragmentActivity() {
                                     }
 
                                     if (latestAppAuthenticated && !returningFromSettings && elapsed >= timeoutMillis) {
-                                        appAuthenticated = false
-                                        viewModel.cancelAutoLockTimer()
-                                        viewModel.clearSensitiveState()
+                                        viewModel.lockApp()
                                         viewModel.logSecurityEvent(
                                             "BACKGROUND_AUTO_LOCK",
                                             "PureLock secured on background return. Master authentication required."
                                         )
                                     } else if (latestAppAuthenticated) {
-                                        lastInteractionTime = System.currentTimeMillis()
+                                        viewModel.resetAutoLockTimer()
                                     }
                                     appBackgroundTimestamp = 0L
                                 }
@@ -223,20 +218,10 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                // Inactivity Auto-Lock Loop using ViewModel Timer
-                val isAppAutoLocked by viewModel.isAppAutoLocked.collectAsState()
-
-                LaunchedEffect(isAppAutoLocked) {
-                    if (isAppAutoLocked) {
-                        appAuthenticated = false
-                    }
-                }
-
-                LaunchedEffect(appAuthenticated, inactivityTimeoutSec, lastInteractionTime) {
+                // Inactivity Auto-Lock Loop driven directly by ViewModel without triggering Compose recomposition per tap
+                LaunchedEffect(appAuthenticated, inactivityTimeoutSec) {
                     if (appAuthenticated && inactivityTimeoutSec > 0) {
-                        viewModel.onUserActivity {
-                            appAuthenticated = false
-                        }
+                        viewModel.resetAutoLockTimer()
                     } else if (!appAuthenticated) {
                         viewModel.cancelAutoLockTimer()
                     }
@@ -244,7 +229,7 @@ class MainActivity : FragmentActivity() {
 
                 if (isOnboardingCompleted == null || !hasSplashFinished) {
                     SecuritySplashScreen(
-                        onSplashFinished = { hasSplashFinished = true }
+                        onSplashFinished = { viewModel.markSplashFinished() }
                     )
                 } else {
                     AnimatedContent(
@@ -259,8 +244,6 @@ class MainActivity : FragmentActivity() {
                             com.example.ui.OnboardingScreen(
                                 onOnboardingComplete = { pin, securityType, pattern ->
                                     viewModel.completeOnboarding(pin, securityType, pattern)
-                                    appAuthenticated = true
-                                    lastInteractionTime = System.currentTimeMillis()
                                     viewModel.unlockApp()
                                 }
                             )
@@ -269,8 +252,6 @@ class MainActivity : FragmentActivity() {
                                 packageName = context.packageName,
                                 repository = viewModel.repository,
                                 onUnlocked = {
-                                    appAuthenticated = true
-                                    lastInteractionTime = System.currentTimeMillis()
                                     viewModel.unlockApp()
                                     viewModel.recordVaultUnlock()
                                 },
@@ -287,6 +268,7 @@ class MainActivity : FragmentActivity() {
                                     "VIEW_SHIELD" -> "shield"
                                     "VIEW_INTRUDER" -> "intruder"
                                     "VIEW_AUDIT" -> "audit"
+                                    "VIEW_SETTINGS" -> "suite"
                                     "VIEW_VAULT", "GENERATE_PASSWORD" -> "vault"
                                     else -> null
                                 }
@@ -311,10 +293,7 @@ class MainActivity : FragmentActivity() {
                                         awaitPointerEventScope {
                                             while (true) {
                                                 awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
-                                                val now = System.currentTimeMillis()
-                                                if (now - lastInteractionTime > 500L) {
-                                                    lastInteractionTime = now
-                                                }
+                                                viewModel.onUserActivity()
                                             }
                                         }
                                     }
@@ -341,7 +320,7 @@ class MainActivity : FragmentActivity() {
                                                 selected = currentRoute == "vault",
                                                 colors = navColors,
                                                 onClick = {
-                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    viewModel.onUserActivity()
                                                     navController.navigate("vault") {
                                                         popUpTo(navController.graph.findStartDestination().id) {
                                                             saveState = true
@@ -364,7 +343,7 @@ class MainActivity : FragmentActivity() {
                                                 selected = currentRoute == "shield",
                                                 colors = navColors,
                                                 onClick = {
-                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    viewModel.onUserActivity()
                                                     navController.navigate("shield") {
                                                         popUpTo(navController.graph.findStartDestination().id) {
                                                             saveState = true
@@ -387,7 +366,7 @@ class MainActivity : FragmentActivity() {
                                                 selected = currentRoute == "intruder",
                                                 colors = navColors,
                                                 onClick = {
-                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    viewModel.onUserActivity()
                                                     navController.navigate("intruder") {
                                                         popUpTo(navController.graph.findStartDestination().id) {
                                                             saveState = true
@@ -410,7 +389,7 @@ class MainActivity : FragmentActivity() {
                                                 selected = currentRoute == "suite",
                                                 colors = navColors,
                                                 onClick = {
-                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    viewModel.onUserActivity()
                                                     navController.navigate("suite") {
                                                         popUpTo(navController.graph.findStartDestination().id) {
                                                             saveState = true
@@ -433,7 +412,7 @@ class MainActivity : FragmentActivity() {
                                                 selected = currentRoute == "audit",
                                                 colors = navColors,
                                                 onClick = {
-                                                    lastInteractionTime = System.currentTimeMillis()
+                                                    viewModel.onUserActivity()
                                                     navController.navigate("audit") {
                                                         popUpTo(navController.graph.findStartDestination().id) {
                                                             saveState = true

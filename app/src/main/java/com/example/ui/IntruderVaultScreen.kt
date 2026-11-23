@@ -62,9 +62,11 @@ fun IntruderVaultScreen(
 
     val filteredNotes = remember(encryptedVaultItems, vaultSearchQuery) {
         encryptedVaultItems.filter { item ->
-            vaultSearchQuery.isEmpty() ||
+            vaultSearchQuery.isBlank() ||
                     item.title.contains(vaultSearchQuery, ignoreCase = true) ||
-                    item.secretContent.contains(vaultSearchQuery, ignoreCase = true)
+                    item.username.contains(vaultSearchQuery, ignoreCase = true) ||
+                    item.websiteOrApp.contains(vaultSearchQuery, ignoreCase = true) ||
+                    item.notes.contains(vaultSearchQuery, ignoreCase = true)
         }
     }
 
@@ -226,12 +228,7 @@ fun IntruderVaultScreen(
                                 key1 = selfie.photoData
                             ) {
                                 value = withContext(Dispatchers.IO) {
-                                    try {
-                                        val bytes = Base64.decode(selfie.photoData, Base64.DEFAULT)
-                                        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                                    } catch (_: Exception) {
-                                        null
-                                    }
+                                    decodeSampledBase64Bitmap(selfie.photoData, maxDimPx = 480)
                                 }
                             }
 
@@ -489,12 +486,7 @@ fun IntruderVaultScreen(
                         key1 = selfie.photoData
                     ) {
                         value = withContext(Dispatchers.IO) {
-                            try {
-                                val bytes = Base64.decode(selfie.photoData, Base64.DEFAULT)
-                                BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                            } catch (_: Exception) {
-                                null
-                            }
+                            decodeSampledBase64Bitmap(selfie.photoData, maxDimPx = 960)
                         }
                     }
 
@@ -644,10 +636,10 @@ fun IntruderVaultScreen(
             icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
             title = { Text(stringResource(R.string.delete_secret_dialog_title)) },
             text = { Text(stringResource(R.string.delete_secret_dialog_message, item.title)) },
-            confirmButton = {
+                    confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.deleteEncryptedVaultItem(item.id)
+                        viewModel.moveVaultItemToTrash(item.id)
                         itemToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
@@ -659,5 +651,25 @@ fun IntruderVaultScreen(
                 TextButton(onClick = { itemToDelete = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
+    }
+}
+
+private fun decodeSampledBase64Bitmap(
+    base64Data: String,
+    maxDimPx: Int
+): androidx.compose.ui.graphics.ImageBitmap? {
+    return try {
+        val bytes = Base64.decode(base64Data, Base64.DEFAULT)
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+        var sampleSize = 1
+        val maxSide = maxOf(bounds.outWidth, bounds.outHeight)
+        while (maxSide > 0 && maxSide / sampleSize > maxDimPx) {
+            sampleSize *= 2
+        }
+        val opts = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)?.asImageBitmap()
+    } catch (_: Exception) {
+        null
     }
 }

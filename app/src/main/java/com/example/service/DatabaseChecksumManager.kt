@@ -8,19 +8,24 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.io.File
 import java.security.MessageDigest
 
-class DatabaseChecksumManager(private val context: Context) {
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+class DatabaseChecksumManager(context: Context) {
+
+    private val appContext: Context = context.applicationContext
+
+    companion object {
+        private const val TAG = "ChecksumManager"
+        private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    }
 
     fun validateChecksumAndLog() {
         scope.launch {
             try {
-                val dbFile = context.getDatabasePath(PureLockDatabase.DATABASE_NAME)
+                val dbFile = appContext.getDatabasePath(PureLockDatabase.DATABASE_NAME)
                 if (!dbFile.exists()) return@launch
 
-                val isEncryptedOnDisk = PureLockDatabase.isEncryptedOnDisk(context)
+                val isEncryptedOnDisk = PureLockDatabase.isEncryptedOnDisk(appContext)
                 val digest = MessageDigest.getInstance("SHA-256")
                 val buffer = ByteArray(8192)
                 dbFile.inputStream().buffered().use { input ->
@@ -32,12 +37,12 @@ class DatabaseChecksumManager(private val context: Context) {
                 val hashBytes = digest.digest()
                 val currentChecksum = hashBytes.joinToString("") { "%02x".format(it) }
 
-                val prefs = context.getSharedPreferences("pure_lock_checksum_prefs", Context.MODE_PRIVATE)
+                val prefs = appContext.getSharedPreferences("pure_lock_checksum_prefs", Context.MODE_PRIVATE)
                 val savedChecksum = prefs.getString("last_checksum", null)
 
-                val dao = PureLockDatabase.getDatabase(context).logDao()
+                val dao = PureLockDatabase.getDatabase(appContext).logDao()
                 if (!isEncryptedOnDisk) {
-                    Log.w("ChecksumManager", "Database header verification warning: file is not SQLCipher-encrypted.")
+                    Log.w(TAG, "Database header verification warning: file is not SQLCipher-encrypted.")
                     dao.insertLog(
                         SecurityLogEntity(
                             action = "ENCRYPTION_WARNING",
@@ -54,12 +59,12 @@ class DatabaseChecksumManager(private val context: Context) {
                             details = "Initial SQLCipher DB checksum registered: ${currentChecksum.take(12)}..."
                         )
                     )
-                } else {
+                } else if (savedChecksum != currentChecksum) {
                     prefs.edit().putString("last_checksum", currentChecksum).apply()
-                    Log.i("ChecksumManager", "Encrypted database checksum verified: ${currentChecksum.take(12)}...")
+                    Log.i(TAG, "Encrypted database checksum updated: ${currentChecksum.take(12)}...")
                 }
             } catch (e: Exception) {
-                Log.e("ChecksumManager", "Error validating checksum", e)
+                Log.e(TAG, "Error validating checksum", e)
             }
         }
     }

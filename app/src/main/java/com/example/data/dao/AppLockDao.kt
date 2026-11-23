@@ -24,6 +24,12 @@ interface AppLockDao {
     @Query("SELECT COUNT(*) FROM locked_apps WHERE isLocked = 1")
     fun getActiveLockedAppsCount(): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM locked_apps WHERE isLocked = 1")
+    suspend fun getActiveLockedAppsCountSync(): Int
+
+    @Query("SELECT packageName FROM locked_apps WHERE isLocked = 1")
+    fun getActiveLockedPackageNames(): Flow<List<String>>
+
     @Query("SELECT * FROM locked_apps WHERE isLocked = 1")
     suspend fun getActiveLockedAppsSync(): List<LockedAppEntity>
 

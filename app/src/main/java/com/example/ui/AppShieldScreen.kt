@@ -1,7 +1,9 @@
 package com.example.ui
 
+import android.util.LruCache
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,8 +11,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
@@ -20,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -32,6 +38,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.model.LockedAppEntity
+import com.example.data.model.ScheduleRuleEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.Locale
+
+private object AppIconCache {
+    private val cache = LruCache<String, ImageBitmap>(96)
+
+    fun get(packageName: String): ImageBitmap? = synchronized(cache) { cache.get(packageName) }
+
+    fun put(packageName: String, icon: ImageBitmap) = synchronized(cache) { cache.put(packageName, icon) }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +60,7 @@ fun AppShieldScreen(
     val context = LocalContext.current
     val allApps by viewModel.allApps.collectAsState()
     val activeCount by viewModel.activeLockedAppsCount.collectAsState()
+    val scheduleRules by viewModel.scheduleRules.collectAsState()
     val isSyncingApps by viewModel.isSyncingApps.collectAsState()
     val haptic = LocalHapticFeedback.current
 
@@ -50,6 +69,7 @@ fun AppShieldScreen(
     var selectedStatusFilter by remember { mutableStateOf("ALL") } // "ALL", "LOCKED", "UNLOCKED"
     var showInfoDialog by remember { mutableStateOf(false) }
     var showPermGuideDialog by remember { mutableStateOf(false) }
+    var showSchedulesDialog by remember { mutableStateOf(false) }
 
     val categories = listOf("ALL", "FINANCIAL", "SOCIAL", "SYSTEM", "MEDIA", "GAMES", "OTHER")
 
@@ -162,6 +182,11 @@ fun AppShieldScreen(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             viewModel.setAllAppsLockState(true)
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.shield_all_apps_locked_toast, allApps.size),
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
                         },
                         modifier = Modifier
                             .size(38.dp)
@@ -182,6 +207,11 @@ fun AppShieldScreen(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             viewModel.setAllAppsLockState(false)
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.shield_all_apps_unlocked_toast),
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
                         },
                         modifier = Modifier
                             .size(38.dp)
@@ -193,6 +223,26 @@ fun AppShieldScreen(
                             imageVector = Icons.Default.LockOpen,
                             contentDescription = stringResource(R.string.shield_unlock_all),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    // Custom Lock Schedules quick action
+                    IconButton(
+                        onClick = { showSchedulesDialog = true },
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (scheduleRules.any { it.isEnabled }) MaterialTheme.colorScheme.primaryContainer
+                                else MaterialTheme.colorScheme.surfaceVariant
+                            )
+                            .testTag("btn_shield_schedules")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = stringResource(R.string.shield_custom_schedule_title),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -471,6 +521,17 @@ fun AppShieldScreen(
             onDismissRequest = { showPermGuideDialog = false }
         )
     }
+
+    if (showSchedulesDialog) {
+        CustomScheduleRulesDialog(
+            apps = allApps,
+            rules = scheduleRules,
+            onAddRule = { rule -> viewModel.addScheduleRule(rule) },
+            onToggleRule = { id, enabled -> viewModel.toggleScheduleRule(id, enabled) },
+            onDeleteRule = { id -> viewModel.deleteScheduleRule(id) },
+            onDismiss = { showSchedulesDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -478,8 +539,27 @@ private fun AppShieldItemCard(
     app: LockedAppEntity,
     onToggle: () -> Unit
 ) {
+    val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary
     val haptic = LocalHapticFeedback.current
+
+    val appIcon by produceState<ImageBitmap?>(
+        initialValue = AppIconCache.get(app.packageName),
+        key1 = app.packageName
+    ) {
+        if (value == null) {
+            value = withContext(Dispatchers.IO) {
+                try {
+                    val drawable = context.packageManager.getApplicationIcon(app.packageName)
+                    drawableToBitmap(drawable, maxSizePx = 96).asImageBitmap().also {
+                        AppIconCache.put(app.packageName, it)
+                    }
+                } catch (_: Exception) {
+                    null
+                }
+            }
+        }
+    }
 
     Surface(
         color = if (app.isLocked) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
@@ -509,7 +589,7 @@ private fun AppShieldItemCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                // Category Icon
+                // Real Installed App Icon (cached off main thread) with category fallback
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -520,20 +600,31 @@ private fun AppShieldItemCard(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    val categoryIcon = when (app.category) {
-                        "FINANCIAL" -> Icons.Default.AccountBalance
-                        "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
-                        "SYSTEM" -> Icons.Default.Build
-                        "MEDIA" -> Icons.Default.PlayCircle
-                        "GAMES" -> Icons.Default.SportsEsports
-                        else -> Icons.Default.Apps
+                    val loadedIcon = appIcon
+                    if (loadedIcon != null) {
+                        Image(
+                            bitmap = loadedIcon,
+                            contentDescription = app.appName,
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                        )
+                    } else {
+                        val categoryIcon = when (app.category) {
+                            "FINANCIAL" -> Icons.Default.AccountBalance
+                            "SOCIAL" -> Icons.AutoMirrored.Filled.Chat
+                            "SYSTEM" -> Icons.Default.Build
+                            "MEDIA" -> Icons.Default.PlayCircle
+                            "GAMES" -> Icons.Default.SportsEsports
+                            else -> Icons.Default.Apps
+                        }
+                        Icon(
+                            imageVector = categoryIcon,
+                            contentDescription = null,
+                            tint = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
-                    Icon(
-                        imageVector = categoryIcon,
-                        contentDescription = null,
-                        tint = if (app.isLocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
@@ -646,4 +737,232 @@ fun AnimatedLockToggleIcon(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomScheduleRulesDialog(
+    apps: List<LockedAppEntity>,
+    rules: List<ScheduleRuleEntity>,
+    onAddRule: (ScheduleRuleEntity) -> Unit,
+    onToggleRule: (Long, Boolean) -> Unit,
+    onDeleteRule: (Long) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val lockedApps = remember(apps) { apps.filter { it.isLocked }.ifEmpty { apps } }
+    var showAddForm by remember { mutableStateOf(false) }
+    var selectedApp by remember(lockedApps) { mutableStateOf(lockedApps.firstOrNull()) }
+    var appDropdownExpanded by remember { mutableStateOf(false) }
+    var startHour by remember { mutableIntStateOf(22) }
+    var endHour by remember { mutableIntStateOf(7) }
+    val allDayTokens = remember { listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN") }
+    var selectedDays by remember { mutableStateOf(allDayTokens.toSet()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        title = {
+            Text(
+                text = stringResource(R.string.shield_custom_schedule_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.shield_schedule_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+
+                if (showAddForm && lockedApps.isNotEmpty()) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Box {
+                                OutlinedButton(
+                                    onClick = { appDropdownExpanded = true },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = selectedApp?.appName ?: "",
+                                        maxLines = 1,
+                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                }
+                                DropdownMenu(
+                                    expanded = appDropdownExpanded,
+                                    onDismissRequest = { appDropdownExpanded = false }
+                                ) {
+                                    lockedApps.forEach { app ->
+                                        DropdownMenuItem(
+                                            text = { Text(app.appName) },
+                                            onClick = {
+                                                selectedApp = app
+                                                appDropdownExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(stringResource(R.string.shield_start_time), style = MaterialTheme.typography.labelSmall)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { startHour = (startHour + 23) % 24 }, modifier = Modifier.size(30.dp)) {
+                                            Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        }
+                                        Text(String.format(Locale.US, "%02d:00", startHour), fontWeight = FontWeight.Bold)
+                                        IconButton(onClick = { startHour = (startHour + 1) % 24 }, modifier = Modifier.size(30.dp)) {
+                                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        }
+                                    }
+                                }
+                                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(stringResource(R.string.shield_end_time), style = MaterialTheme.typography.labelSmall)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { endHour = (endHour + 23) % 24 }, modifier = Modifier.size(30.dp)) {
+                                            Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        }
+                                        Text(String.format(Locale.US, "%02d:00", endHour), fontWeight = FontWeight.Bold)
+                                        IconButton(onClick = { endHour = (endHour + 1) % 24 }, modifier = Modifier.size(30.dp)) {
+                                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text(stringResource(R.string.shield_rule_days), style = MaterialTheme.typography.labelSmall)
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                items(allDayTokens) { day ->
+                                    val chosen = day in selectedDays
+                                    FilterChip(
+                                        selected = chosen,
+                                        onClick = {
+                                            selectedDays = if (chosen && selectedDays.size > 1) selectedDays - day else selectedDays + day
+                                        },
+                                        label = { Text(day, fontSize = 10.sp) }
+                                    )
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TextButton(onClick = { showAddForm = false }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
+                                Button(
+                                    enabled = selectedApp != null && selectedDays.isNotEmpty(),
+                                    onClick = {
+                                        val target = selectedApp ?: return@Button
+                                        onAddRule(
+                                            ScheduleRuleEntity(
+                                                packageName = target.packageName,
+                                                appName = target.appName,
+                                                startHour = startHour,
+                                                startMinute = 0,
+                                                endHour = endHour,
+                                                endMinute = 0,
+                                                isEnabled = true,
+                                                daysString = allDayTokens.filter { it in selectedDays }.joinToString(",")
+                                            )
+                                        )
+                                        showAddForm = false
+                                    }
+                                ) {
+                                    Text(stringResource(R.string.save))
+                                }
+                            }
+                        }
+                    }
+                } else if (lockedApps.isNotEmpty()) {
+                    OutlinedButton(
+                        onClick = { showAddForm = true },
+                        modifier = Modifier.fillMaxWidth().testTag("btn_add_schedule_rule")
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(R.string.shield_add_schedule))
+                    }
+                }
+
+                if (rules.isNotEmpty()) {
+                    rules.forEach { rule ->
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(rule.appName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                                    Text(
+                                        text = String.format(
+                                            Locale.US,
+                                            "%02d:%02d – %02d:%02d • %s",
+                                            rule.startHour,
+                                            rule.startMinute,
+                                            rule.endHour,
+                                            rule.endMinute,
+                                            rule.daysString
+                                        ),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                }
+                                Switch(
+                                    checked = rule.isEnabled,
+                                    onCheckedChange = { onToggleRule(rule.id, it) }
+                                )
+                                IconButton(
+                                    onClick = { onDeleteRule(rule.id) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.DeleteOutline,
+                                        contentDescription = stringResource(R.string.shield_delete_schedule),
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.btn_close))
+            }
+        }
+    )
 }

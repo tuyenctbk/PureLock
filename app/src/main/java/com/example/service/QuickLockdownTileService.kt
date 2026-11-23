@@ -39,11 +39,19 @@ class QuickLockdownTileService : TileService() {
                     prefs
                 )
 
-                // Trigger immediate mass lockdown
-                repository.setAllAppsLockState(true)
+                // Revoke all unlocked app sessions and wipe clipboard without overwriting per-app Shield selections
+                val foregroundPkg = PureLockAccessibilityService.getCurrentForegroundPackage()
+                val shouldLockForeground = !foregroundPkg.isNullOrBlank() &&
+                    foregroundPkg != applicationContext.packageName &&
+                    repository.isPackageProtected(foregroundPkg)
+
                 repository.lockAllAndClearSessions()
                 com.example.util.ClipboardSecurityManager.clearClipboard(applicationContext, showNotification = false)
                 repository.logSecurityEvent("QUICK_LOCKDOWN_TILE", "Emergency Quick Lockdown executed from Quick Settings Tile.")
+
+                if (shouldLockForeground) {
+                    PureLockAccessibilityService.launchOverlayForPackage(applicationContext, foregroundPkg!!)
+                }
             } catch (_: Exception) {
             }
 

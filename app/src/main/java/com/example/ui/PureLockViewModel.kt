@@ -59,8 +59,17 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
                 repository.preferences.trashPurgeDays.first().let { days ->
                     repository.purgeTrashVault(days)
                 }
+                com.example.service.DatabaseChecksumManager(application).validateChecksumAndLog()
+                com.example.service.BackupHealthService(application).checkBackupHealth()
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+
+        // Immediately lock in-app session whenever Quick Settings Tile, Widget, or Screen-Off broadcasts lockdown
+        viewModelScope.launch {
+            com.example.service.LockdownSignalBus.lockdownEvents.collect {
+                lockApp()
             }
         }
     }
@@ -481,6 +490,9 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     val clipboardAutoClearSec: StateFlow<Int> = userSettings.clipboardAutoClearSec
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
 
+    val lastBackupTimestamp: StateFlow<Long> = userSettings.lastBackupTimestamp
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
+
     fun setClipboardAutoClearSec(sec: Int) {
         viewModelScope.launch {
             userSettings.setClipboardAutoClearSec(sec)
@@ -697,6 +709,15 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         return result
     }
 
+    private fun csvEscape(raw: String): String {
+        val safe = if (raw.isNotEmpty() && raw[0] in charArrayOf('=', '+', '-', '@', '\t', '\r')) {
+            "'$raw"
+        } else {
+            raw
+        }
+        return "\"${safe.replace("\"", "\"\"").replace("\r", " ").replace("\n", " ")}\""
+    }
+
     fun exportConfigToCsv(): String {
         viewModelScope.launch {
             repository.logSecurityEvent("EXPORT_TRIGGERED", "Export triggered: Human-readable CSV config exported.")
@@ -705,7 +726,7 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         val sb = StringBuilder()
         sb.append("PackageName,AppName,Category,IsLocked\n")
         apps.forEach { app ->
-            sb.append("${app.packageName},${app.appName},${app.category},${app.isLocked}\n")
+            sb.append("${csvEscape(app.packageName)},${csvEscape(app.appName)},${csvEscape(app.category)},${app.isLocked}\n")
         }
         return sb.toString()
     }
@@ -721,13 +742,13 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         sb.append("RecordType,ID,Title/Name,Category/Package,Content/Locked,Timestamp\n")
 
         apps.forEach { app ->
-            sb.append("APP,${app.packageName.hashCode()},\"${app.appName.replace("\"", "\"\"")}\",${app.packageName},Locked=${app.isLocked},${app.lastUnlockedTimestamp}\n")
+            sb.append("APP,${app.packageName.hashCode()},${csvEscape(app.appName)},${csvEscape(app.packageName)},Locked=${app.isLocked},${app.lastUnlockedTimestamp}\n")
         }
         vault.forEach { item ->
-            sb.append("VAULT_SECRET,${item.id},\"${item.title.replace("\"", "\"\"")}\",${item.category},\"${item.secretContent.replace("\"", "\"\"")}\",${item.timestamp}\n")
+            sb.append("VAULT_SECRET,${item.id},${csvEscape(item.title)},${csvEscape(item.category)},${csvEscape(item.secretContent)},${item.timestamp}\n")
         }
         trash.forEach { item ->
-            sb.append("TRASH_SECRET,${item.id},\"${item.title.replace("\"", "\"\"")}\",${item.category},\"${item.secretContent.replace("\"", "\"\"")}\",${item.deletedTimestamp}\n")
+            sb.append("TRASH_SECRET,${item.id},${csvEscape(item.title)},${csvEscape(item.category)},${csvEscape(item.secretContent)},${item.deletedTimestamp}\n")
         }
         return sb.toString()
     }
@@ -864,6 +885,24 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         return backupManager.importEncryptedNotesFromFile(file, passphrase)
     }
 
+    suspend fun exportEncryptedBackupToUri(uri: android.net.Uri, passphrase: String): Boolean {
+        val ok = backupManager.exportEncryptedBackupToUri(uri, passphrase)
+        if (ok) {
+            repository.logSecurityEvent("ENCRYPTED_BACKUP_EXPORTED", "AES-256-GCM encrypted .plk vault backup exported.")
+            recordSuccessfulOperation()
+        }
+        return ok
+    }
+
+    suspend fun importEncryptedBackupFromUri(uri: android.net.Uri, passphrase: String): Boolean {
+        val ok = backupManager.importEncryptedBackupFromUri(uri, passphrase)
+        if (ok) {
+            repository.logSecurityEvent("ENCRYPTED_BACKUP_RESTORED", "AES-256-GCM encrypted .plk vault backup restored.")
+            recordSuccessfulOperation()
+        }
+        return ok
+    }
+
     fun getBackupDirectory(): java.io.File {
         return backupManager.getBackupDirectory()
     }
@@ -876,18 +915,38 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    // ViewModel Auto-Lock Timer Logic
+    // ViewModel-scoped session & Auto-Lock state (survives configuration changes like rotation & theme switch)
+    private val _hasSplashFinished = MutableStateFlow(false)
+    val hasSplashFinished: StateFlow<Boolean> = _hasSplashFinished.asStateFlow()
+
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
+
     private var autoLockJob: kotlinx.coroutines.Job? = null
+    private var lastActivityResetMs: Long = 0L
     private val _isAppAutoLocked = MutableStateFlow(false)
     val isAppAutoLocked: StateFlow<Boolean> get() = _isAppAutoLocked
+
+    fun markSplashFinished() {
+        _hasSplashFinished.value = true
+    }
+
+    fun lockApp() {
+        _isAuthenticated.value = false
+        _isAppAutoLocked.value = true
+        cancelAutoLockTimer()
+        clearSensitiveState()
+    }
 
     fun resetAutoLockTimer(onTimeout: () -> Unit = {}) {
         autoLockJob?.cancel()
         _isAppAutoLocked.value = false
         val sec = inactivityTimeoutSec.value
-        if (sec > 0) {
+        if (sec > 0 && _isAuthenticated.value) {
+            lastActivityResetMs = System.currentTimeMillis()
             autoLockJob = viewModelScope.launch {
                 kotlinx.coroutines.delay(sec * 1000L)
+                _isAuthenticated.value = false
                 _isAppAutoLocked.value = true
                 clearSensitiveState()
                 onTimeout()
@@ -902,10 +961,14 @@ class PureLockViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun onUserActivity(onTimeout: () -> Unit = {}) {
+        if (!_isAuthenticated.value) return
+        val now = System.currentTimeMillis()
+        if (autoLockJob != null && (now - lastActivityResetMs) < 1_500L) return
         resetAutoLockTimer(onTimeout)
     }
 
     fun unlockApp() {
+        _isAuthenticated.value = true
         _isAppAutoLocked.value = false
         resetAutoLockTimer()
     }

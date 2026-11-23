@@ -61,12 +61,16 @@ object DatabaseKeyManager {
         // 1. Primary path: unwrap Android Keystore AES-256-GCM encrypted passphrase
         val wrappedCipher = prefs.getString(WRAPPED_KEY_CIPHER_ALIAS, null)
         val wrappedIv = prefs.getString(WRAPPED_KEY_IV_ALIAS, null)
-        if (!wrappedCipher.isNullOrEmpty() && !wrappedIv.isNullOrEmpty()) {
-            val unwrapped = wrapper.decrypt(wrappedCipher, wrappedIv)
+        val hasExistingWrappedKey = !wrappedCipher.isNullOrEmpty() && !wrappedIv.isNullOrEmpty()
+        if (hasExistingWrappedKey) {
+            val unwrapped = wrapper.decrypt(wrappedCipher!!, wrappedIv!!)
             if (unwrapped != null && unwrapped.size == PASSPHRASE_LENGTH_BYTES) {
                 return unwrapped
             }
-            Log.e(TAG, "Failed to unwrap hardware-protected SQLCipher key; checking legacy fallback.")
+            if (unwrapped != null) {
+                wipePassphrase(unwrapped)
+            }
+            Log.e(TAG, "Failed to unwrap existing hardware-protected SQLCipher key; checking legacy fallback.")
         }
 
         // 2. Seamless migration path: upgrade legacy plaintext key into Keystore-wrapped storage
@@ -88,7 +92,18 @@ object DatabaseKeyManager {
                     Log.i(TAG, "Migrated legacy SQLCipher passphrase to Android Keystore AES-256-GCM wrapping.")
                 }
                 return legacyBytes
+            } else if (legacyBytes != null) {
+                wipePassphrase(legacyBytes)
             }
+        }
+
+        // CRITICAL SAFETY GUARD: Never overwrite an existing wrapped key if Keystore decryption
+        // failed transiently (e.g., locked device / Direct Boot / Keystore IPC hiccup), because
+        // regenerating a new key would permanently orphan the user's encrypted SQLCipher vault.
+        if (hasExistingWrappedKey) {
+            throw IllegalStateException(
+                "Unable to unwrap existing hardware-protected SQLCipher key; refusing to overwrite key material."
+            )
         }
 
         // 3. Fresh install: generate a 256-bit cryptographically random SQLCipher passphrase

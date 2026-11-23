@@ -58,12 +58,48 @@ import com.example.R
 import com.example.data.PureLockRepository
 import com.example.service.BiometricPromptManager
 import com.example.service.BiometricStatus
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import kotlin.math.hypot
+
+private val panicActionScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+/**
+ * Progressive brute-force cooldown (seconds) after consecutive failed unlock attempts.
+ */
+internal fun computeLockoutCooldownSeconds(failedAttempts: Int): Int = when {
+    failedAttempts >= 10 -> 60
+    failedAttempts >= 8 -> 30
+    failedAttempts >= 5 -> 15
+    else -> 0
+}
+
+/**
+ * Returns the intermediate node (1..9) when a 3x3 pattern segment passes collinearly through it,
+ * matching standard Android pattern lock behavior (e.g., 1->3 passes through 2, 1->9 passes through 5).
+ */
+internal fun findCollinearMidpoint(from: Int, to: Int): Int? {
+    if (from !in 1..9 || to !in 1..9 || from == to) return null
+    val r1 = (from - 1) / 3
+    val c1 = (from - 1) % 3
+    val r2 = (to - 1) / 3
+    val c2 = (to - 1) % 3
+    val dr = r2 - r1
+    val dc = c2 - c1
+    return if (dr % 2 == 0 && dc % 2 == 0) {
+        val midR = (r1 + r2) / 2
+        val midC = (c1 + c2) / 2
+        midR * 3 + midC + 1
+    } else {
+        null
+    }
+}
 
 @Composable
 fun LockOverlayScreen(
@@ -95,16 +131,25 @@ fun LockOverlayScreen(
     var isTvMode by remember { mutableStateOf(false) }
     var isStealthDecoy by remember { mutableStateOf(false) }
     var decoyType by remember { mutableStateOf("NONE") }
+    var isHapticFeedbackEnabled by remember { mutableStateOf(true) }
     var isCalculatorDisguiseActive by remember { mutableStateOf(false) }
     var isFakeCrashActive by remember { mutableStateOf(false) }
 
     var inputPin by remember { mutableStateOf("") }
     var patternSelectedNodes by remember { mutableStateOf(listOf<Int>()) }
     var failedAttempts by remember { mutableStateOf(0) }
+    var lockoutRemainingSec by remember { mutableIntStateOf(0) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var intruderCapturedBanner by remember { mutableStateOf(false) }
     var isUnlockingSuccess by remember { mutableStateOf(false) }
     var secondaryAuthNotice by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(lockoutRemainingSec) {
+        if (lockoutRemainingSec > 0) {
+            delay(1000L)
+            lockoutRemainingSec = (lockoutRemainingSec - 1).coerceAtLeast(0)
+        }
+    }
 
     val isBioHardwareAvailable = remember {
         BiometricPromptManager(context).isBiometricAvailable()
@@ -120,6 +165,7 @@ fun LockOverlayScreen(
     }
 
     fun triggerHapticSuccess() {
+        if (!isHapticFeedbackEnabled) return
         try {
             val vibrator = context.getSystemService(android.os.Vibrator::class.java)
             if (vibrator?.hasVibrator() == true) {
@@ -140,6 +186,7 @@ fun LockOverlayScreen(
     }
 
     fun triggerHapticFailure() {
+        if (!isHapticFeedbackEnabled) return
         try {
             val vibrator = context.getSystemService(android.os.Vibrator::class.java)
             if (vibrator?.hasVibrator() == true) {
@@ -157,9 +204,23 @@ fun LockOverlayScreen(
         }
     }
 
+    fun triggerDuressPanic(sourceDetails: String) {
+        com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
+        panicActionScope.launch {
+            try {
+                repository.lockAllAndClearSessions()
+                repository.logSecurityEvent("PANIC_MODE_ACTIVATED", sourceDetails)
+                repository.emptyTrashVault()
+            } catch (_: Exception) {
+            }
+        }
+        onCancelled()
+    }
+
     fun handleSuccessUnlock() {
         if (isUnlockingSuccess) return
         isUnlockingSuccess = true
+        lockoutRemainingSec = 0
         triggerHapticSuccess()
         scope.launch {
             delay(400) // Smooth unlock visual animation spec transition delay
@@ -171,26 +232,34 @@ fun LockOverlayScreen(
         errorMessage = msg
         triggerHapticFailure()
         failedAttempts++
+        val cooldownSec = computeLockoutCooldownSeconds(failedAttempts)
+        if (cooldownSec > 0) {
+            lockoutRemainingSec = cooldownSec
+        }
         if (failedAttempts >= 3) {
             intruderCapturedBanner = true
-            if (isIntruderCapture) {
-                scope.launch {
-                    val intruderSnapshotData = withContext(Dispatchers.IO) {
-                        createIntruderSnapshotBitmap(context, appName)
+            if (isIntruderCapture && failedAttempts % 3 == 0) {
+                val appCtx = context.applicationContext
+                val capturedAttempts = failedAttempts
+                val targetAppName = appName
+                panicActionScope.launch {
+                    try {
+                        val intruderSnapshotData = createIntruderSnapshotBitmap(appCtx, targetAppName)
+                        repository.recordIntruderSelfie(
+                            packageName = packageName,
+                            appName = targetAppName,
+                            photoData = intruderSnapshotData,
+                            attempts = capturedAttempts
+                        )
+                    } catch (_: Exception) {
                     }
-                    repository.recordIntruderSelfie(
-                        packageName = packageName,
-                        appName = appName,
-                        photoData = intruderSnapshotData,
-                        attempts = failedAttempts
-                    )
                 }
             }
         }
     }
 
     fun handleDigitPressed(digit: Int) {
-        if (!isConfigLoaded || isUnlockingSuccess || masterPin.isEmpty()) return
+        if (!isConfigLoaded || isUnlockingSuccess || lockoutRemainingSec > 0 || masterPin.isEmpty()) return
         val hasValidDuress = duressPin.isNotBlank() && duressPin != masterPin
         val maxTargetLen = maxOf(
             masterPin.length.coerceAtLeast(4),
@@ -209,13 +278,7 @@ fun LockOverlayScreen(
 
             // 2. Check distinct Duress PIN (emergency panic mode)
             if (hasValidDuress && updated == duressPin) {
-                com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
-                scope.launch {
-                    repository.resetAllUnlockedSessions()
-                    repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
-                    repository.emptyTrashVault()
-                }
-                onCancelled()
+                triggerDuressPanic("Duress PIN entered! Panic mode triggered rapid wipe / lockout.")
                 return
             }
 
@@ -241,6 +304,7 @@ fun LockOverlayScreen(
         inputPin = ""
         patternSelectedNodes = emptyList()
         failedAttempts = 0
+        lockoutRemainingSec = 0
         errorMessage = null
         secondaryAuthNotice = null
         isUnlockingSuccess = false
@@ -248,7 +312,7 @@ fun LockOverlayScreen(
         isCalculatorDisguiseActive = false
         isFakeCrashActive = false
 
-        // Load app name and genuine target application icon off the main thread
+        // Load app name, app icon, and atomic lock configuration in parallel off the main thread
         val (loadedName, loadedIcon) = withContext(Dispatchers.IO) {
             try {
                 val pm = context.packageManager
@@ -263,18 +327,20 @@ fun LockOverlayScreen(
         appName = loadedName
         appIconBitmap = loadedIcon
 
-        masterPin = repository.preferences.masterPin.first()
-        duressPin = repository.preferences.duressPin.first()
-        masterPattern = repository.preferences.masterPattern.first()
-        masterKnock = repository.preferences.masterKnock.first()
-        securityType = repository.preferences.securityType.first()
-        isBiometricEnabled = repository.preferences.biometricEnabled.first()
-        isRandomKeyboard = repository.preferences.randomKeyboard.first()
-        isHidePatternPath = repository.preferences.hidePatternPath.first()
-        isIntruderCapture = repository.preferences.intruderCapture.first()
-        isTvMode = repository.preferences.tvMode.first()
-        isStealthDecoy = repository.preferences.stealthDecoy.first()
-        decoyType = repository.preferences.decoyType.first()
+        val lockConfig = repository.preferences.lockScreenConfig.first()
+        masterPin = lockConfig.masterPin
+        duressPin = lockConfig.duressPin
+        masterPattern = lockConfig.masterPattern
+        masterKnock = lockConfig.masterKnock
+        securityType = lockConfig.securityType
+        isBiometricEnabled = lockConfig.isBiometricEnabled
+        isRandomKeyboard = lockConfig.isRandomKeyboard
+        isHidePatternPath = lockConfig.isHidePatternPath
+        isIntruderCapture = lockConfig.isIntruderCapture
+        isTvMode = lockConfig.isTvMode
+        isStealthDecoy = lockConfig.isStealthDecoy
+        decoyType = lockConfig.decoyType
+        isHapticFeedbackEnabled = lockConfig.isHapticFeedbackEnabled
 
         if (decoyType == "FAKE_CRASH") {
             isFakeCrashActive = true
@@ -344,13 +410,7 @@ fun LockOverlayScreen(
             duressPin = duressPin,
             onUnlock = { handleSuccessUnlock() },
             onDuress = {
-                com.example.util.ClipboardSecurityManager.clearClipboard(context, showNotification = false)
-                scope.launch {
-                    repository.resetAllUnlockedSessions()
-                    repository.logSecurityEvent("PANIC_MODE_ACTIVATED", "Duress PIN entered via Calculator disguise! Panic mode triggered.")
-                    repository.emptyTrashVault()
-                }
-                onCancelled()
+                triggerDuressPanic("Duress PIN entered via Calculator disguise! Panic mode triggered.")
             },
             onCancel = onCancelled,
             onSwitchToDirectLock = { isCalculatorDisguiseActive = false }
@@ -486,9 +546,14 @@ fun LockOverlayScreen(
                 }
             }
 
-            // Error Message Banner
+            // Error Message / Progressive Lockout Cooldown Banner
+            val bannerErrorText = if (lockoutRemainingSec > 0) {
+                "${errorMessage ?: stringResource(R.string.lock_incorrect_pin)} (${stringResource(R.string.duration_sec_short, lockoutRemainingSec)})"
+            } else {
+                errorMessage
+            }
             AnimatedVisibility(
-                visible = errorMessage != null,
+                visible = bannerErrorText != null,
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut()
             ) {
@@ -497,7 +562,7 @@ fun LockOverlayScreen(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = errorMessage ?: "",
+                        text = bannerErrorText ?: "",
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
@@ -661,6 +726,8 @@ fun LockOverlayScreen(
                                             KeypadButton(
                                                 text = digit.toString(),
                                                 isTvMode = isTvMode,
+                                                hapticEnabled = isHapticFeedbackEnabled,
+                                                enabled = lockoutRemainingSec == 0,
                                                 onClick = { handleDigitPressed(digit) }
                                             )
                                         }
@@ -673,17 +740,23 @@ fun LockOverlayScreen(
                                         text = stringResource(R.string.lock_keypad_clear),
                                         isTvMode = isTvMode,
                                         isAction = true,
+                                        hapticEnabled = isHapticFeedbackEnabled,
+                                        enabled = lockoutRemainingSec == 0,
                                         onClick = { inputPin = "" }
                                     )
                                     KeypadButton(
                                         text = keyboardDigits[9].toString(),
                                         isTvMode = isTvMode,
+                                        hapticEnabled = isHapticFeedbackEnabled,
+                                        enabled = lockoutRemainingSec == 0,
                                         onClick = { handleDigitPressed(keyboardDigits[9]) }
                                     )
                                     KeypadButton(
                                         text = stringResource(R.string.lock_keypad_backspace),
                                         isTvMode = isTvMode,
                                         isAction = true,
+                                        hapticEnabled = isHapticFeedbackEnabled,
+                                        enabled = lockoutRemainingSec == 0,
                                         onClick = {
                                             if (inputPin.isNotEmpty()) {
                                                 inputPin = inputPin.dropLast(1)
@@ -737,13 +810,25 @@ fun LockOverlayScreen(
                             PatternGridDrawer(
                                 selectedNodes = patternSelectedNodes,
                                 hidePath = isHidePatternPath,
+                                hapticEnabled = isHapticFeedbackEnabled,
                                 onNodeSelected = { node ->
+                                    if (lockoutRemainingSec > 0) return@PatternGridDrawer
                                     if (!patternSelectedNodes.contains(node)) {
-                                        patternSelectedNodes = patternSelectedNodes + node
+                                        val prev = patternSelectedNodes.lastOrNull()
+                                        val mid = if (prev != null) findCollinearMidpoint(prev, node) else null
+                                        val nextList = buildList {
+                                            addAll(patternSelectedNodes)
+                                            if (mid != null && !contains(mid)) add(mid)
+                                            add(node)
+                                        }
+                                        patternSelectedNodes = nextList
                                     }
                                 },
                                 onPatternCompleted = {
-                                    if (patternSelectedNodes.isEmpty()) return@PatternGridDrawer
+                                    if (lockoutRemainingSec > 0 || patternSelectedNodes.isEmpty()) {
+                                        patternSelectedNodes = emptyList()
+                                        return@PatternGridDrawer
+                                    }
                                     val userPatternStr = patternSelectedNodes.joinToString(",")
                                     if (userPatternStr == masterPattern) {
                                         handleSuccessUnlock()
@@ -840,6 +925,8 @@ fun LockOverlayScreen(
                     "KNOCK" -> {
                         KnockCodeDrawer(
                             masterKnock = masterKnock,
+                            enabled = lockoutRemainingSec == 0,
+                            hapticEnabled = isHapticFeedbackEnabled,
                             onUnlock = { handleSuccessUnlock() },
                             onFailed = { msg -> recordFailedAttempt(msg) }
                         )
@@ -882,6 +969,8 @@ private fun KeypadButton(
     text: String,
     isTvMode: Boolean,
     isAction: Boolean = false,
+    hapticEnabled: Boolean = true,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -891,7 +980,7 @@ private fun KeypadButton(
 
     val buttonScale by animateFloatAsState(
         targetValue = when {
-            isPressed -> 0.90f
+            isPressed && enabled -> 0.90f
             isFocused -> 1.08f
             else -> 1.0f
         },
@@ -904,9 +993,13 @@ private fun KeypadButton(
 
     Surface(
         onClick = {
-            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            if (!enabled) return@Surface
+            if (hapticEnabled) {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            }
             onClick()
         },
+        enabled = enabled,
         interactionSource = interactionSource,
         shape = CircleShape,
         color = when {
@@ -942,6 +1035,7 @@ private fun KeypadButton(
 fun PatternGridDrawer(
     selectedNodes: List<Int>,
     hidePath: Boolean,
+    hapticEnabled: Boolean = true,
     onNodeSelected: (Int) -> Unit,
     onPatternCompleted: () -> Unit
 ) {
@@ -953,6 +1047,7 @@ fun PatternGridDrawer(
     val latestSelectedNodes by rememberUpdatedState(selectedNodes)
     val latestOnNodeSelected by rememberUpdatedState(onNodeSelected)
     val latestOnPatternCompleted by rememberUpdatedState(onPatternCompleted)
+    val latestHapticEnabled by rememberUpdatedState(hapticEnabled)
 
     Box(
         modifier = Modifier
@@ -963,18 +1058,23 @@ fun PatternGridDrawer(
                     onDragStart = { offset ->
                         val node = getNodeAtOffset(offset, size.width, size.height)
                         if (node != null && !latestSelectedNodes.contains(node)) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            if (latestHapticEnabled) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            }
                             latestOnNodeSelected(node)
                         }
                     },
                     onDrag = { change, _ ->
                         val node = getNodeAtOffset(change.position, size.width, size.height)
                         if (node != null && !latestSelectedNodes.contains(node)) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            if (latestHapticEnabled) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            }
                             latestOnNodeSelected(node)
                         }
                     },
-                    onDragEnd = { latestOnPatternCompleted() }
+                    onDragEnd = { latestOnPatternCompleted() },
+                    onDragCancel = { latestOnPatternCompleted() }
                 )
             },
         contentAlignment = Alignment.Center
@@ -1070,13 +1170,19 @@ fun PatternGridDrawer(
 }
 
 private fun getNodeAtOffset(offset: Offset, width: Int, height: Int): Int? {
+    if (width <= 0 || height <= 0) return null
     val colWidth = width / 3f
     val rowHeight = height / 3f
 
     val col = (offset.x / colWidth).toInt().coerceIn(0, 2)
     val row = (offset.y / rowHeight).toInt().coerceIn(0, 2)
 
-    return row * 3 + col + 1
+    // Centered circular hit radius prevents diagonal swipes from accidentally clipping neighboring cells
+    val centerX = col * colWidth + colWidth / 2f
+    val centerY = row * rowHeight + rowHeight / 2f
+    val hitRadius = minOf(colWidth, rowHeight) * 0.38f
+    val dist = hypot((offset.x - centerX).toDouble(), (offset.y - centerY).toDouble()).toFloat()
+    return if (dist <= hitRadius) row * 3 + col + 1 else null
 }
 
 private fun createIntruderSnapshotBitmap(context: android.content.Context, appName: String): String {
@@ -1377,6 +1483,7 @@ internal fun evaluateCalculatorExpression(expr: String): String {
                 }
                 i += 2
             }
+            if (!res.isFinite()) return "Error"
             if (res % 1.0 == 0.0) res.toLong().toString() else String.format(java.util.Locale.US, "%.2f", res)
         } else {
             val single = tokens[0].toDoubleOrNull()
@@ -1539,6 +1646,8 @@ fun FakeCrashDecoyView(
 @Composable
 fun KnockCodeDrawer(
     masterKnock: String,
+    enabled: Boolean = true,
+    hapticEnabled: Boolean = true,
     onUnlock: () -> Unit,
     onFailed: (String) -> Unit
 ) {
@@ -1547,10 +1656,13 @@ fun KnockCodeDrawer(
     val knockFailedMsg = stringResource(R.string.lock_knock_incorrect)
 
     fun handleKnock(quadrant: Int) {
+        if (!enabled) return
         val expected = masterKnock.split(',').mapNotNull { it.trim().toIntOrNull() }
         if (expected.isEmpty()) return
 
-        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        if (hapticEnabled) {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
         val updated = currentKnocks + quadrant
         currentKnocks = updated
 
@@ -1627,12 +1739,16 @@ private fun KnockQuadrant(
     }
 }
 
-fun drawableToBitmap(drawable: android.graphics.drawable.Drawable): Bitmap {
+fun drawableToBitmap(drawable: android.graphics.drawable.Drawable, maxSizePx: Int = 192): Bitmap {
     if (drawable is android.graphics.drawable.BitmapDrawable && drawable.bitmap != null) {
-        return drawable.bitmap
+        val src = drawable.bitmap
+        if (src.width <= maxSizePx && src.height <= maxSizePx) return src
+        return Bitmap.createScaledBitmap(src, maxSizePx, maxSizePx, true)
     }
-    val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 96
-    val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 96
+    val rawW = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 96
+    val rawH = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 96
+    val width = rawW.coerceAtMost(maxSizePx)
+    val height = rawH.coerceAtMost(maxSizePx)
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, canvas.width, canvas.height)

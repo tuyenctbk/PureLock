@@ -33,10 +33,19 @@ data class PermissionGuideItem(
 object PermissionManager {
 
     /**
-     * Checks if PureLockAccessibilityService is explicitly enabled in Android Accessibility settings.
+     * Checks if PureLockAccessibilityService is explicitly enabled in Android Accessibility settings
+     * and that Android's master accessibility toggle is active.
      */
     fun isAccessibilityServiceEnabled(context: Context): Boolean {
+        val masterEnabled = try {
+            Settings.Secure.getInt(context.contentResolver, Settings.Secure.ACCESSIBILITY_ENABLED, 0)
+        } catch (_: Exception) {
+            1
+        }
+        if (masterEnabled != 1) return false
+
         val expectedServiceName = "${context.packageName}/${PureLockAccessibilityService::class.java.canonicalName}"
+        val expectedShortName = "${context.packageName}/.service.PureLockAccessibilityService"
         val enabledServices = Settings.Secure.getString(
             context.contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
@@ -47,6 +56,7 @@ object PermissionManager {
         while (colonSplitter.hasNext()) {
             val componentName = colonSplitter.next()
             if (componentName.equals(expectedServiceName, ignoreCase = true) ||
+                componentName.equals(expectedShortName, ignoreCase = true) ||
                 (componentName.contains(context.packageName) && componentName.contains("PureLockAccessibilityService"))
             ) {
                 return true

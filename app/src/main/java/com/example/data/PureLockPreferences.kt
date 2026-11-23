@@ -35,6 +35,7 @@ class PureLockPreferences(context: Context) {
     val intruderCapture: Flow<Boolean> = userSettings.intruderCapture
     val tvMode: Flow<Boolean> = userSettings.tvMode
     val lastBackupTimestamp: Flow<Long> = userSettings.lastBackupTimestamp
+    val lockScreenConfig: Flow<LockScreenConfig> = userSettings.lockScreenConfig
     val hapticFeedbackEnabled: Flow<Boolean> = userSettings.hapticFeedbackEnabled
     val soundFeedbackEnabled: Flow<Boolean> = userSettings.soundFeedbackEnabled
     val clipboardAutoClearSec: Flow<Int> = userSettings.clipboardAutoClearSec
@@ -73,6 +74,9 @@ class PureLockPreferences(context: Context) {
     suspend fun setAppLanguage(langCode: String) = userSettings.setAppLanguage(langCode)
     suspend fun setLastBackupTimestamp(timestamp: Long) = userSettings.setLastBackupTimestamp(timestamp)
     suspend fun getLastBackupTimestamp(): Long = userSettings.getLastBackupTimestamp()
+    suspend fun setLastBackupWarningTimestamp(timestamp: Long) = userSettings.setLastBackupWarningTimestamp(timestamp)
+    suspend fun getLastBackupWarningTimestamp(): Long = userSettings.getLastBackupWarningTimestamp()
+    suspend fun getFirstInstallTimestamp(): Long = userSettings.getFirstInstallTimestamp()
     suspend fun setDuressPin(pin: String) = userSettings.setDuressPin(pin)
     suspend fun setHapticFeedbackEnabled(enabled: Boolean) = userSettings.setHapticFeedbackEnabled(enabled)
     suspend fun setSoundFeedbackEnabled(enabled: Boolean) = userSettings.setSoundFeedbackEnabled(enabled)

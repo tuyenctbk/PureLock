@@ -1,9 +1,11 @@
 package com.example.data
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.service.KeystoreHardwareSecurityManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -13,13 +15,36 @@ import java.io.IOException
 private val Context.userSettingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "purelock_user_settings")
 
 /**
+ * Atomic snapshot of all settings required by LockOverlayScreen so lock screens load
+ * in a single DataStore read instead of 12+ sequential emissions.
+ */
+data class LockScreenConfig(
+    val masterPin: String = "",
+    val duressPin: String = "",
+    val masterPattern: String = "",
+    val masterKnock: String = "",
+    val securityType: String = "PIN",
+    val isBiometricEnabled: Boolean = true,
+    val isRandomKeyboard: Boolean = false,
+    val isHidePatternPath: Boolean = false,
+    val isIntruderCapture: Boolean = true,
+    val isTvMode: Boolean = false,
+    val isStealthDecoy: Boolean = false,
+    val decoyType: String = "NONE",
+    val isHapticFeedbackEnabled: Boolean = true
+)
+
+/**
  * UserSettingsManager manages all persistent user preferences using Jetpack DataStore.
- * Provides reactive Flows and suspend mutating functions for settings like auto-lock intervals,
- * biometric authentication status, dynamic theming, and security policies.
+ * Sensitive credentials (Master PIN, Pattern, Knock Code, Duress PIN) are encrypted at rest
+ * via hardware-backed Android Keystore AES-256-GCM with transparent legacy plaintext migration.
  */
 class UserSettingsManager(private val context: Context) {
 
     companion object {
+        private const val TAG = "UserSettingsManager"
+        private const val ENC_PREFIX = "enc_v1:"
+
         // Security & Authentication Keys
         val KEY_AUTO_LOCK_INACTIVITY_SEC = intPreferencesKey("auto_lock_inactivity_sec")
         val KEY_BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
@@ -49,6 +74,7 @@ class UserSettingsManager(private val context: Context) {
         val KEY_DASHBOARD_CARD_ORDER = stringPreferencesKey("dashboard_card_order")
         val KEY_TRASH_PURGE_DAYS = intPreferencesKey("trash_purge_days")
         val KEY_LAST_BACKUP_TIMESTAMP = longPreferencesKey("last_backup_timestamp")
+        val KEY_LAST_BACKUP_WARNING_TIMESTAMP = longPreferencesKey("last_backup_warning_timestamp")
         val KEY_CLIPBOARD_AUTO_CLEAR_SEC = intPreferencesKey("clipboard_auto_clear_sec")
         val KEY_IS_ONBOARDING_COMPLETED = booleanPreferencesKey("is_onboarding_completed")
         val KEY_HAS_SHARED_APP = booleanPreferencesKey("has_shared_app")
@@ -70,7 +96,42 @@ class UserSettingsManager(private val context: Context) {
         val KEY_SUPPORTER_TIER = stringPreferencesKey("supporter_tier")
     }
 
-    private val dataStore: DataStore<Preferences> = context.userSettingsDataStore
+    private val appContext: Context = context.applicationContext
+    private val dataStore: DataStore<Preferences> = appContext.userSettingsDataStore
+    private val keystoreManager: KeystoreHardwareSecurityManager by lazy {
+        KeystoreHardwareSecurityManager(appContext)
+    }
+
+    private fun encodeCredential(plain: String): String {
+        if (plain.isEmpty()) return ""
+        return try {
+            val encrypted = keystoreManager.encryptData(plain)
+            if (encrypted != null) {
+                "$ENC_PREFIX${encrypted.second}:${encrypted.first}"
+            } else {
+                plain
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Keystore unavailable while encrypting credential; falling back to private DataStore", e)
+            plain
+        }
+    }
+
+    private fun decodeCredential(stored: String?): String {
+        if (stored.isNullOrEmpty()) return ""
+        if (!stored.startsWith(ENC_PREFIX)) return stored // Seamless backward compatibility with legacy plaintext
+        val payload = stored.removePrefix(ENC_PREFIX)
+        val sepIndex = payload.indexOf(':')
+        if (sepIndex <= 0 || sepIndex >= payload.lastIndex) return ""
+        val ivBase64 = payload.substring(0, sepIndex)
+        val cipherBase64 = payload.substring(sepIndex + 1)
+        return try {
+            keystoreManager.decryptData(cipherBase64, ivBase64) ?: ""
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to decrypt stored credential via Android Keystore", e)
+            ""
+        }
+    }
 
     private val safeData: Flow<Preferences> = dataStore.data
         .catch { exception ->
@@ -96,15 +157,15 @@ class UserSettingsManager(private val context: Context) {
     }
 
     val masterPin: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_MASTER_PIN] ?: ""
+        decodeCredential(prefs[KEY_MASTER_PIN])
     }
 
     val masterPattern: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_MASTER_PATTERN] ?: ""
+        decodeCredential(prefs[KEY_MASTER_PATTERN])
     }
 
     val duressPin: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_DURESS_PIN] ?: ""
+        decodeCredential(prefs[KEY_DURESS_PIN])
     }
 
     val gracePeriodMs: Flow<Long> = safeData.map { prefs ->
@@ -147,7 +208,32 @@ class UserSettingsManager(private val context: Context) {
     }
 
     val masterKnock: Flow<String> = safeData.map { prefs ->
-        prefs[KEY_MASTER_KNOCK] ?: ""
+        decodeCredential(prefs[KEY_MASTER_KNOCK])
+    }
+
+    val lockScreenConfig: Flow<LockScreenConfig> = safeData.map { prefs ->
+        val explicitDecoy = prefs[KEY_DECOY_TYPE]
+        val stealth = prefs[KEY_STEALTH_DECOY] ?: false
+        val resolvedDecoy = when {
+            explicitDecoy != null -> explicitDecoy
+            stealth -> "CALCULATOR"
+            else -> "NONE"
+        }
+        LockScreenConfig(
+            masterPin = decodeCredential(prefs[KEY_MASTER_PIN]),
+            duressPin = decodeCredential(prefs[KEY_DURESS_PIN]),
+            masterPattern = decodeCredential(prefs[KEY_MASTER_PATTERN]),
+            masterKnock = decodeCredential(prefs[KEY_MASTER_KNOCK]),
+            securityType = prefs[KEY_SECURITY_TYPE] ?: "PIN",
+            isBiometricEnabled = prefs[KEY_BIOMETRIC_ENABLED] ?: true,
+            isRandomKeyboard = prefs[KEY_RANDOM_KEYBOARD] ?: false,
+            isHidePatternPath = prefs[KEY_HIDE_PATTERN_PATH] ?: false,
+            isIntruderCapture = prefs[KEY_INTRUDER_CAPTURE] ?: true,
+            isTvMode = prefs[KEY_TV_MODE] ?: false,
+            isStealthDecoy = stealth,
+            decoyType = resolvedDecoy,
+            isHapticFeedbackEnabled = prefs[KEY_HAPTIC_FEEDBACK_ENABLED] ?: true
+        )
     }
 
     val stealthModeActive: Flow<Boolean> = safeData.map { prefs ->
@@ -195,6 +281,14 @@ class UserSettingsManager(private val context: Context) {
         prefs[KEY_LAST_BACKUP_TIMESTAMP] ?: 0L
     }
 
+    val lastBackupWarningTimestamp: Flow<Long> = safeData.map { prefs ->
+        prefs[KEY_LAST_BACKUP_WARNING_TIMESTAMP] ?: 0L
+    }
+
+    val firstInstallTimestamp: Flow<Long> = safeData.map { prefs ->
+        prefs[KEY_FIRST_INSTALL_TIMESTAMP] ?: 0L
+    }
+
     val clipboardAutoClearSec: Flow<Int> = safeData.map { prefs ->
         prefs[KEY_CLIPBOARD_AUTO_CLEAR_SEC] ?: 30
     }
@@ -227,8 +321,8 @@ class UserSettingsManager(private val context: Context) {
 
     suspend fun setMasterPin(pin: String) {
         dataStore.edit { prefs ->
-            prefs[KEY_MASTER_PIN] = pin
-            if (prefs[KEY_DURESS_PIN] == pin) {
+            prefs[KEY_MASTER_PIN] = encodeCredential(pin)
+            if (decodeCredential(prefs[KEY_DURESS_PIN]) == pin) {
                 prefs[KEY_DURESS_PIN] = ""
             }
         }
@@ -236,13 +330,13 @@ class UserSettingsManager(private val context: Context) {
 
     suspend fun setMasterPattern(pattern: String) {
         dataStore.edit { prefs ->
-            prefs[KEY_MASTER_PATTERN] = pattern
+            prefs[KEY_MASTER_PATTERN] = encodeCredential(pattern)
         }
     }
 
     suspend fun setDuressPin(pin: String) {
         dataStore.edit { prefs ->
-            prefs[KEY_DURESS_PIN] = pin
+            prefs[KEY_DURESS_PIN] = encodeCredential(pin)
         }
     }
 
@@ -302,7 +396,7 @@ class UserSettingsManager(private val context: Context) {
 
     suspend fun setMasterKnock(knock: String) {
         dataStore.edit { prefs ->
-            prefs[KEY_MASTER_KNOCK] = knock
+            prefs[KEY_MASTER_KNOCK] = encodeCredential(knock)
         }
     }
 
@@ -373,6 +467,16 @@ class UserSettingsManager(private val context: Context) {
     }
 
     suspend fun getLastBackupTimestamp(): Long = lastBackupTimestamp.first()
+
+    suspend fun setLastBackupWarningTimestamp(timestamp: Long) {
+        dataStore.edit { prefs ->
+            prefs[KEY_LAST_BACKUP_WARNING_TIMESTAMP] = timestamp
+        }
+    }
+
+    suspend fun getLastBackupWarningTimestamp(): Long = lastBackupWarningTimestamp.first()
+
+    suspend fun getFirstInstallTimestamp(): Long = firstInstallTimestamp.first()
 
     val isOnboardingCompleted: Flow<Boolean> = safeData.map { prefs ->
         prefs[KEY_IS_ONBOARDING_COMPLETED] ?: false

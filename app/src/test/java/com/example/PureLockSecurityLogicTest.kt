@@ -1,13 +1,18 @@
 package com.example
 
 import com.example.data.PureLockRepository
+import com.example.data.model.EncryptedVaultEntity
 import com.example.data.model.ScheduleRuleEntity
 import com.example.service.PasswordGeneratorConfig
 import com.example.service.PasswordGeneratorService
 import com.example.service.PasswordStrength
+import com.example.service.PureLockAutofillService
+import com.example.ui.computeLockoutCooldownSeconds
 import com.example.ui.evaluateCalculatorExpression
+import com.example.ui.findCollinearMidpoint
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Calendar
@@ -117,5 +122,67 @@ class PureLockSecurityLogicTest {
         } finally {
             java.util.Locale.setDefault(prevLocale)
         }
+    }
+
+    @Test
+    fun testPasswordGenerator_respectsShortTargetLength() {
+        val shortPass = service.generatePassword(
+            PasswordGeneratorConfig(
+                length = 2,
+                includeUppercase = true,
+                includeLowercase = true,
+                includeNumbers = true,
+                includeSymbols = true
+            )
+        )
+        assertEquals(2, shortPass.length)
+    }
+
+    @Test
+    fun testBruteForceCooldownProgression() {
+        assertEquals(0, computeLockoutCooldownSeconds(0))
+        assertEquals(0, computeLockoutCooldownSeconds(4))
+        assertEquals(15, computeLockoutCooldownSeconds(5))
+        assertEquals(30, computeLockoutCooldownSeconds(8))
+        assertEquals(60, computeLockoutCooldownSeconds(10))
+    }
+
+    @Test
+    fun testPatternCollinearMidpoints() {
+        assertEquals(2, findCollinearMidpoint(1, 3))
+        assertEquals(4, findCollinearMidpoint(1, 7))
+        assertEquals(5, findCollinearMidpoint(1, 9))
+        assertEquals(5, findCollinearMidpoint(3, 7))
+        assertEquals(6, findCollinearMidpoint(9, 3))
+        assertNull(findCollinearMidpoint(1, 2))
+        assertNull(findCollinearMidpoint(1, 6))
+        assertNull(findCollinearMidpoint(4, 9))
+    }
+
+    @Test
+    fun testAutofillCandidateSelection_restrictsToMatchesAndNeverLeaksNotes() {
+        val vault = listOf(
+            EncryptedVaultEntity(id = 1, title = "GitHub", secretContent = "gh_secret", category = "PASSWORD", websiteOrApp = "github.com"),
+            EncryptedVaultEntity(id = 2, title = "Chase Bank", secretContent = "bank_secret", category = "PASSWORD", websiteOrApp = "chase.com"),
+            EncryptedVaultEntity(id = 3, title = "Seed Phrase", secretContent = "twelve secret words", category = "NOTE", websiteOrApp = "")
+        )
+
+        // Direct web domain match returns ONLY matching credential (never unrelated bank or private note)
+        val githubMatches = PureLockAutofillService.selectAutofillCandidates(
+            vaultItems = vault,
+            webDomains = setOf("github.com"),
+            targetPackage = "com.android.chrome"
+        )
+        assertEquals(1, githubMatches.size)
+        assertEquals("GitHub", githubMatches.first().title)
+
+        // Unknown site fallback offers credential items only (strictly excludes NOTE items)
+        val unknownMatches = PureLockAutofillService.selectAutofillCandidates(
+            vaultItems = vault,
+            webDomains = setOf("unknownsite.org"),
+            targetPackage = "com.example.other"
+        )
+        assertEquals(2, unknownMatches.size)
+        assertTrue(unknownMatches.none { it.category == "NOTE" })
     }
 }

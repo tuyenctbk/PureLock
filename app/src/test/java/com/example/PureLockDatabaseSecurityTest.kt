@@ -109,6 +109,38 @@ class PureLockDatabaseSecurityTest {
     }
 
     @Test
+    fun `database key manager refuses to overwrite existing wrapped key on transient decrypt failure`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = context.getSharedPreferences("test_key_no_overwrite", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+        val workingWrapper = SoftwareAesGcmKeyWrapper()
+
+        val originalKey = DatabaseKeyManager.getOrCreatePassphrase(prefs, workingWrapper)
+        val originalCipher = prefs.getString(DatabaseKeyManager.WRAPPED_KEY_CIPHER_ALIAS, null)
+        val originalIv = prefs.getString(DatabaseKeyManager.WRAPPED_KEY_IV_ALIAS, null)
+
+        val failingWrapper = object : PassphraseKeyWrapper {
+            override fun encrypt(plainBytes: ByteArray): Pair<String, String>? = workingWrapper.encrypt(plainBytes)
+            override fun decrypt(cipherBase64: String, ivBase64: String): ByteArray? = null
+        }
+
+        var threw = false
+        try {
+            DatabaseKeyManager.getOrCreatePassphrase(prefs, failingWrapper)
+        } catch (_: IllegalStateException) {
+            threw = true
+        }
+
+        assertTrue("Expected IllegalStateException when unwrap fails for existing wrapped key", threw)
+        assertEquals(originalCipher, prefs.getString(DatabaseKeyManager.WRAPPED_KEY_CIPHER_ALIAS, null))
+        assertEquals(originalIv, prefs.getString(DatabaseKeyManager.WRAPPED_KEY_IV_ALIAS, null))
+
+        // Recovery succeeds cleanly once Keystore becomes available again
+        val recoveredKey = DatabaseKeyManager.getOrCreatePassphrase(prefs, workingWrapper)
+        assertArrayEquals(originalKey, recoveredKey)
+    }
+
+    @Test
     fun `sqlcipher header detector distinguishes plaintext sqlite from encrypted salt header`() {
         val plaintextHeader = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
         assertFalse(PureLockDatabase.isSqlCipherHeaderEncrypted(plaintextHeader))
